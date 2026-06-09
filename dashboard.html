@@ -51,13 +51,13 @@ body{font-family:var(--font);background:var(--bg);color:var(--text-1);min-height
 .theme-btn svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
 
 /* TOPBAR */
-.topbar{position:fixed;top:0;left:var(--sidebar);right:0;height:var(--topbar);background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 18px;z-index:90;gap:10px;transition:background .2s;}
+.topbar{position:fixed;top:0;left:var(--sidebar);right:0;height:var(--topbar);background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 18px;z-index:90;gap:10px;transition:background .2s,left .25s;}
 .tb-left{display:flex;align-items:center;gap:10px;min-width:0;}
 .hamburger{display:none;background:none;border:none;cursor:pointer;padding:4px;flex-shrink:0;}
 .hamburger svg{width:18px;height:18px;stroke:var(--text-2);fill:none;stroke-width:2;stroke-linecap:round;}
 .page-title{font-size:14px;font-weight:600;color:var(--text-1);white-space:nowrap;}
 .period-badge{font-size:11px;color:var(--text-3);background:var(--surface-2);border:1px solid var(--border);border-radius:20px;padding:2px 9px;white-space:nowrap;flex-shrink:0;}
-.tb-right{display:flex;align-items:center;gap:6px;flex-shrink:0;}
+.tb-right{display:flex;align-items:center;gap:6px;flex-shrink:0;flex-wrap:wrap;}
 
 /* FILTER CONTROLS */
 .filter-group{display:flex;border:1px solid var(--border);border-radius:7px;overflow:hidden;background:var(--surface-2);}
@@ -74,7 +74,7 @@ select.month-sel option{background:var(--surface);}
 .btn-exp:hover{background:var(--border);}
 
 /* MAIN */
-.main{margin-left:var(--sidebar);margin-top:var(--topbar);padding:18px;min-height:calc(100vh - var(--topbar));}
+.main{margin-left:var(--sidebar);margin-top:var(--topbar);padding:18px;min-height:calc(100vh - var(--topbar));transition:margin-left .25s;}
 
 /* KPI */
 .kpi-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-bottom:16px;}
@@ -166,8 +166,11 @@ tbody td:first-child{color:var(--text-1);font-weight:500;text-align:left;}
 .eg{background:var(--green-lt);color:var(--green);}
 .eo{background:var(--amber-lt);color:var(--amber);}
 .er{background:var(--red-lt);color:var(--red);}
-.warn-row{background:var(--amber-lt)!important;}
-[data-theme="dark"] .warn-row{background:#2d1f06!important;}
+.warn-row td{background:var(--amber-lt)!important;}
+[data-theme="dark"] .warn-row td{background:#2d1f06!important;}
+
+/* EMPTY STATE */
+.empty-state{padding:32px;text-align:center;color:var(--text-3);font-size:12px;}
 
 /* LOADING */
 .loading{display:flex;align-items:center;justify-content:center;padding:48px;flex-direction:column;gap:10px;}
@@ -176,7 +179,7 @@ tbody td:first-child{color:var(--text-1);font-weight:500;text-align:left;}
 .load-txt{font-size:11px;color:var(--text-3);}
 
 /* TOOLTIP */
-.tip{position:fixed;background:var(--text-1);color:var(--surface);font-size:11px;padding:5px 9px;border-radius:6px;pointer-events:none;z-index:999;display:none;max-width:180px;line-height:1.4;}
+.tip{position:fixed;background:var(--text-1);color:var(--surface);font-size:11px;padding:5px 9px;border-radius:6px;pointer-events:none;z-index:999;display:none;max-width:200px;line-height:1.4;word-break:break-word;}
 
 /* OVERLAY */
 .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:99;}
@@ -207,7 +210,10 @@ tbody td:first-child{color:var(--text-1);font-weight:500;text-align:left;}
 </head>
 <body>
 
-<script>var GAS_URL="https://script.google.com/macros/s/AKfycbywIW79lgCQOvlqUX0XuIsKk8A4NPGMnHx0shd573HZ-VXzjnijSuzSQ4PnpYf4zHKE/exec";</script>
+<script>
+  // ── CONFIGURATION — ganti URL ini dengan GAS Web App URL Anda
+  var GAS_URL = "https://script.google.com/macros/s/AKfycbywIW79lgCQOvlqUX0XuIsKk8A4NPGMnHx0shd573HZ-VXzjnijSuzSQ4PnpYf4zHKE/exec";
+</script>
 
 <!-- SIDEBAR -->
 <aside class="sidebar" id="sidebar">
@@ -258,21 +264,28 @@ tbody td:first-child{color:var(--text-1);font-weight:500;text-align:left;}
   </div>
   <div class="tb-right">
     <div class="filter-group">
-      <button class="flt-btn" id="btnDay" onclick="setRange('day')">Day</button>
-      <button class="flt-btn" id="btnWeek" onclick="setRange('week')">Week</button>
-      <button class="flt-btn active" id="btnMonth" onclick="setRange('month')">Month</button>
+      <button class="flt-btn" id="btnDay"    onclick="setRange('day')">Day</button>
+      <button class="flt-btn" id="btnWeek"   onclick="setRange('week')">Week</button>
+      <button class="flt-btn active" id="btnMonth"  onclick="setRange('month')">Month</button>
+      <button class="flt-btn" id="btnCustom" onclick="setRange('custom')">Custom</button>
     </div>
+    <!-- Month selector -->
     <div class="date-wrap" id="wrapMonth">
-      <select class="month-sel" id="monthSel" onchange="loadMonth(this.value)"><option>Loading…</option></select>
+      <select class="month-sel" id="monthSel" onchange="onMonthSelChange(this.value)"><option>Loading…</option></select>
     </div>
+    <!-- Custom date range -->
     <div class="date-wrap" id="wrapCustom" style="display:none">
       <input type="date" class="d-inp" id="dateFrom">
       <span style="font-size:10px;color:var(--text-3)">–</span>
       <input type="date" class="d-inp" id="dateTo">
-      <button class="btn-apply" onclick="applyRange()">Apply</button>
+      <button class="btn-apply" onclick="applyCustomRange()">Apply</button>
     </div>
-    <button class="btn-exp" onclick="exportPDF()"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>PDF</button>
-    <button class="btn-exp" onclick="exportCSV()"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>CSV</button>
+    <button class="btn-exp" onclick="exportPDF()">
+      <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>PDF
+    </button>
+    <button class="btn-exp" onclick="exportCSV()">
+      <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>CSV
+    </button>
   </div>
 </header>
 
@@ -338,7 +351,7 @@ tbody td:first-child{color:var(--text-1);font-weight:500;text-align:left;}
           <div class="c-sub">Ordered per shift this period</div>
           <div class="shift-tog">
             <button class="s-tog on" id="togS" onclick="switchShift('snack')">Snack</button>
-            <button class="s-tog" id="togM" onclick="switchShift('meal')">Meal</button>
+            <button class="s-tog"    id="togM" onclick="switchShift('meal')">Meal</button>
           </div>
           <div id="shiftBars"></div>
           <div style="margin-top:16px">
@@ -395,353 +408,653 @@ tbody td:first-child{color:var(--text-1);font-weight:500;text-align:left;}
 <div class="tip" id="tip"></div>
 
 <script>
-var D=null, selMonth='', rangeMode='month', shiftMode='snack', isDark=false;
-var tChart=null, dChart=null, mChart=null;
+// ═══════════════════════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════════════════════
+var D          = null;          // raw API response
+var selMonth   = '';            // currently loaded month (yyyy-MM)
+var rangeMode  = 'month';       // day | week | month | custom
+var shiftMode  = 'snack';
+var isDark     = false;
+var filteredRows = [];          // currently displayed rows (after filter)
+var filteredLabel = '';
 
-// ── INIT
-window.onload=function(){
-  if(window.matchMedia('(prefers-color-scheme: dark)').matches) toggleTheme();
-  if(!GAS_URL||GAS_URL==='YOUR_GAS_WEB_APP_URL_HERE'){
-    document.getElementById('loader').innerHTML='<div style="color:var(--red);font-size:12px;text-align:center;padding:32px;line-height:1.8">⚠️ GAS URL not configured.<br>Replace <code style="background:var(--surface-2);padding:1px 5px;border-radius:3px">YOUR_GAS_WEB_APP_URL_HERE</code> in dashboard.html</div>';
+var tChart = null;
+var dChart = null;
+var mChart = null;
+
+// ═══════════════════════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════════════════════
+window.onload = function() {
+  if (window.matchMedia('(prefers-color-scheme: dark)').matches) toggleTheme();
+
+  if (!GAS_URL || GAS_URL === 'YOUR_GAS_WEB_APP_URL_HERE') {
+    showError('⚠️ GAS URL not configured.<br>Set <code>GAS_URL</code> at the top of dashboard.html.');
     return;
   }
-  var now=new Date();
-  selMonth=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0');
+
+  // Set default custom-date inputs to current month range
+  var now = new Date();
+  var y = now.getFullYear(), m = String(now.getMonth() + 1).padStart(2, '0');
+  var lastDay = new Date(y, now.getMonth() + 1, 0).getDate();
+  document.getElementById('dateFrom').value = y + '-' + m + '-01';
+  document.getElementById('dateTo').value   = y + '-' + m + '-' + String(lastDay).padStart(2, '0');
+
+  selMonth = y + '-' + m;
   loadMonth(selMonth);
 };
 
-// ── SIDEBAR
-function openSb(){document.getElementById('sidebar').classList.add('open');document.getElementById('overlay').classList.add('show');}
-function closeSb(){document.getElementById('sidebar').classList.remove('open');document.getElementById('overlay').classList.remove('show');}
+// ═══════════════════════════════════════════════════════════════
+//  SIDEBAR
+// ═══════════════════════════════════════════════════════════════
+function openSb()  { document.getElementById('sidebar').classList.add('open');    document.getElementById('overlay').classList.add('show'); }
+function closeSb() { document.getElementById('sidebar').classList.remove('open'); document.getElementById('overlay').classList.remove('show'); }
 
-// ── NAV
-function navTo(id,btn){
-  var el=document.getElementById(id); if(!el) return;
-  document.querySelectorAll('.nav-item').forEach(function(b){b.classList.remove('active');});
-  if(btn) btn.classList.add('active');
-  var top=el.getBoundingClientRect().top+window.pageYOffset-60;
-  window.scrollTo({top:top,behavior:'smooth'});
+// ═══════════════════════════════════════════════════════════════
+//  NAVIGATION
+// ═══════════════════════════════════════════════════════════════
+function navTo(id, btn) {
+  var el = document.getElementById(id);
+  if (!el) return;
+  document.querySelectorAll('.nav-item').forEach(function(b) { b.classList.remove('active'); });
+  if (btn) btn.classList.add('active');
+  var topbarH = document.querySelector('.topbar').offsetHeight || 52;
+  var top = el.getBoundingClientRect().top + window.pageYOffset - topbarH - 8;
+  window.scrollTo({ top: top, behavior: 'smooth' });
   closeSb();
 }
 
-// ── THEME
-function toggleTheme(){
-  isDark=!isDark;
-  document.documentElement.setAttribute('data-theme',isDark?'dark':'light');
-  document.getElementById('themeLbl').textContent=isDark?'Dark mode':'Light mode';
+// ═══════════════════════════════════════════════════════════════
+//  THEME
+// ═══════════════════════════════════════════════════════════════
+function toggleTheme() {
+  isDark = !isDark;
+  document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+  document.getElementById('themeLbl').textContent = isDark ? 'Dark mode' : 'Light mode';
   updateChartColors();
+  // Re-render heatmap so colors adapt
+  if (filteredRows.length) {
+    var thr = (D && D.config && D.config.threshold) ? D.config.threshold : 15;
+    renderHeatmap(filteredRows, thr);
+  }
 }
-function gc(){return{grid:isDark?'#30363d':'#f1f5f9',txt:isDark?'#8b949e':'#94a3b8'};}
-function updateChartColors(){
-  [tChart,dChart,mChart].forEach(function(ch){
-    if(!ch)return;
-    var c=gc();
-    if(ch.options.scales) Object.keys(ch.options.scales).forEach(function(k){
-      if(ch.options.scales[k].grid) ch.options.scales[k].grid.color=c.grid;
-      if(ch.options.scales[k].ticks) ch.options.scales[k].ticks.color=c.txt;
-    });
+
+function gc() {
+  return {
+    grid: isDark ? '#30363d' : '#f1f5f9',
+    txt:  isDark ? '#8b949e' : '#94a3b8'
+  };
+}
+
+function updateChartColors() {
+  [tChart, dChart, mChart].forEach(function(ch) {
+    if (!ch) return;
+    var c = gc();
+    if (ch.options.scales) {
+      Object.keys(ch.options.scales).forEach(function(k) {
+        if (ch.options.scales[k].grid)  ch.options.scales[k].grid.color  = c.grid;
+        if (ch.options.scales[k].ticks) ch.options.scales[k].ticks.color = c.txt;
+      });
+    }
     ch.update();
   });
 }
 
-// ── RANGE FILTER
-function setRange(mode){
-  rangeMode=mode;
-  ['btnDay','btnWeek','btnMonth'].forEach(function(id){
-    var el=document.getElementById(id); if(el) el.classList.remove('active');
+// ═══════════════════════════════════════════════════════════════
+//  RANGE FILTER
+// ═══════════════════════════════════════════════════════════════
+function setRange(mode) {
+  rangeMode = mode;
+  ['btnDay','btnWeek','btnMonth','btnCustom'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) el.classList.remove('active');
   });
-  var map={day:'btnDay',week:'btnWeek',month:'btnMonth'};
-  var btn=document.getElementById(map[mode]); if(btn) btn.classList.add('active');
-  document.getElementById('wrapMonth').style.display  =(mode==='month')?'':'none';
-  document.getElementById('wrapCustom').style.display =(mode!=='month')?'':'none';
-  if(D) applyRangeFilter();
+  var map = { day:'btnDay', week:'btnWeek', month:'btnMonth', custom:'btnCustom' };
+  var btn = document.getElementById(map[mode]);
+  if (btn) btn.classList.add('active');
+
+  document.getElementById('wrapMonth').style.display  = (mode === 'month')  ? '' : 'none';
+  document.getElementById('wrapCustom').style.display = (mode === 'custom') ? '' : 'none';
+
+  if (mode !== 'custom' && D) applyRangeFilter();
 }
 
-function applyRangeFilter(){
-  if(!D) return;
-  var rows=D.allRows, label=D.selectedMonth;
-  var now=new Date();
+function applyRangeFilter() {
+  if (!D || !D.allRows) return;
+  var rows  = D.allRows;
+  var label = D.selectedMonth || selMonth;
+  var now   = new Date();
 
-  if(rangeMode==='day'){
-    var todayStr=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0');
-    rows=D.allRows.filter(function(r){ return r.rawDate===todayStr; });
-    label='Today — '+now.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
-    if(!rows.length) rows=D.allRows.slice(-1); // fallback: last entry
-  } else if(rangeMode==='week'){
-    var weekAgo=new Date(now); weekAgo.setDate(weekAgo.getDate()-6);
-    var weekStr=weekAgo.getFullYear()+'-'+String(weekAgo.getMonth()+1).padStart(2,'0')+'-'+String(weekAgo.getDate()).padStart(2,'0');
-    rows=D.allRows.filter(function(r){ return r.rawDate>=weekStr; });
-    if(!rows.length) rows=D.allRows.slice(-7); // fallback
-    label='Last 7 days';
+  if (rangeMode === 'day') {
+    var todayStr = toYMD(now);
+    var filtered = rows.filter(function(r) { return r.rawDate === todayStr; });
+    // Fallback: use the most recent entry if today has no data
+    if (!filtered.length && rows.length) filtered = [rows[rows.length - 1]];
+    rows  = filtered;
+    label = 'Today — ' + now.toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' });
+
+  } else if (rangeMode === 'week') {
+    var weekAgo    = new Date(now);
+    weekAgo.setDate(weekAgo.getDate() - 6);
+    var weekAgoStr = toYMD(weekAgo);
+    var filtered   = rows.filter(function(r) { return r.rawDate >= weekAgoStr; });
+    // Fallback: last 7 entries
+    if (!filtered.length && rows.length) filtered = rows.slice(-7);
+    rows  = filtered;
+    label = 'Last 7 days';
   }
-  renderAll(rows,label);
+  // month: use all rows already loaded for that month
+
+  filteredRows  = rows;
+  filteredLabel = label;
+  renderAll(rows, label);
 }
 
-function applyRange(){
-  var from=document.getElementById('dateFrom').value;
-  var to=document.getElementById('dateTo').value;
-  if(!from||!to||!D) return;
-  var rows=D.allRows.filter(function(r){ return r.rawDate&&r.rawDate>=from&&r.rawDate<=to; });
-  if(!rows.length){alert('No data found for this date range.');return;}
-  var fmt=function(s){return new Date(s).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});};
-  renderAll(rows,fmt(from)+' – '+fmt(to));
+// Custom range (explicit Apply click)
+function applyCustomRange() {
+  var from = document.getElementById('dateFrom').value;
+  var to   = document.getElementById('dateTo').value;
+  if (!from || !to) { alert('Please select both start and end dates.'); return; }
+  if (from > to)    { alert('Start date must be before end date.'); return; }
+  if (!D || !D.allRows) { alert('No data loaded yet.'); return; }
+
+  // We may need to reload if the range spans months not in current D.allRows
+  var fromMonth = from.substring(0, 7);
+  var toMonth   = to.substring(0, 7);
+
+  if (fromMonth === toMonth && fromMonth === selMonth) {
+    // Same month as already loaded — just filter in memory
+    _applyCustomFilter(from, to);
+  } else {
+    // Different month — need to load all data for a broader range
+    // Strategy: load "all" months and filter (GAS endpoint only supports one month at a time,
+    // so we load the from-month and filter; multi-month range shows a notice)
+    if (fromMonth !== toMonth) {
+      alert('Note: Cross-month ranges filter from already-loaded data.\nFor full cross-month reports, select each month individually.');
+    }
+    // Load the from-month first then filter
+    selMonth = fromMonth;
+    var sel = document.getElementById('monthSel');
+    for (var i = 0; i < sel.options.length; i++) {
+      if (sel.options[i].value === fromMonth) { sel.selectedIndex = i; break; }
+    }
+    loadMonth(fromMonth, function() { _applyCustomFilter(from, to); });
+  }
 }
 
-// ── LOAD
-function loadMonth(m){
-  selMonth=m;
-  document.getElementById('loader').style.display='flex';
-  document.getElementById('dash').style.display='none';
-  fetch(GAS_URL+'?action=dashboard&month='+m,{redirect:'follow'})
-    .then(function(r){return r.json();})
-    .then(function(data){
-      if(!data.success) throw new Error(data.message);
-      D=data; D.allRows=D.chartData||[];
-      fillMonthSel(data.availableMonths);
-      document.getElementById('loader').style.display='none';
-      document.getElementById('dash').style.display='';
-      renderAll(D.allRows,data.selectedMonth);
+function _applyCustomFilter(from, to) {
+  if (!D || !D.allRows) return;
+  var rows = D.allRows.filter(function(r) { return r.rawDate && r.rawDate >= from && r.rawDate <= to; });
+  if (!rows.length) { alert('No data found for this date range.'); return; }
+  var fmt = function(s) {
+    var d = new Date(s + 'T00:00:00');
+    return d.toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' });
+  };
+  var label = fmt(from) + ' – ' + fmt(to);
+  filteredRows  = rows;
+  filteredLabel = label;
+  renderAll(rows, label);
+}
+
+function onMonthSelChange(val) {
+  if (val !== selMonth) {
+    selMonth = val;
+    loadMonth(val);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  LOAD FROM API
+// ═══════════════════════════════════════════════════════════════
+function loadMonth(m, callback) {
+  selMonth = m;
+  document.getElementById('loader').innerHTML = '<div class="spin"></div><span class="load-txt">Loading data…</span>';
+  document.getElementById('loader').style.display = 'flex';
+  document.getElementById('dash').style.display = 'none';
+
+  fetch(GAS_URL + '?action=dashboard&month=' + m, { redirect: 'follow' })
+    .then(function(r) {
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      return r.json();
     })
-    .catch(function(e){
-      document.getElementById('loader').innerHTML='<div style="color:var(--red);font-size:12px;text-align:center;padding:32px">Cannot reach GAS API.<br><small style="color:var(--text-3)">'+e.message+'</small></div>';
+    .then(function(data) {
+      if (!data.success) throw new Error(data.message || 'API returned success=false');
+      D = data;
+      D.allRows = data.chartData || [];
+      fillMonthSel(data.availableMonths);
+      document.getElementById('loader').style.display = 'none';
+      document.getElementById('dash').style.display = '';
+      // Apply active range filter to freshly-loaded data
+      rangeMode = 'month'; // reset to month after a fresh load
+      ['btnDay','btnWeek','btnMonth','btnCustom'].forEach(function(id) {
+        var el = document.getElementById(id);
+        if (el) el.classList.remove('active');
+      });
+      var btnM = document.getElementById('btnMonth');
+      if (btnM) btnM.classList.add('active');
+      document.getElementById('wrapMonth').style.display  = '';
+      document.getElementById('wrapCustom').style.display = 'none';
+
+      filteredRows  = D.allRows;
+      filteredLabel = data.selectedMonth || m;
+      renderAll(D.allRows, filteredLabel);
+      if (typeof callback === 'function') callback();
+    })
+    .catch(function(e) {
+      showError('Cannot reach GAS API.<br><small style="color:var(--text-3)">' + e.message + '</small>');
     });
 }
 
-// ── RENDER ALL
-function renderAll(rows,label){
-  document.getElementById('periodBadge').textContent=label;
-  document.getElementById('sumPeriod').textContent=label;
-  var k=buildKPI(rows);
-  var thr=(D.config&&D.config.threshold)||15;
-  renderKPI(k);
-  renderRemarks(k,rows,label);
-  renderSummary(k,rows.length);
-  renderTrend(rows);
-  renderDonut(k);
-  renderShiftBars(D.shiftData,shiftMode);
-  renderMonthly(D.monthlyRows);
-  renderHeatmap(rows,thr);
-  renderTable(rows,thr);
-  renderHistory(D.monthlyRows);
+function showError(html) {
+  document.getElementById('loader').innerHTML =
+    '<div style="color:var(--red);font-size:12px;text-align:center;padding:32px;line-height:1.8">' + html + '</div>';
+  document.getElementById('loader').style.display = 'flex';
+  document.getElementById('dash').style.display = 'none';
 }
 
-// ── HELPERS
-function n(v){return Number(v)||0;}
-function f(v){return Number(v||0).toLocaleString();}
-function set(id,v){var el=document.getElementById(id);if(el)el.textContent=v;}
-function eb(v){var c=v>=98?'eg':v>=95?'eo':'er';return '<span class="eb '+c+'">'+v+'%</span>';}
+// ═══════════════════════════════════════════════════════════════
+//  RENDER ALL
+// ═══════════════════════════════════════════════════════════════
+function renderAll(rows, label) {
+  document.getElementById('periodBadge').textContent = label || '—';
+  document.getElementById('sumPeriod').textContent   = label || '—';
 
-function buildKPI(rows){
-  var a=rows.reduce(function(acc,r){
-    acc.tso+=n(r.snackOrder);acc.tsl+=n(r.snackLeftover);acc.tsc+=n(r.snackConsumed);acc.seS+=n(r.snackEff);
-    acc.tmo+=n(r.mealOrder); acc.tml+=n(r.mealLeftover); acc.tmc+=n(r.mealConsumed); acc.meS+=n(r.mealEff);
+  var thr = (D && D.config && D.config.threshold) ? Number(D.config.threshold) : 15;
+  var k   = buildKPI(rows);
+
+  renderKPI(k, rows.length);
+  renderRemarks(k, rows, label);
+  renderSummary(k);
+  renderTrend(rows);
+  renderDonut(k);
+  renderShiftBars(D ? D.shiftData : null, shiftMode);
+  renderMonthly(D ? D.monthlyRows : null);
+  renderHeatmap(rows, thr);
+  renderTable(rows, thr);
+  renderHistory(D ? D.monthlyRows : null);
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  HELPERS
+// ═══════════════════════════════════════════════════════════════
+function n(v)   { return Number(v) || 0; }
+function f(v)   { return Number(v || 0).toLocaleString(); }
+function set(id, v) { var el = document.getElementById(id); if (el) el.textContent = v; }
+function toYMD(d) {
+  return d.getFullYear() + '-' +
+    String(d.getMonth() + 1).padStart(2, '0') + '-' +
+    String(d.getDate()).padStart(2, '0');
+}
+function eb(v) {
+  var val = parseFloat(v) || 0;
+  var cls = val >= 98 ? 'eg' : val >= 95 ? 'eo' : 'er';
+  return '<span class="eb ' + cls + '">' + val.toFixed(1) + '%</span>';
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  KPI
+// ═══════════════════════════════════════════════════════════════
+function buildKPI(rows) {
+  var a = rows.reduce(function(acc, r) {
+    acc.tso += n(r.snackOrder);    acc.tsl += n(r.snackLeftover); acc.tsc += n(r.snackConsumed); acc.seS += n(r.snackEff);
+    acc.tmo += n(r.mealOrder);     acc.tml += n(r.mealLeftover);  acc.tmc += n(r.mealConsumed);  acc.meS += n(r.mealEff);
     return acc;
-  },{tso:0,tsl:0,tsc:0,tmo:0,tml:0,tmc:0,seS:0,meS:0});
-  var d=rows.length||1;
-  return{
-    days:rows.length,
-    totalSnackOrder:a.tso,totalSnackConsumed:a.tsc,totalSnackLeftover:a.tsl,
-    totalMealOrder:a.tmo,totalMealConsumed:a.tmc,totalMealLeftover:a.tml,
-    snackEff:rows.length?Math.round(a.seS/d*100)/100:0,
-    mealEff:rows.length?Math.round(a.meS/d*100)/100:0,
-    avgSO:Math.round(a.tso/d),avgMO:Math.round(a.tmo/d)
+  }, { tso:0, tsl:0, tsc:0, tmo:0, tml:0, tmc:0, seS:0, meS:0 });
+
+  var d = rows.length || 1;
+  return {
+    days:              rows.length,
+    totalSnackOrder:   a.tso, totalSnackConsumed: a.tsc, totalSnackLeftover: a.tsl,
+    totalMealOrder:    a.tmo, totalMealConsumed:  a.tmc, totalMealLeftover:  a.tml,
+    snackEff:          rows.length ? Math.round(a.seS / d * 100) / 100 : 0,
+    mealEff:           rows.length ? Math.round(a.meS / d * 100) / 100 : 0,
+    avgSO:             Math.round(a.tso / d),
+    avgMO:             Math.round(a.tmo / d)
   };
 }
 
-// ── KPI
-function renderKPI(k){
-  var avg=Math.round((k.snackEff+k.mealEff)/2*10)/10;
-  var ec=avg>=98?'#1a6b3f':avg>=95?'#002366':avg>=90?'#b45309':'#b91c1c';
-  document.getElementById('kpiGrid').innerHTML=[
-    {l:'Total Ordered',   v:f(k.totalSnackOrder+k.totalMealOrder),     s:'Snack + Meal', a:'#002366'},
-    {l:'Total Consumed',  v:f(k.totalSnackConsumed+k.totalMealConsumed),s:'Snack + Meal', a:'#1a6b3f'},
-    {l:'Total Leftover',  v:f(k.totalSnackLeftover+k.totalMealLeftover),s:'Snack + Meal', a:'#b45309'},
-    {l:'Snack Efficiency',v:k.snackEff+'%',                            s:'Period avg',   a:'#1a6b3f'},
-    {l:'Meal Efficiency', v:k.mealEff+'%',                             s:'Period avg',   a:'#002366'},
-    {l:'Overall Eff.',    v:avg+'%',                                   s:k.days+' days', a:ec}
-  ].map(function(c){
-    return '<div class="kpi-card">'+
-      '<div class="kpi-accent" style="background:'+c.a+'"></div>'+
-      '<div class="kpi-lbl">'+c.l+'</div>'+
-      '<div class="kpi-val">'+c.v+'</div>'+
-      '<div class="kpi-sub">'+c.s+'</div></div>';
+function renderKPI(k) {
+  var avg = Math.round((k.snackEff + k.mealEff) / 2 * 10) / 10;
+  var ec  = avg >= 98 ? '#1a6b3f' : avg >= 95 ? '#002366' : avg >= 90 ? '#b45309' : '#b91c1c';
+  document.getElementById('kpiGrid').innerHTML = [
+    { l:'Total Ordered',    v:f(k.totalSnackOrder + k.totalMealOrder),      s:'Snack + Meal', a:'#002366' },
+    { l:'Total Consumed',   v:f(k.totalSnackConsumed + k.totalMealConsumed),s:'Snack + Meal', a:'#1a6b3f' },
+    { l:'Total Leftover',   v:f(k.totalSnackLeftover + k.totalMealLeftover),s:'Snack + Meal', a:'#b45309' },
+    { l:'Snack Efficiency', v:k.snackEff + '%',                             s:'Period avg',   a:'#1a6b3f' },
+    { l:'Meal Efficiency',  v:k.mealEff  + '%',                             s:'Period avg',   a:'#002366' },
+    { l:'Overall Eff.',     v:avg + '%',                                    s:k.days + ' days', a:ec       }
+  ].map(function(c) {
+    return '<div class="kpi-card">' +
+      '<div class="kpi-accent" style="background:' + c.a + '"></div>' +
+      '<div class="kpi-lbl">' + c.l + '</div>' +
+      '<div class="kpi-val">' + c.v + '</div>' +
+      '<div class="kpi-sub">' + c.s + '</div></div>';
   }).join('');
 }
 
-// ── REMARKS
-function renderRemarks(k,rows,label){
-  var avg=Math.round((k.snackEff+k.mealEff)/2*10)/10;
-  var peak=0,peakDate='—';
-  rows.forEach(function(r){var v=n(r.snackLeftover)+n(r.mealLeftover);if(v>peak){peak=v;peakDate=r.date;}});
-  var v=avg>=98?'Excellent — minimal waste.':avg>=95?'Normal — within target range.':avg>=90?'Needs attention — leftover above average.':'Poor — immediate review recommended.';
-  set('remTxt',label+': Overall efficiency '+avg+'% (Snack '+k.snackEff+'% / Meal '+k.mealEff+'%). Peak leftover on '+peakDate+' ('+f(peak)+' portions). '+v);
+// ═══════════════════════════════════════════════════════════════
+//  REMARKS
+// ═══════════════════════════════════════════════════════════════
+function renderRemarks(k, rows, label) {
+  var avg = Math.round((k.snackEff + k.mealEff) / 2 * 10) / 10;
+  var peak = 0, peakDate = '—';
+  rows.forEach(function(r) {
+    var v = n(r.snackLeftover) + n(r.mealLeftover);
+    if (v > peak) { peak = v; peakDate = r.date || '—'; }
+  });
+  var verdict = avg >= 98 ? 'Excellent — minimal waste.' :
+                avg >= 95 ? 'Normal — within target range.' :
+                avg >= 90 ? 'Needs attention — leftover above average.' :
+                            'Poor — immediate review recommended.';
+  set('remTxt',
+    (label || '—') + ': Overall efficiency ' + avg + '% ' +
+    '(Snack ' + k.snackEff + '% / Meal ' + k.mealEff + '%). ' +
+    'Peak leftover on ' + peakDate + ' (' + f(peak) + ' portions). ' + verdict
+  );
 }
 
-// ── SUMMARY
-function renderSummary(k,days){
-  set('s-ord',f(k.totalSnackOrder));set('s-con',f(k.totalSnackConsumed));
-  set('s-lft',f(k.totalSnackLeftover));set('s-avg',f(k.avgSO)+' / day');
-  set('m-ord',f(k.totalMealOrder)); set('m-con',f(k.totalMealConsumed));
-  set('m-lft',f(k.totalMealLeftover));set('m-avg',f(k.avgMO)+' / day');
+// ═══════════════════════════════════════════════════════════════
+//  SUMMARY
+// ═══════════════════════════════════════════════════════════════
+function renderSummary(k) {
+  set('s-ord', f(k.totalSnackOrder));    set('s-con', f(k.totalSnackConsumed));
+  set('s-lft', f(k.totalSnackLeftover)); set('s-avg', f(k.avgSO) + ' / day');
+  set('m-ord', f(k.totalMealOrder));     set('m-con', f(k.totalMealConsumed));
+  set('m-lft', f(k.totalMealLeftover));  set('m-avg', f(k.avgMO) + ' / day');
 }
 
-// ── TREND CHART
-function renderTrend(rows){
-  if(tChart) tChart.destroy();
-  var c=gc(), ctx=document.getElementById('trendChart').getContext('2d');
-  tChart=new Chart(ctx,{
-    type:'line',
-    data:{
-      labels:rows.map(function(r){return r.date;}),
-      datasets:[
-        {label:'Meal Ordered',  data:rows.map(function(r){return r.mealOrder;}),   borderColor:'#002366',backgroundColor:'transparent',borderWidth:2,pointRadius:2,tension:.3},
-        {label:'Meal Consumed', data:rows.map(function(r){return r.mealConsumed;}),borderColor:'#93c5fd',backgroundColor:'transparent',borderWidth:1.5,borderDash:[4,3],pointRadius:0,tension:.3},
-        {label:'Snack Ordered', data:rows.map(function(r){return r.snackOrder;}),  borderColor:'#1a6b3f',backgroundColor:'transparent',borderWidth:2,pointRadius:2,tension:.3},
-        {label:'Snack Consumed',data:rows.map(function(r){return r.snackConsumed;}),borderColor:'#86efac',backgroundColor:'transparent',borderWidth:1.5,borderDash:[4,3],pointRadius:0,tension:.3}
+// ═══════════════════════════════════════════════════════════════
+//  TREND CHART
+// ═══════════════════════════════════════════════════════════════
+function renderTrend(rows) {
+  if (tChart) { tChart.destroy(); tChart = null; }
+  if (!rows.length) return;
+  var c   = gc();
+  var ctx = document.getElementById('trendChart').getContext('2d');
+  tChart  = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: rows.map(function(r) { return r.date; }),
+      datasets: [
+        { label:'Meal Ordered',   data:rows.map(function(r){ return n(r.mealOrder); }),   borderColor:'#002366', backgroundColor:'transparent', borderWidth:2,   pointRadius:2, tension:.3 },
+        { label:'Meal Consumed',  data:rows.map(function(r){ return n(r.mealConsumed); }),borderColor:'#93c5fd', backgroundColor:'transparent', borderWidth:1.5, borderDash:[4,3], pointRadius:0, tension:.3 },
+        { label:'Snack Ordered',  data:rows.map(function(r){ return n(r.snackOrder); }),  borderColor:'#1a6b3f', backgroundColor:'transparent', borderWidth:2,   pointRadius:2, tension:.3 },
+        { label:'Snack Consumed', data:rows.map(function(r){ return n(r.snackConsumed);}),borderColor:'#86efac', backgroundColor:'transparent', borderWidth:1.5, borderDash:[4,3], pointRadius:0, tension:.3 }
       ]
     },
-    options:{
-      responsive:true,maintainAspectRatio:true,animation:{duration:500},
-      plugins:{legend:{display:false},tooltip:{callbacks:{label:function(ctx){return ctx.dataset.label+': '+ctx.raw.toLocaleString();}}}},
-      scales:{
-        x:{grid:{color:c.grid},ticks:{color:c.txt,font:{size:9},maxTicksLimit:12}},
-        y:{grid:{color:c.grid},ticks:{color:c.txt,font:{size:9},callback:function(v){return v.toLocaleString();}}}
+    options: {
+      responsive:true, maintainAspectRatio:true, animation:{ duration:400 },
+      plugins: {
+        legend: { display:false },
+        tooltip: { callbacks: { label:function(ctx){ return ctx.dataset.label + ': ' + n(ctx.raw).toLocaleString(); } } }
+      },
+      scales: {
+        x: { grid:{ color:c.grid }, ticks:{ color:c.txt, font:{ size:9 }, maxTicksLimit:14 } },
+        y: { grid:{ color:c.grid }, ticks:{ color:c.txt, font:{ size:9 }, callback:function(v){ return v.toLocaleString(); } }, beginAtZero:true }
       }
     }
   });
 }
 
-// ── DONUT
-function renderDonut(k){
-  if(dChart) dChart.destroy();
-  var ctx=document.getElementById('donutChart').getContext('2d');
-  dChart=new Chart(ctx,{
-    type:'doughnut',
-    data:{
-      labels:['Snack Consumed','Snack Leftover','Meal Consumed','Meal Leftover'],
-      datasets:[{data:[k.snackEff,100-k.snackEff,k.mealEff,100-k.mealEff],backgroundColor:['#1a6b3f','#e6f4ed','#002366','#e8edf7'],borderWidth:0,cutout:'65%'}]
+// ═══════════════════════════════════════════════════════════════
+//  DONUT
+// ═══════════════════════════════════════════════════════════════
+function renderDonut(k) {
+  if (dChart) { dChart.destroy(); dChart = null; }
+  var ctx = document.getElementById('donutChart').getContext('2d');
+  var sLft = Math.max(0, 100 - k.snackEff);
+  var mLft = Math.max(0, 100 - k.mealEff);
+  dChart = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: ['Snack Consumed', 'Snack Leftover', 'Meal Consumed', 'Meal Leftover'],
+      datasets: [{
+        data: [k.snackEff, sLft, k.mealEff, mLft],
+        backgroundColor: ['#1a6b3f', '#e6f4ed', '#002366', '#e8edf7'],
+        borderWidth: 0,
+        cutout: '65%'
+      }]
     },
-    options:{
-      responsive:true,maintainAspectRatio:true,animation:{duration:500},
-      plugins:{legend:{position:'bottom',labels:{font:{size:10},boxWidth:10,padding:10}},tooltip:{callbacks:{label:function(ctx){return ctx.label+': '+ctx.raw.toFixed(1)+'%';}}}}
-    }
-  });
-}
-
-// ── SHIFT BARS
-function switchShift(m){
-  shiftMode=m;
-  document.getElementById('togS').className='s-tog'+(m==='snack'?' on':'');
-  document.getElementById('togM').className='s-tog'+(m==='meal'?' on':'');
-  if(D) renderShiftBars(D.shiftData,m);
-}
-function renderShiftBars(sd,m){
-  if(!sd) return;
-  var s1=m==='snack'?sd.snackS1:sd.mealS1, s2=m==='snack'?sd.snackS2:sd.mealS2, s3=m==='snack'?sd.snackS3:sd.mealS3;
-  var tot=s1+s2+s3||1, col=m==='snack'?'#1a6b3f':'#002366';
-  document.getElementById('shiftBars').innerHTML=
-    [['Shift 1','d1',s1],['Shift 2','d2',s2],['Shift 3','d3',s3]].map(function(sh){
-      var pct=Math.round(sh[2]/tot*1000)/10;
-      return '<div class="eff-row">'+
-        '<div class="eff-top"><span class="eff-lbl"><span class="sdot '+sh[1]+'" style="display:inline-block;margin-right:4px"></span>'+sh[0]+'</span>'+
-        '<span class="eff-val">'+f(sh[2])+' <small style="font-weight:400;color:var(--text-3)">'+pct+'%</small></span></div>'+
-        '<div class="bar-bg"><div class="bar-fill" style="width:'+pct+'%;background:'+col+'"></div></div></div>';
-    }).join('');
-}
-
-// ── MONTHLY CHART
-function renderMonthly(mrows){
-  if(!mrows||!mrows.length) return;
-  if(mChart) mChart.destroy();
-  var c=gc(), ctx=document.getElementById('monthlyChart').getContext('2d');
-  mChart=new Chart(ctx,{
-    type:'bar',
-    data:{
-      labels:mrows.map(function(r){return r.month;}),
-      datasets:[
-        {label:'Snack Eff %',data:mrows.map(function(r){return r.snackEff||0;}),backgroundColor:'#86efac',borderRadius:3},
-        {label:'Meal Eff %', data:mrows.map(function(r){return r.mealEff||0;}), backgroundColor:'#93c5fd',borderRadius:3}
-      ]
-    },
-    options:{
-      responsive:true,maintainAspectRatio:true,animation:{duration:500},
-      plugins:{legend:{labels:{font:{size:9},boxWidth:8,padding:8}}},
-      scales:{
-        x:{grid:{display:false},ticks:{color:c.txt,font:{size:9}}},
-        y:{min:85,max:100,grid:{color:c.grid},ticks:{color:c.txt,font:{size:9},callback:function(v){return v+'%';}}}
+    options: {
+      responsive:true, maintainAspectRatio:true, animation:{ duration:400 },
+      plugins: {
+        legend: { position:'bottom', labels:{ font:{ size:10 }, boxWidth:10, padding:10 } },
+        tooltip: { callbacks: { label:function(ctx){ return ctx.label + ': ' + parseFloat(ctx.raw).toFixed(1) + '%'; } } }
       }
     }
   });
 }
 
-// ── HEATMAP
-function renderHeatmap(rows,thr){
-  var grid=document.getElementById('hmGrid');
-  if(!rows.length){grid.innerHTML='<p style="font-size:11px;color:var(--text-3);padding:12px 0">No data.</p>';return;}
-  var vals=rows.map(function(r){return n(r.snackLeftover)+n(r.mealLeftover);});
-  var maxV=Math.max.apply(null,vals)||1;
-  function hmColor(v){
-    if(v===0) return isDark?'#1c2128':'#f0fdf4';
-    var r=v/maxV;
-    return r<0.3?'#86efac':r<0.6?'#fcd34d':r<0.85?'#fb923c':'#f87171';
+// ═══════════════════════════════════════════════════════════════
+//  SHIFT BARS
+// ═══════════════════════════════════════════════════════════════
+function switchShift(m) {
+  shiftMode = m;
+  document.getElementById('togS').className = 's-tog' + (m === 'snack' ? ' on' : '');
+  document.getElementById('togM').className = 's-tog' + (m === 'meal'  ? ' on' : '');
+  if (D) renderShiftBars(D.shiftData, m);
+}
+
+function renderShiftBars(sd, m) {
+  var el = document.getElementById('shiftBars');
+  if (!sd) {
+    el.innerHTML = '<p style="font-size:11px;color:var(--text-3)">Shift data not available.</p>';
+    return;
   }
-  grid.innerHTML=rows.map(function(r,i){
-    var v=vals[i], col=hmColor(v);
-    var tc=v/maxV>0.5?'#1f2937':'#374151';
-    return '<div class="hm-cell" style="background:'+col+';color:'+tc+'"'+
-      ' onmouseenter="showTip(event,\''+r.date+': '+f(v)+' leftover\')"'+
-      ' onmouseleave="hideTip()">'+r.date.split(' ')[0]+'</div>';
-  }).join('');
-  document.getElementById('hmLegBar').innerHTML=
-    ['#86efac','#fcd34d','#fb923c','#f87171'].map(function(c){return '<div class="hm-sq" style="background:'+c+'"></div>';}).join('');
-}
+  var s1  = n(m === 'snack' ? sd.snackS1 : sd.mealS1);
+  var s2  = n(m === 'snack' ? sd.snackS2 : sd.mealS2);
+  var s3  = n(m === 'snack' ? sd.snackS3 : sd.mealS3);
+  var tot = (s1 + s2 + s3) || 1;
+  var col = m === 'snack' ? '#1a6b3f' : '#002366';
 
-// ── TOOLTIP
-function showTip(e,txt){var t=document.getElementById('tip');t.textContent=txt;t.style.display='block';t.style.left=(e.clientX+12)+'px';t.style.top=(e.clientY-8)+'px';}
-function hideTip(){document.getElementById('tip').style.display='none';}
-
-// ── TABLE
-function renderTable(rows,thr){
-  set('tblCount',rows.length+' entries');
-  document.getElementById('tblBody').innerHTML=rows.map(function(r){
-    var w=(n(r.snackLeftover)+n(r.mealLeftover))>thr?' warn-row':'';
-    return '<tr class="'+w+'"><td>'+r.date+'</td>'+
-      '<td>'+f(r.snackOrder)+'</td><td>'+f(r.snackConsumed)+'</td><td>'+f(r.snackLeftover)+'</td><td>'+eb(r.snackEff)+'</td>'+
-      '<td>'+f(r.mealOrder)+'</td><td>'+f(r.mealConsumed)+'</td><td>'+f(r.mealLeftover)+'</td><td>'+eb(r.mealEff)+'</td></tr>';
+  el.innerHTML = [['Shift 1','d1',s1],['Shift 2','d2',s2],['Shift 3','d3',s3]].map(function(sh) {
+    var pct = Math.round(sh[2] / tot * 1000) / 10;
+    return '<div class="eff-row">' +
+      '<div class="eff-top">' +
+        '<span class="eff-lbl"><span class="sdot ' + sh[1] + '" style="display:inline-block;margin-right:4px"></span>' + sh[0] + '</span>' +
+        '<span class="eff-val">' + f(sh[2]) + ' <small style="font-weight:400;color:var(--text-3)">' + pct + '%</small></span>' +
+      '</div>' +
+      '<div class="bar-bg"><div class="bar-fill" style="width:' + pct + '%;background:' + col + '"></div></div>' +
+    '</div>';
   }).join('');
 }
 
-// ── HISTORY
-function renderHistory(mrows){
-  if(!mrows||!mrows.length) return;
-  document.getElementById('histBody').innerHTML=mrows.map(function(r){
-    return '<tr><td><strong>'+r.month+'</strong></td><td>'+r.workingDays+'</td>'+
-      '<td>'+f(r.snackOrder)+'</td><td>'+eb(r.snackEff)+'</td>'+
-      '<td>'+f(r.mealOrder)+'</td><td>'+eb(r.mealEff)+'</td>'+
-      '<td>'+(r.peakDate||'—')+'</td>'+
-      '<td style="font-size:10px;color:var(--text-3);max-width:160px;white-space:normal">'+(r.remarks||'—')+'</td></tr>';
+// ═══════════════════════════════════════════════════════════════
+//  MONTHLY CHART
+// ═══════════════════════════════════════════════════════════════
+function renderMonthly(mrows) {
+  if (mChart) { mChart.destroy(); mChart = null; }
+  if (!mrows || !mrows.length) return;
+
+  // Compute dynamic y-axis min (floor to nearest 5, at least 5 below actual min)
+  var allEff = [];
+  mrows.forEach(function(r) {
+    if (r.snackEff) allEff.push(n(r.snackEff));
+    if (r.mealEff)  allEff.push(n(r.mealEff));
+  });
+  var minEff = allEff.length ? Math.min.apply(null, allEff) : 80;
+  var yMin   = Math.max(0, Math.floor((minEff - 5) / 5) * 5);
+
+  var c   = gc();
+  var ctx = document.getElementById('monthlyChart').getContext('2d');
+  mChart  = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: mrows.map(function(r) { return r.month; }),
+      datasets: [
+        { label:'Snack Eff %', data:mrows.map(function(r){ return n(r.snackEff); }), backgroundColor:'#86efac', borderRadius:3 },
+        { label:'Meal Eff %',  data:mrows.map(function(r){ return n(r.mealEff); }),  backgroundColor:'#93c5fd', borderRadius:3 }
+      ]
+    },
+    options: {
+      responsive:true, maintainAspectRatio:true, animation:{ duration:400 },
+      plugins: { legend:{ labels:{ font:{ size:9 }, boxWidth:8, padding:8 } } },
+      scales: {
+        x: { grid:{ display:false }, ticks:{ color:c.txt, font:{ size:9 } } },
+        y: { min:yMin, max:100, grid:{ color:c.grid }, ticks:{ color:c.txt, font:{ size:9 }, callback:function(v){ return v + '%'; } } }
+      }
+    }
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  HEATMAP
+// ═══════════════════════════════════════════════════════════════
+function renderHeatmap(rows, thr) {
+  var grid = document.getElementById('hmGrid');
+  if (!rows.length) {
+    grid.innerHTML = '<p class="empty-state">No data for this period.</p>';
+    document.getElementById('hmLegBar').innerHTML = '';
+    return;
+  }
+  var vals = rows.map(function(r) { return n(r.snackLeftover) + n(r.mealLeftover); });
+  var maxV = Math.max.apply(null, vals) || 1;
+
+  function hmColor(v) {
+    if (v === 0) return isDark ? '#1c2128' : '#f0fdf4';
+    var r = v / maxV;
+    if (r < 0.25)  return '#86efac';
+    if (r < 0.50)  return '#fcd34d';
+    if (r < 0.75)  return '#fb923c';
+    return '#f87171';
+  }
+  function textColor(v) { return (v / maxV) > 0.45 ? '#1f2937' : '#374151'; }
+
+  grid.innerHTML = rows.map(function(r, i) {
+    var v   = vals[i];
+    var col = hmColor(v);
+    var tc  = textColor(v);
+    var lbl = r.rawDate ? r.rawDate.substring(8) : (r.date ? r.date.split(' ')[0] : i + 1);
+    // Escape for inline event attribute
+    var tipTxt = (r.date || r.rawDate || '') + ': ' + f(v) + ' leftover';
+    return '<div class="hm-cell" style="background:' + col + ';color:' + tc + '"' +
+      ' onmouseenter="showTip(event,\'' + tipTxt.replace(/'/g, '&#39;') + '\')"' +
+      ' onmouseleave="hideTip()">' + lbl + '</div>';
+  }).join('');
+
+  document.getElementById('hmLegBar').innerHTML =
+    ['#86efac','#fcd34d','#fb923c','#f87171']
+      .map(function(c) { return '<div class="hm-sq" style="background:' + c + '"></div>'; })
+      .join('');
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  TOOLTIP
+// ═══════════════════════════════════════════════════════════════
+function showTip(e, txt) {
+  var t = document.getElementById('tip');
+  t.textContent  = txt;
+  t.style.display = 'block';
+  // Keep within viewport
+  var x = e.clientX + 14;
+  var y = e.clientY - 8;
+  if (x + 200 > window.innerWidth)  x = e.clientX - 214;
+  if (y + 40  > window.innerHeight) y = e.clientY - 48;
+  t.style.left = x + 'px';
+  t.style.top  = y + 'px';
+}
+function hideTip() { document.getElementById('tip').style.display = 'none'; }
+
+// ═══════════════════════════════════════════════════════════════
+//  DETAIL TABLE
+// ═══════════════════════════════════════════════════════════════
+function renderTable(rows, thr) {
+  set('tblCount', rows.length + ' entr' + (rows.length === 1 ? 'y' : 'ies'));
+  if (!rows.length) {
+    document.getElementById('tblBody').innerHTML =
+      '<tr><td colspan="9" class="empty-state">No data for this period.</td></tr>';
+    return;
+  }
+  document.getElementById('tblBody').innerHTML = rows.map(function(r) {
+    var leftover = n(r.snackLeftover) + n(r.mealLeftover);
+    var cls = leftover > thr ? ' warn-row' : '';
+    return '<tr class="' + cls + '">' +
+      '<td>' + (r.date || r.rawDate || '—') + '</td>' +
+      '<td>' + f(r.snackOrder)    + '</td>' +
+      '<td>' + f(r.snackConsumed) + '</td>' +
+      '<td>' + f(r.snackLeftover) + '</td>' +
+      '<td>' + eb(r.snackEff)     + '</td>' +
+      '<td>' + f(r.mealOrder)     + '</td>' +
+      '<td>' + f(r.mealConsumed)  + '</td>' +
+      '<td>' + f(r.mealLeftover)  + '</td>' +
+      '<td>' + eb(r.mealEff)      + '</td>' +
+    '</tr>';
   }).join('');
 }
 
-// ── MONTH SELECT
-function fillMonthSel(months){
-  var sel=document.getElementById('monthSel'); sel.innerHTML='';
-  (months||[]).forEach(function(m){
-    var o=document.createElement('option');
-    o.value=m.value;o.textContent=m.label;
-    if(m.value===selMonth) o.selected=true;
+// ═══════════════════════════════════════════════════════════════
+//  HISTORY TABLE
+// ═══════════════════════════════════════════════════════════════
+function renderHistory(mrows) {
+  var tbody = document.getElementById('histBody');
+  if (!mrows || !mrows.length) {
+    tbody.innerHTML = '<tr><td colspan="8" class="empty-state">No monthly history yet.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = mrows.map(function(r) {
+    return '<tr>' +
+      '<td><strong>' + (r.month || '—') + '</strong></td>' +
+      '<td>' + (r.workingDays || 0) + '</td>' +
+      '<td>' + f(r.snackOrder)      + '</td>' +
+      '<td>' + eb(r.snackEff)       + '</td>' +
+      '<td>' + f(r.mealOrder)       + '</td>' +
+      '<td>' + eb(r.mealEff)        + '</td>' +
+      '<td>' + (r.peakDate  || '—') + '</td>' +
+      '<td style="font-size:10px;color:var(--text-3);max-width:180px;white-space:normal">' + (r.remarks || '—') + '</td>' +
+    '</tr>';
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  MONTH SELECT
+// ═══════════════════════════════════════════════════════════════
+function fillMonthSel(months) {
+  var sel = document.getElementById('monthSel');
+  sel.innerHTML = '';
+  if (!months || !months.length) {
+    sel.innerHTML = '<option value="">No data</option>';
+    return;
+  }
+  // months already sorted ascending from API; show descending in UI (most recent first)
+  var list = months.slice().reverse();
+  list.forEach(function(m) {
+    var o = document.createElement('option');
+    o.value       = m.value;
+    o.textContent = m.label;
+    if (m.value === selMonth) o.selected = true;
     sel.appendChild(o);
   });
 }
 
-// ── EXPORT
-function exportCSV(){
-  var rows=D?D.allRows:[];if(!rows.length)return;
-  var csv='Date,Snack Ordered,Snack Consumed,Snack Leftover,Snack Eff%,Meal Ordered,Meal Consumed,Meal Leftover,Meal Eff%\n';
-  csv+=rows.map(function(r){return[r.date,r.snackOrder,r.snackConsumed,r.snackLeftover,r.snackEff,r.mealOrder,r.mealConsumed,r.mealLeftover,r.mealEff].join(',');}).join('\n');
-  var a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download='canteen_'+selMonth+'.csv';a.click();
+// ═══════════════════════════════════════════════════════════════
+//  EXPORT
+// ═══════════════════════════════════════════════════════════════
+function exportCSV() {
+  // Export the currently visible (filtered) rows, not always the full month
+  var rows = filteredRows.length ? filteredRows : (D ? D.allRows : []);
+  if (!rows.length) { alert('No data to export.'); return; }
+
+  var csv = 'Date,Snack Ordered,Snack Consumed,Snack Leftover,Snack Eff%,Meal Ordered,Meal Consumed,Meal Leftover,Meal Eff%\n';
+  csv += rows.map(function(r) {
+    return [
+      r.date || r.rawDate,
+      n(r.snackOrder), n(r.snackConsumed), n(r.snackLeftover), n(r.snackEff),
+      n(r.mealOrder),  n(r.mealConsumed),  n(r.mealLeftover),  n(r.mealEff)
+    ].join(',');
+  }).join('\n');
+
+  var filename = 'canteen_' + (filteredLabel || selMonth).replace(/[^a-zA-Z0-9_-]/g, '_') + '.csv';
+  var a = document.createElement('a');
+  a.href     = URL.createObjectURL(new Blob([csv], { type:'text/csv;charset=utf-8;' }));
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(a.href);
 }
-function exportPDF(){window.print();}
+
+function exportPDF() { window.print(); }
 </script>
 </body>
 </html>
