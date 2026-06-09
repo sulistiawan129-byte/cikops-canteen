@@ -8,7 +8,7 @@
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-html{font-size:14px;}
+html{font-size:13px;}
 
 :root{
   --navy:#002366;--navy-lt:#e8edf7;
@@ -18,8 +18,8 @@ html{font-size:14px;}
   --bg:#f0f2f5;--surface:#fff;--surface-2:#f8f9fb;
   --border:#e2e5eb;--text-1:#0f172a;--text-2:#475569;--text-3:#94a3b8;
   --font:'Inter','Segoe UI',system-ui,sans-serif;
-  --r:10px;--shadow:0 1px 3px rgba(0,0,0,.06),0 4px 12px rgba(0,0,0,.04);
-  --sidebar:220px;--topbar:52px;
+  --r:10px;--shadow:0 1px 3px rgba(0,0,0,.05),0 3px 10px rgba(0,0,0,.04);
+  --sidebar:210px;--topbar:50px;
 }
 [data-theme="dark"]{
   --bg:#0d1117;--surface:#161b22;--surface-2:#1c2128;--border:#30363d;
@@ -30,188 +30,211 @@ html{font-size:14px;}
 
 body{font-family:var(--font);background:var(--bg);color:var(--text-1);min-height:100vh;transition:background .2s,color .2s;line-height:1.5;}
 
-/* SIDEBAR */
+/* ── SIDEBAR ── */
 .sidebar{position:fixed;top:0;left:0;height:100vh;width:var(--sidebar);background:var(--navy);display:flex;flex-direction:column;z-index:100;transition:transform .25s;}
-.sb-logo{padding:16px 14px 12px;border-bottom:1px solid rgba(255,255,255,.1);}
-.sb-logo-row{display:flex;align-items:center;gap:9px;margin-bottom:8px;}
-.logo-sq{width:32px;height:32px;border-radius:7px;background:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-.logo-sq span{font-size:9px;font-weight:700;color:var(--navy);letter-spacing:-.2px;}
-.logo-co{font-size:12px;font-weight:600;color:#fff;line-height:1.2;}
-.logo-pl{font-size:10px;color:rgba(255,255,255,.45);}
-.vendor-tag{display:inline-block;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);border-radius:20px;padding:2px 9px;font-size:10px;color:rgba(255,255,255,.65);}
-.sb-nav{flex:1;padding:10px 8px;display:flex;flex-direction:column;gap:1px;overflow-y:auto;}
-.nav-sec{font-size:9px;font-weight:600;color:rgba(255,255,255,.3);text-transform:uppercase;letter-spacing:.1em;padding:8px 8px 3px;}
-.nav-item{display:flex;align-items:center;gap:8px;padding:8px 9px;border-radius:7px;cursor:pointer;font-size:12px;font-weight:500;color:rgba(255,255,255,.55);transition:background .12s,color .12s;border:none;background:none;width:100%;text-align:left;font-family:var(--font);}
+.sb-logo{padding:14px 13px 11px;border-bottom:1px solid rgba(255,255,255,.1);}
+.sb-logo-row{display:flex;align-items:center;gap:9px;margin-bottom:7px;}
+.logo-sq{width:30px;height:30px;border-radius:7px;background:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.logo-sq span{font-size:9px;font-weight:700;color:var(--navy);}
+.logo-co{font-size:11px;font-weight:600;color:#fff;line-height:1.3;}
+.logo-pl{font-size:9px;color:rgba(255,255,255,.4);}
+.vendor-tag{display:inline-block;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.14);border-radius:20px;padding:2px 8px;font-size:9px;color:rgba(255,255,255,.6);}
+.sb-nav{flex:1;padding:8px 7px;display:flex;flex-direction:column;gap:1px;overflow-y:auto;}
+.nav-sec{font-size:8px;font-weight:600;color:rgba(255,255,255,.28);text-transform:uppercase;letter-spacing:.1em;padding:7px 7px 3px;}
+.nav-item{display:flex;align-items:center;gap:7px;padding:7px 8px;border-radius:6px;cursor:pointer;font-size:11px;font-weight:500;color:rgba(255,255,255,.52);transition:background .12s,color .12s;border:none;background:none;width:100%;text-align:left;font-family:var(--font);}
 .nav-item:hover{background:rgba(255,255,255,.08);color:rgba(255,255,255,.9);}
 .nav-item.active{background:rgba(255,255,255,.14);color:#fff;}
-.nav-item svg{width:14px;height:14px;flex-shrink:0;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
-.sb-foot{padding:10px 8px;border-top:1px solid rgba(255,255,255,.1);}
-.theme-btn{display:flex;align-items:center;gap:8px;padding:8px 9px;border-radius:7px;cursor:pointer;font-size:12px;color:rgba(255,255,255,.55);border:none;background:none;width:100%;font-family:var(--font);transition:background .12s;}
+.nav-item svg{width:13px;height:13px;flex-shrink:0;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.sb-foot{padding:8px 7px;border-top:1px solid rgba(255,255,255,.1);}
+.theme-btn{display:flex;align-items:center;gap:7px;padding:7px 8px;border-radius:6px;cursor:pointer;font-size:11px;color:rgba(255,255,255,.52);border:none;background:none;width:100%;font-family:var(--font);transition:background .12s;}
 .theme-btn:hover{background:rgba(255,255,255,.08);color:rgba(255,255,255,.9);}
-.theme-btn svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.theme-btn svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
 
-/* TOPBAR */
-.topbar{position:fixed;top:0;left:var(--sidebar);right:0;height:var(--topbar);background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 18px;z-index:90;gap:10px;transition:background .2s,left .25s;}
-.tb-left{display:flex;align-items:center;gap:10px;min-width:0;}
+/* ── TOPBAR ── */
+.topbar{position:fixed;top:0;left:var(--sidebar);right:0;height:var(--topbar);background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 16px;z-index:90;gap:8px;transition:background .2s;}
+.tb-left{display:flex;align-items:center;gap:8px;min-width:0;}
 .hamburger{display:none;background:none;border:none;cursor:pointer;padding:4px;flex-shrink:0;}
-.hamburger svg{width:18px;height:18px;stroke:var(--text-2);fill:none;stroke-width:2;stroke-linecap:round;}
-.page-title{font-size:14px;font-weight:600;color:var(--text-1);white-space:nowrap;}
-.period-badge{font-size:11px;color:var(--text-3);background:var(--surface-2);border:1px solid var(--border);border-radius:20px;padding:2px 9px;white-space:nowrap;flex-shrink:0;}
-.tb-right{display:flex;align-items:center;gap:6px;flex-shrink:0;flex-wrap:wrap;}
+.hamburger svg{width:16px;height:16px;stroke:var(--text-2);fill:none;stroke-width:2;stroke-linecap:round;}
+.page-title{font-size:13px;font-weight:600;color:var(--text-1);white-space:nowrap;}
+.period-badge{font-size:10px;color:var(--text-3);background:var(--surface-2);border:1px solid var(--border);border-radius:20px;padding:2px 8px;white-space:nowrap;flex-shrink:0;}
+.tb-right{display:flex;align-items:center;gap:5px;flex-shrink:0;flex-wrap:wrap;}
 
-/* FILTER CONTROLS */
-.filter-group{display:flex;border:1px solid var(--border);border-radius:7px;overflow:hidden;background:var(--surface-2);}
-.flt-btn{padding:5px 11px;font-size:11px;font-weight:500;font-family:var(--font);background:none;border:none;cursor:pointer;color:var(--text-3);transition:background .12s,color .12s;}
+/* ── FILTER CONTROLS ── */
+.filter-group{display:flex;border:1px solid var(--border);border-radius:6px;overflow:hidden;background:var(--surface-2);}
+.flt-btn{padding:4px 10px;font-size:10px;font-weight:500;font-family:var(--font);background:none;border:none;cursor:pointer;color:var(--text-3);transition:background .12s,color .12s;}
 .flt-btn.active{background:var(--navy);color:#fff;}
-.date-wrap{display:flex;align-items:center;gap:5px;}
-.d-inp{border:1px solid var(--border);border-radius:7px;padding:4px 8px;font-size:11px;font-family:var(--font);background:var(--surface-2);color:var(--text-1);cursor:pointer;}
+.date-wrap{display:flex;align-items:center;gap:4px;}
+.d-inp{border:1px solid var(--border);border-radius:6px;padding:3px 7px;font-size:10px;font-family:var(--font);background:var(--surface-2);color:var(--text-1);}
 .d-inp:focus{outline:none;border-color:var(--navy);}
-select.month-sel{border:1px solid var(--border);border-radius:7px;padding:4px 8px;font-size:11px;font-family:var(--font);background:var(--surface-2);color:var(--text-1);cursor:pointer;min-width:130px;}
+select.month-sel{border:1px solid var(--border);border-radius:6px;padding:3px 7px;font-size:10px;font-family:var(--font);background:var(--surface-2);color:var(--text-1);min-width:120px;}
 select.month-sel option{background:var(--surface);}
-.btn-apply{background:var(--navy);color:#fff;border:none;border-radius:7px;padding:5px 10px;font-size:11px;font-weight:500;font-family:var(--font);cursor:pointer;}
-.btn-exp{display:flex;align-items:center;gap:4px;background:var(--surface-2);border:1px solid var(--border);border-radius:7px;padding:5px 10px;font-size:11px;font-weight:500;font-family:var(--font);color:var(--text-2);cursor:pointer;white-space:nowrap;}
-.btn-exp svg{width:12px;height:12px;stroke:var(--text-3);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.btn-apply{background:var(--navy);color:#fff;border:none;border-radius:6px;padding:4px 9px;font-size:10px;font-weight:500;font-family:var(--font);cursor:pointer;}
+.btn-exp{display:flex;align-items:center;gap:3px;background:var(--surface-2);border:1px solid var(--border);border-radius:6px;padding:4px 9px;font-size:10px;font-weight:500;font-family:var(--font);color:var(--text-2);cursor:pointer;white-space:nowrap;}
+.btn-exp svg{width:11px;height:11px;stroke:var(--text-3);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
 .btn-exp:hover{background:var(--border);}
 
-/* MAIN */
-.main{margin-left:var(--sidebar);margin-top:var(--topbar);padding:18px;min-height:calc(100vh - var(--topbar));transition:margin-left .25s;}
+/* ── MAIN ── */
+.main{margin-left:var(--sidebar);margin-top:var(--topbar);padding:16px;min-height:calc(100vh - var(--topbar));}
 
-/* KPI */
-.kpi-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-bottom:16px;}
-.kpi-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:13px 14px;position:relative;overflow:hidden;box-shadow:var(--shadow);transition:transform .12s;}
+/* ── KPI — separate snack / meal ── */
+.kpi-section{margin-bottom:14px;}
+.kpi-section-hdr{display:flex;align-items:center;gap:7px;margin-bottom:8px;}
+.kpi-section-lbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-3);}
+.kpi-divider{flex:1;height:1px;background:var(--border);}
+.kpi-grid{display:grid;gap:8px;}
+.kpi-grid-snack{grid-template-columns:repeat(4,1fr);}
+.kpi-grid-meal {grid-template-columns:repeat(4,1fr);}
+.kpi-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:11px 13px;position:relative;overflow:hidden;box-shadow:var(--shadow);transition:transform .12s;}
 .kpi-card:hover{transform:translateY(-1px);}
 .kpi-accent{position:absolute;top:0;left:0;width:3px;height:100%;}
-.kpi-lbl{font-size:9px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:5px;}
-.kpi-val{font-size:20px;font-weight:700;color:var(--text-1);line-height:1.1;margin-bottom:2px;font-variant-numeric:tabular-nums;}
-.kpi-sub{font-size:10px;color:var(--text-3);}
+.kpi-lbl{font-size:9px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:4px;}
+.kpi-val{font-size:18px;font-weight:700;color:var(--text-1);line-height:1.1;margin-bottom:2px;font-variant-numeric:tabular-nums;}
+.kpi-sub{font-size:9px;color:var(--text-3);}
+/* Overall row */
+.kpi-overall{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:8px;}
 
-/* REMARKS */
-.remarks{background:var(--navy-lt);border:1px solid rgba(0,35,102,.12);border-radius:var(--r);padding:11px 14px;display:flex;gap:10px;margin-bottom:16px;}
-[data-theme="dark"] .remarks{border-color:rgba(100,140,255,.15);}
-.rem-icon{font-size:14px;flex-shrink:0;margin-top:1px;}
-.rem-lbl{font-size:9px;font-weight:600;color:var(--navy);text-transform:uppercase;letter-spacing:.08em;margin-bottom:2px;}
+/* ── REMARKS ── */
+.remarks{background:var(--navy-lt);border:1px solid rgba(0,35,102,.1);border-radius:var(--r);padding:9px 13px;display:flex;gap:8px;margin-bottom:14px;}
+[data-theme="dark"] .remarks{border-color:rgba(100,140,255,.13);}
+.rem-icon{font-size:13px;flex-shrink:0;margin-top:1px;}
+.rem-lbl{font-size:8px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:.08em;margin-bottom:2px;}
 [data-theme="dark"] .rem-lbl{color:#7fa8ff;}
-.rem-txt{font-size:12px;color:#003087;line-height:1.6;}
+.rem-txt{font-size:11px;color:#003087;line-height:1.6;}
 [data-theme="dark"] .rem-txt{color:#aac4ff;}
 
-/* CARDS */
-.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;box-shadow:var(--shadow);}
-.c-title{font-size:12px;font-weight:600;color:var(--text-1);margin-bottom:2px;}
-.c-sub{font-size:11px;color:var(--text-3);margin-bottom:12px;}
+/* ── CARDS ── */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:12px 14px;box-shadow:var(--shadow);}
+.c-title{font-size:11px;font-weight:600;color:var(--text-1);margin-bottom:1px;}
+.c-sub{font-size:10px;color:var(--text-3);margin-bottom:10px;}
 
-/* GRID */
-.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;}
-.g3{display:grid;grid-template-columns:2fr 1fr;gap:12px;margin-bottom:14px;}
-.g4{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:14px;}
-.mb{margin-bottom:14px;}
+/* ── SECTION HEADER (Snack | Meal split) ── */
+.split-hdr{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;}
+.split-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;padding:6px 10px;border-radius:6px;display:flex;align-items:center;gap:5px;}
+.split-snack{background:var(--green-lt);color:var(--green);}
+.split-meal {background:var(--navy-lt); color:var(--navy);}
+[data-theme="dark"] .split-meal{color:#7fa8ff;}
+[data-theme="dark"] .split-snack{color:#4ade80;}
 
-/* LEGEND */
-.legend{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:10px;}
-.leg{display:flex;align-items:center;gap:4px;font-size:10px;color:var(--text-2);}
-.leg-dot{width:8px;height:8px;border-radius:2px;flex-shrink:0;}
+/* ── GRIDS ── */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;}
+.g2-wide{display:grid;grid-template-columns:3fr 2fr;gap:10px;margin-bottom:12px;}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:12px;}
+.mb{margin-bottom:12px;}
 
-/* SUMMARY ROWS */
-.sum-row{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--surface-2);font-size:12px;}
+/* ── CHART WRAPPER — keep charts small & consistent ── */
+.chart-box{position:relative;}
+.chart-box canvas{display:block;width:100%!important;}
+.chart-h-sm{max-height:140px;}  /* small: shift bars, monthly */
+.chart-h-md{max-height:180px;}  /* medium: donut, mini trend */
+.chart-h-lg{max-height:220px;}  /* large: main trend only */
+
+/* ── LEGEND ── */
+.legend{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:8px;}
+.leg{display:flex;align-items:center;gap:3px;font-size:9px;color:var(--text-2);}
+.leg-dot{width:7px;height:7px;border-radius:2px;flex-shrink:0;}
+
+/* ── SUMMARY ROWS ── */
+.sum-row{display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--surface-2);font-size:11px;}
 .sum-row:last-child{border-bottom:none;}
 .sum-lbl{color:var(--text-2);}
 .sum-val{font-weight:600;color:var(--text-1);}
 .sum-val.g{color:var(--green);}
 .sum-val.r{color:var(--red);}
 
-/* BADGE */
-.badge{display:inline-block;font-size:9px;font-weight:600;padding:2px 7px;border-radius:20px;}
-.bs{background:var(--green-lt);color:var(--green);}
-.bm{background:var(--navy-lt);color:var(--navy);}
-[data-theme="dark"] .bm{color:#7fa8ff;}
-[data-theme="dark"] .bs{color:#4ade80;}
-
-/* EFF BARS */
-.eff-row{margin-bottom:10px;}
+/* ── EFF BARS (shift) ── */
+.eff-row{margin-bottom:8px;}
 .eff-row:last-child{margin-bottom:0;}
-.eff-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;}
-.eff-lbl{font-size:11px;font-weight:500;color:var(--text-2);display:flex;align-items:center;gap:5px;}
-.eff-val{font-size:12px;font-weight:600;color:var(--text-1);}
-.bar-bg{height:5px;background:var(--surface-2);border-radius:5px;overflow:hidden;border:1px solid var(--border);}
-.bar-fill{height:100%;border-radius:5px;transition:width .5s cubic-bezier(.4,0,.2,1);}
+.eff-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:3px;}
+.eff-lbl{font-size:10px;font-weight:500;color:var(--text-2);display:flex;align-items:center;gap:4px;}
+.eff-val{font-size:10px;font-weight:600;color:var(--text-1);}
+.bar-bg{height:4px;background:var(--surface-2);border-radius:4px;overflow:hidden;border:1px solid var(--border);}
+.bar-fill{height:100%;border-radius:4px;transition:width .45s cubic-bezier(.4,0,.2,1);}
 .sdot{display:inline-block;width:6px;height:6px;border-radius:50%;}
 .d1{background:#f59e0b;}.d2{background:#3b82f6;}.d3{background:#8b5cf6;}
 
-/* SHIFT TOGGLE */
-.shift-tog{display:flex;gap:5px;margin-bottom:12px;}
-.s-tog{padding:4px 10px;border:1px solid var(--border);border-radius:6px;font-size:11px;font-weight:500;font-family:var(--font);cursor:pointer;background:var(--surface-2);color:var(--text-2);transition:all .12s;}
+/* ── SHIFT TOGGLE ── */
+.shift-tog{display:flex;gap:4px;margin-bottom:10px;}
+.s-tog{padding:3px 9px;border:1px solid var(--border);border-radius:5px;font-size:10px;font-weight:500;font-family:var(--font);cursor:pointer;background:var(--surface-2);color:var(--text-2);transition:all .12s;}
 .s-tog.on{background:var(--navy);color:#fff;border-color:var(--navy);}
 
-/* HEATMAP */
-.hm-wrap{overflow-x:auto;padding-bottom:4px;}
-.hm-grid{display:flex;flex-wrap:wrap;gap:4px;}
-.hm-cell{width:34px;height:34px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:600;cursor:default;flex-shrink:0;transition:transform .1s;}
+/* ── HEATMAP ── */
+.hm-wrap{overflow-x:auto;padding-bottom:2px;}
+.hm-grid{display:flex;flex-wrap:wrap;gap:3px;}
+.hm-cell{width:30px;height:30px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:600;cursor:default;flex-shrink:0;transition:transform .1s;}
 .hm-cell:hover{transform:scale(1.15);z-index:1;position:relative;}
-.hm-leg{display:flex;align-items:center;gap:5px;margin-top:8px;font-size:10px;color:var(--text-3);}
+.hm-leg{display:flex;align-items:center;gap:4px;margin-top:6px;font-size:9px;color:var(--text-3);}
 .hm-leg-bar{display:flex;gap:2px;}
-.hm-sq{width:12px;height:12px;border-radius:2px;}
+.hm-sq{width:10px;height:10px;border-radius:2px;}
 
-/* TABLE */
-.tbl-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;box-shadow:var(--shadow);margin-bottom:14px;}
-.tbl-hdr{padding:12px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;}
+/* ── TABLE ── */
+.tbl-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;box-shadow:var(--shadow);margin-bottom:12px;}
+.tbl-hdr{padding:10px 13px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:5px;}
 .tbl-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;}
 table{width:100%;border-collapse:collapse;font-size:11px;}
-thead th{padding:7px 12px;text-align:right;font-size:9px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:.06em;background:var(--surface-2);border-bottom:1px solid var(--border);white-space:nowrap;}
+thead th{padding:6px 10px;text-align:right;font-size:9px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:.05em;background:var(--surface-2);border-bottom:1px solid var(--border);white-space:nowrap;}
 thead th:first-child{text-align:left;}
+/* Group headers */
+.th-snack{background:#e6f4ed!important;color:var(--green)!important;}
+.th-meal {background:#e8edf7!important;color:var(--navy)!important;}
+[data-theme="dark"] .th-snack{background:#0d2b1e!important;color:#4ade80!important;}
+[data-theme="dark"] .th-meal {background:#1a2540!important;color:#7fa8ff!important;}
 tbody tr{border-bottom:1px solid var(--surface-2);transition:background .1s;}
 tbody tr:last-child{border-bottom:none;}
 tbody tr:hover{background:var(--surface-2);}
-tbody td{padding:7px 12px;color:var(--text-2);text-align:right;white-space:nowrap;}
+tbody td{padding:6px 10px;color:var(--text-2);text-align:right;white-space:nowrap;}
 tbody td:first-child{color:var(--text-1);font-weight:500;text-align:left;}
-.eb{display:inline-block;padding:1px 6px;border-radius:9px;font-size:10px;font-weight:600;}
+.eb{display:inline-block;padding:1px 6px;border-radius:8px;font-size:9px;font-weight:600;}
 .eg{background:var(--green-lt);color:var(--green);}
 .eo{background:var(--amber-lt);color:var(--amber);}
 .er{background:var(--red-lt);color:var(--red);}
 .warn-row td{background:var(--amber-lt)!important;}
 [data-theme="dark"] .warn-row td{background:#2d1f06!important;}
 
-/* EMPTY STATE */
-.empty-state{padding:32px;text-align:center;color:var(--text-3);font-size:12px;}
-
-/* LOADING */
+/* ── EMPTY / LOADING ── */
+.empty-state{padding:24px;text-align:center;color:var(--text-3);font-size:11px;}
 .loading{display:flex;align-items:center;justify-content:center;padding:48px;flex-direction:column;gap:10px;}
-.spin{width:24px;height:24px;border:2px solid var(--border);border-top-color:var(--navy);border-radius:50%;animation:spin .7s linear infinite;}
+.spin{width:22px;height:22px;border:2px solid var(--border);border-top-color:var(--navy);border-radius:50%;animation:spin .7s linear infinite;}
 @keyframes spin{to{transform:rotate(360deg);}}
-.load-txt{font-size:11px;color:var(--text-3);}
+.load-txt{font-size:10px;color:var(--text-3);}
 
-/* TOOLTIP */
-.tip{position:fixed;background:var(--text-1);color:var(--surface);font-size:11px;padding:5px 9px;border-radius:6px;pointer-events:none;z-index:999;display:none;max-width:200px;line-height:1.4;word-break:break-word;}
+/* ── TOOLTIP ── */
+.tip{position:fixed;background:var(--text-1);color:var(--surface);font-size:10px;padding:4px 8px;border-radius:5px;pointer-events:none;z-index:999;display:none;max-width:200px;line-height:1.4;}
 
-/* OVERLAY */
+/* ── OVERLAY ── */
 .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:99;}
 .overlay.show{display:block;}
 
-/* RESPONSIVE */
-@media(max-width:1200px){.kpi-grid{grid-template-columns:repeat(3,1fr);}}
+/* ── RESPONSIVE ── */
+@media(max-width:1300px){
+  .kpi-grid-snack,.kpi-grid-meal{grid-template-columns:repeat(2,1fr);}
+  .kpi-overall{grid-template-columns:repeat(3,1fr);}
+}
+@media(max-width:1000px){
+  .g2,.g2-wide,.g3{grid-template-columns:1fr;}
+  .split-hdr{grid-template-columns:1fr;}
+}
 @media(max-width:900px){
   .sidebar{transform:translateX(-100%);}
   .sidebar.open{transform:translateX(0);}
   .topbar{left:0;}
-  .main{margin-left:0;padding:12px;}
+  .main{margin-left:0;padding:10px;}
   .hamburger{display:block;}
-  .g2,.g3,.g4{grid-template-columns:1fr;}
-  .kpi-grid{grid-template-columns:repeat(2,1fr);}
 }
-@media(max-width:480px){
-  .kpi-grid{grid-template-columns:repeat(2,1fr);}
-  .kpi-val{font-size:16px;}
-  .tb-right .date-wrap{display:none;}
+@media(max-width:600px){
+  .kpi-grid-snack,.kpi-grid-meal{grid-template-columns:repeat(2,1fr);}
+  .kpi-overall{grid-template-columns:repeat(2,1fr);}
+  .kpi-val{font-size:15px;}
 }
 @media print{
   .sidebar,.topbar,.overlay{display:none!important;}
-  .main{margin:0;padding:10px;}
-  .kpi-grid{grid-template-columns:repeat(3,1fr);}
+  .main{margin:0;padding:8px;}
 }
 </style>
 </head>
 <body>
 
 <script>
-  // ── CONFIGURATION — ganti URL ini dengan GAS Web App URL Anda
+  // ── CONFIGURATION ── replace with your GAS Web App URL
   var GAS_URL = "https://script.google.com/macros/s/AKfycbywIW79lgCQOvlqUX0XuIsKk8A4NPGMnHx0shd573HZ-VXzjnijSuzSQ4PnpYf4zHKE/exec";
 </script>
 
@@ -241,7 +264,7 @@ tbody td:first-child{color:var(--text-1);font-weight:500;text-align:left;}
     <button class="nav-item" onclick="navTo('detail',this)">
       <svg viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>Detail
     </button>
-    <div class="nav-sec" style="margin-top:6px">Quick</div>
+    <div class="nav-sec" style="margin-top:4px">Quick</div>
     <a class="nav-item" href="index.html">
       <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>New Entry
     </a>
@@ -269,14 +292,12 @@ tbody td:first-child{color:var(--text-1);font-weight:500;text-align:left;}
       <button class="flt-btn active" id="btnMonth"  onclick="setRange('month')">Month</button>
       <button class="flt-btn" id="btnCustom" onclick="setRange('custom')">Custom</button>
     </div>
-    <!-- Month selector -->
     <div class="date-wrap" id="wrapMonth">
       <select class="month-sel" id="monthSel" onchange="onMonthSelChange(this.value)"><option>Loading…</option></select>
     </div>
-    <!-- Custom date range -->
     <div class="date-wrap" id="wrapCustom" style="display:none">
       <input type="date" class="d-inp" id="dateFrom">
-      <span style="font-size:10px;color:var(--text-3)">–</span>
+      <span style="font-size:9px;color:var(--text-3)">–</span>
       <input type="date" class="d-inp" id="dateTo">
       <button class="btn-apply" onclick="applyCustomRange()">Apply</button>
     </div>
@@ -290,93 +311,159 @@ tbody td:first-child{color:var(--text-1);font-weight:500;text-align:left;}
 </header>
 
 <!-- MAIN -->
-<main class="main" id="mainContent">
+<main class="main">
   <div class="loading" id="loader"><div class="spin"></div><span class="load-txt">Connecting to API…</span></div>
   <div id="dash" style="display:none">
 
-    <!-- OVERVIEW -->
+    <!-- ══ OVERVIEW ══ -->
     <section id="overview">
-      <div class="kpi-grid" id="kpiGrid"></div>
+
+      <!-- Snack KPIs -->
+      <div class="kpi-section">
+        <div class="kpi-section-hdr">
+          <span class="kpi-section-lbl" style="color:var(--green)">🥐 Snack</span>
+          <div class="kpi-divider"></div>
+        </div>
+        <div class="kpi-grid kpi-grid-snack" id="kpiSnack"></div>
+      </div>
+
+      <!-- Meal KPIs -->
+      <div class="kpi-section">
+        <div class="kpi-section-hdr">
+          <span class="kpi-section-lbl" style="color:var(--navy)">🍱 Meal</span>
+          <div class="kpi-divider"></div>
+        </div>
+        <div class="kpi-grid kpi-grid-meal" id="kpiMeal"></div>
+      </div>
+
+      <!-- Overall KPIs -->
+      <div class="kpi-section">
+        <div class="kpi-section-hdr">
+          <span class="kpi-section-lbl">Overall</span>
+          <div class="kpi-divider"></div>
+        </div>
+        <div class="kpi-overall" id="kpiOverall"></div>
+      </div>
+
       <div class="remarks mb">
         <span class="rem-icon">📊</span>
         <div><div class="rem-lbl">Auto Analysis</div><div class="rem-txt" id="remTxt">—</div></div>
       </div>
     </section>
 
-    <!-- TRENDS -->
+    <!-- ══ TRENDS ══ -->
     <section id="trends">
-      <div class="g3">
+      <!-- Main trend charts — split Snack & Meal -->
+      <div class="g2 mb">
         <div class="card">
-          <div class="c-title">Daily Consumption Trend</div>
+          <div class="c-title">🥐 Snack — Daily Trend</div>
           <div class="c-sub">Ordered vs consumed per day</div>
           <div class="legend">
-            <span class="leg"><span class="leg-dot" style="background:#002366"></span>Meal ordered</span>
-            <span class="leg"><span class="leg-dot" style="background:#93c5fd"></span>Meal consumed</span>
-            <span class="leg"><span class="leg-dot" style="background:#1a6b3f"></span>Snack ordered</span>
-            <span class="leg"><span class="leg-dot" style="background:#86efac"></span>Snack consumed</span>
+            <span class="leg"><span class="leg-dot" style="background:#1a6b3f"></span>Ordered</span>
+            <span class="leg"><span class="leg-dot" style="background:#86efac"></span>Consumed</span>
+            <span class="leg"><span class="leg-dot" style="background:#fca5a5"></span>Leftover</span>
           </div>
-          <canvas id="trendChart" height="200"></canvas>
+          <div class="chart-box chart-h-lg"><canvas id="trendSnack"></canvas></div>
         </div>
         <div class="card">
-          <div class="c-title">Period Summary</div>
-          <div class="c-sub" id="sumPeriod">—</div>
-          <div style="margin-bottom:12px">
-            <div style="font-size:10px;font-weight:600;color:var(--text-3);margin-bottom:7px"><span class="badge bs">SNACK</span></div>
-            <div class="sum-row"><span class="sum-lbl">Total Ordered</span><span class="sum-val" id="s-ord">—</span></div>
-            <div class="sum-row"><span class="sum-lbl">Consumed</span><span class="sum-val g" id="s-con">—</span></div>
-            <div class="sum-row"><span class="sum-lbl">Leftover</span><span class="sum-val r" id="s-lft">—</span></div>
-            <div class="sum-row"><span class="sum-lbl">Avg / Day</span><span class="sum-val" id="s-avg">—</span></div>
+          <div class="c-title">🍱 Meal — Daily Trend</div>
+          <div class="c-sub">Ordered vs consumed per day</div>
+          <div class="legend">
+            <span class="leg"><span class="leg-dot" style="background:#002366"></span>Ordered</span>
+            <span class="leg"><span class="leg-dot" style="background:#93c5fd"></span>Consumed</span>
+            <span class="leg"><span class="leg-dot" style="background:#fca5a5"></span>Leftover</span>
           </div>
-          <div>
-            <div style="font-size:10px;font-weight:600;color:var(--text-3);margin-bottom:7px"><span class="badge bm">MEAL</span></div>
-            <div class="sum-row"><span class="sum-lbl">Total Ordered</span><span class="sum-val" id="m-ord">—</span></div>
-            <div class="sum-row"><span class="sum-lbl">Consumed</span><span class="sum-val g" id="m-con">—</span></div>
-            <div class="sum-row"><span class="sum-lbl">Leftover</span><span class="sum-val r" id="m-lft">—</span></div>
-            <div class="sum-row"><span class="sum-lbl">Avg / Day</span><span class="sum-val" id="m-avg">—</span></div>
-          </div>
+          <div class="chart-box chart-h-lg"><canvas id="trendMeal"></canvas></div>
+        </div>
+      </div>
+
+      <!-- Summary rows — split -->
+      <div class="g2 mb">
+        <div class="card">
+          <div class="c-title">🥐 Snack — Period Summary</div>
+          <div class="c-sub" id="sumPeriodS">—</div>
+          <div class="sum-row"><span class="sum-lbl">Total Ordered</span><span class="sum-val" id="s-ord">—</span></div>
+          <div class="sum-row"><span class="sum-lbl">Total Consumed</span><span class="sum-val g" id="s-con">—</span></div>
+          <div class="sum-row"><span class="sum-lbl">Total Leftover</span><span class="sum-val r" id="s-lft">—</span></div>
+          <div class="sum-row"><span class="sum-lbl">Avg Ordered / Day</span><span class="sum-val" id="s-avg">—</span></div>
+          <div class="sum-row"><span class="sum-lbl">Efficiency</span><span class="sum-val g" id="s-eff">—</span></div>
+        </div>
+        <div class="card">
+          <div class="c-title">🍱 Meal — Period Summary</div>
+          <div class="c-sub" id="sumPeriodM">—</div>
+          <div class="sum-row"><span class="sum-lbl">Total Ordered</span><span class="sum-val" id="m-ord">—</span></div>
+          <div class="sum-row"><span class="sum-lbl">Total Consumed</span><span class="sum-val g" id="m-con">—</span></div>
+          <div class="sum-row"><span class="sum-lbl">Total Leftover</span><span class="sum-val r" id="m-lft">—</span></div>
+          <div class="sum-row"><span class="sum-lbl">Avg Ordered / Day</span><span class="sum-val" id="m-avg">—</span></div>
+          <div class="sum-row"><span class="sum-lbl">Efficiency</span><span class="sum-val g" id="m-eff">—</span></div>
         </div>
       </div>
     </section>
 
-    <!-- EFFICIENCY -->
+    <!-- ══ EFFICIENCY ══ -->
     <section id="efficiency">
-      <div class="g2">
+      <div class="g3 mb">
+
+        <!-- Donut — Snack -->
         <div class="card">
-          <div class="c-title">Efficiency by Category</div>
-          <div class="c-sub">Snack vs Meal consumption rate</div>
-          <canvas id="donutChart" height="180"></canvas>
+          <div class="c-title">🥐 Snack Efficiency</div>
+          <div class="c-sub">Consumed vs leftover rate</div>
+          <div class="chart-box chart-h-md"><canvas id="donutSnack"></canvas></div>
+        </div>
+
+        <!-- Donut — Meal -->
+        <div class="card">
+          <div class="c-title">🍱 Meal Efficiency</div>
+          <div class="c-sub">Consumed vs leftover rate</div>
+          <div class="chart-box chart-h-md"><canvas id="donutMeal"></canvas></div>
+        </div>
+
+        <!-- Monthly trend -->
+        <div class="card">
+          <div class="c-title">Monthly Efficiency Trend</div>
+          <div class="c-sub">Snack vs Meal eff % per month</div>
+          <div class="legend">
+            <span class="leg"><span class="leg-dot" style="background:#86efac"></span>Snack</span>
+            <span class="leg"><span class="leg-dot" style="background:#93c5fd"></span>Meal</span>
+          </div>
+          <div class="chart-box chart-h-md"><canvas id="monthlyChart"></canvas></div>
+        </div>
+      </div>
+
+      <!-- Shift breakdown — split -->
+      <div class="g2 mb">
+        <div class="card">
+          <div class="c-title">🥐 Snack — Shift Breakdown</div>
+          <div class="c-sub">Ordered per shift</div>
+          <div id="shiftSnack"></div>
         </div>
         <div class="card">
-          <div class="c-title">Shift Breakdown</div>
-          <div class="c-sub">Ordered per shift this period</div>
-          <div class="shift-tog">
-            <button class="s-tog on" id="togS" onclick="switchShift('snack')">Snack</button>
-            <button class="s-tog"    id="togM" onclick="switchShift('meal')">Meal</button>
-          </div>
-          <div id="shiftBars"></div>
-          <div style="margin-top:16px">
-            <div class="c-sub">Monthly efficiency trend</div>
-            <canvas id="monthlyChart" height="110"></canvas>
-          </div>
+          <div class="c-title">🍱 Meal — Shift Breakdown</div>
+          <div class="c-sub">Ordered per shift</div>
+          <div id="shiftMeal"></div>
         </div>
       </div>
     </section>
 
-    <!-- HEATMAP -->
+    <!-- ══ HEATMAP ══ -->
     <section id="heatmap">
-      <div class="card mb">
-        <div class="c-title">Leftover Heatmap</div>
-        <div class="c-sub">Combined daily leftover — hover for details</div>
-        <div class="hm-wrap"><div class="hm-grid" id="hmGrid"></div></div>
-        <div class="hm-leg">
-          <span>Low</span>
-          <div class="hm-leg-bar" id="hmLegBar"></div>
-          <span>High</span>
+      <div class="g2 mb">
+        <div class="card">
+          <div class="c-title">🥐 Snack Leftover Heatmap</div>
+          <div class="c-sub">Daily leftover intensity — hover for value</div>
+          <div class="hm-wrap"><div class="hm-grid" id="hmSnack"></div></div>
+          <div class="hm-leg"><span>Low</span><div class="hm-leg-bar" id="hmLegSnack"></div><span>High</span></div>
+        </div>
+        <div class="card">
+          <div class="c-title">🍱 Meal Leftover Heatmap</div>
+          <div class="c-sub">Daily leftover intensity — hover for value</div>
+          <div class="hm-wrap"><div class="hm-grid" id="hmMeal"></div></div>
+          <div class="hm-leg"><span>Low</span><div class="hm-leg-bar" id="hmLegMeal"></div><span>High</span></div>
         </div>
       </div>
     </section>
 
-    <!-- DETAIL -->
+    <!-- ══ DETAIL TABLE ══ -->
     <section id="detail">
       <div class="tbl-card">
         <div class="tbl-hdr">
@@ -384,677 +471,511 @@ tbody td:first-child{color:var(--text-1);font-weight:500;text-align:left;}
         </div>
         <div class="tbl-scroll">
           <table>
-            <thead><tr>
-              <th>Date</th>
-              <th>Snack Ordered</th><th>Snack Consumed</th><th>Snack Leftover</th><th>Snack Eff</th>
-              <th>Meal Ordered</th><th>Meal Consumed</th><th>Meal Leftover</th><th>Meal Eff</th>
-            </tr></thead>
+            <thead>
+              <tr>
+                <th rowspan="2" style="vertical-align:bottom">Date</th>
+                <th colspan="4" class="th-snack" style="text-align:center">🥐 Snack</th>
+                <th colspan="4" class="th-meal"  style="text-align:center">🍱 Meal</th>
+              </tr>
+              <tr>
+                <th class="th-snack">Ordered</th><th class="th-snack">Consumed</th><th class="th-snack">Leftover</th><th class="th-snack">Eff</th>
+                <th class="th-meal">Ordered</th><th class="th-meal">Consumed</th><th class="th-meal">Leftover</th><th class="th-meal">Eff</th>
+              </tr>
+            </thead>
             <tbody id="tblBody"></tbody>
           </table>
         </div>
       </div>
+
       <div class="tbl-card">
         <div class="tbl-hdr"><div><div class="c-title">Monthly History</div><div class="c-sub" style="margin-bottom:0">All recorded months</div></div></div>
         <div class="tbl-scroll">
           <table>
-            <thead><tr><th>Month</th><th>Days</th><th>Snack Ordered</th><th>Snack Eff</th><th>Meal Ordered</th><th>Meal Eff</th><th>Peak Date</th><th>Remarks</th></tr></thead>
+            <thead>
+              <tr>
+                <th rowspan="2" style="vertical-align:bottom">Month</th>
+                <th rowspan="2" style="vertical-align:bottom">Days</th>
+                <th colspan="2" class="th-snack" style="text-align:center">🥐 Snack</th>
+                <th colspan="2" class="th-meal"  style="text-align:center">🍱 Meal</th>
+                <th rowspan="2" style="vertical-align:bottom">Peak Date</th>
+                <th rowspan="2" style="vertical-align:bottom">Remarks</th>
+              </tr>
+              <tr>
+                <th class="th-snack">Ordered</th><th class="th-snack">Eff</th>
+                <th class="th-meal">Ordered</th><th class="th-meal">Eff</th>
+              </tr>
+            </thead>
             <tbody id="histBody"></tbody>
           </table>
         </div>
       </div>
     </section>
-  </div>
+
+  </div><!-- #dash -->
 </main>
 <div class="tip" id="tip"></div>
 
 <script>
-// ═══════════════════════════════════════════════════════════════
+// ══════════════════════════════════════════════════
 //  STATE
-// ═══════════════════════════════════════════════════════════════
-var D          = null;          // raw API response
-var selMonth   = '';            // currently loaded month (yyyy-MM)
-var rangeMode  = 'month';       // day | week | month | custom
-var shiftMode  = 'snack';
-var isDark     = false;
-var filteredRows = [];          // currently displayed rows (after filter)
-var filteredLabel = '';
+// ══════════════════════════════════════════════════
+var D=null, selMonth='', rangeMode='month', isDark=false;
+var filteredRows=[], filteredLabel='';
+var tSnack=null, tMeal=null, dSnack=null, dMeal=null, mChart=null;
 
-var tChart = null;
-var dChart = null;
-var mChart = null;
-
-// ═══════════════════════════════════════════════════════════════
+// ══════════════════════════════════════════════════
 //  INIT
-// ═══════════════════════════════════════════════════════════════
-window.onload = function() {
-  if (window.matchMedia('(prefers-color-scheme: dark)').matches) toggleTheme();
-
-  if (!GAS_URL || GAS_URL === 'YOUR_GAS_WEB_APP_URL_HERE') {
-    showError('⚠️ GAS URL not configured.<br>Set <code>GAS_URL</code> at the top of dashboard.html.');
-    return;
-  }
-
-  // Set default custom-date inputs to current month range
-  var now = new Date();
-  var y = now.getFullYear(), m = String(now.getMonth() + 1).padStart(2, '0');
-  var lastDay = new Date(y, now.getMonth() + 1, 0).getDate();
-  document.getElementById('dateFrom').value = y + '-' + m + '-01';
-  document.getElementById('dateTo').value   = y + '-' + m + '-' + String(lastDay).padStart(2, '0');
-
-  selMonth = y + '-' + m;
+// ══════════════════════════════════════════════════
+window.onload=function(){
+  if(window.matchMedia('(prefers-color-scheme: dark)').matches) toggleTheme();
+  var now=new Date(), y=now.getFullYear(), m=String(now.getMonth()+1).padStart(2,'0');
+  var last=new Date(y,now.getMonth()+1,0).getDate();
+  document.getElementById('dateFrom').value=y+'-'+m+'-01';
+  document.getElementById('dateTo').value=y+'-'+m+'-'+String(last).padStart(2,'0');
+  selMonth=y+'-'+m;
   loadMonth(selMonth);
 };
 
-// ═══════════════════════════════════════════════════════════════
-//  SIDEBAR
-// ═══════════════════════════════════════════════════════════════
-function openSb()  { document.getElementById('sidebar').classList.add('open');    document.getElementById('overlay').classList.add('show'); }
-function closeSb() { document.getElementById('sidebar').classList.remove('open'); document.getElementById('overlay').classList.remove('show'); }
-
-// ═══════════════════════════════════════════════════════════════
-//  NAVIGATION
-// ═══════════════════════════════════════════════════════════════
-function navTo(id, btn) {
-  var el = document.getElementById(id);
-  if (!el) return;
-  document.querySelectorAll('.nav-item').forEach(function(b) { b.classList.remove('active'); });
-  if (btn) btn.classList.add('active');
-  var topbarH = document.querySelector('.topbar').offsetHeight || 52;
-  var top = el.getBoundingClientRect().top + window.pageYOffset - topbarH - 8;
-  window.scrollTo({ top: top, behavior: 'smooth' });
+// ══════════════════════════════════════════════════
+//  SIDEBAR / NAV
+// ══════════════════════════════════════════════════
+function openSb(){document.getElementById('sidebar').classList.add('open');document.getElementById('overlay').classList.add('show');}
+function closeSb(){document.getElementById('sidebar').classList.remove('open');document.getElementById('overlay').classList.remove('show');}
+function navTo(id,btn){
+  var el=document.getElementById(id); if(!el) return;
+  document.querySelectorAll('.nav-item').forEach(function(b){b.classList.remove('active');});
+  if(btn) btn.classList.add('active');
+  var th=document.querySelector('.topbar').offsetHeight||50;
+  window.scrollTo({top:el.getBoundingClientRect().top+window.pageYOffset-th-6,behavior:'smooth'});
   closeSb();
 }
 
-// ═══════════════════════════════════════════════════════════════
+// ══════════════════════════════════════════════════
 //  THEME
-// ═══════════════════════════════════════════════════════════════
-function toggleTheme() {
-  isDark = !isDark;
-  document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
-  document.getElementById('themeLbl').textContent = isDark ? 'Dark mode' : 'Light mode';
+// ══════════════════════════════════════════════════
+function toggleTheme(){
+  isDark=!isDark;
+  document.documentElement.setAttribute('data-theme',isDark?'dark':'light');
+  document.getElementById('themeLbl').textContent=isDark?'Dark mode':'Light mode';
   updateChartColors();
-  // Re-render heatmap so colors adapt
-  if (filteredRows.length) {
-    var thr = (D && D.config && D.config.threshold) ? D.config.threshold : 15;
-    renderHeatmap(filteredRows, thr);
+  if(filteredRows.length){
+    var thr=(D&&D.config)?+D.config.threshold:15;
+    renderHeatmaps(filteredRows,thr);
   }
 }
-
-function gc() {
-  return {
-    grid: isDark ? '#30363d' : '#f1f5f9',
-    txt:  isDark ? '#8b949e' : '#94a3b8'
-  };
-}
-
-function updateChartColors() {
-  [tChart, dChart, mChart].forEach(function(ch) {
-    if (!ch) return;
-    var c = gc();
-    if (ch.options.scales) {
-      Object.keys(ch.options.scales).forEach(function(k) {
-        if (ch.options.scales[k].grid)  ch.options.scales[k].grid.color  = c.grid;
-        if (ch.options.scales[k].ticks) ch.options.scales[k].ticks.color = c.txt;
-      });
-    }
+function gc(){return{grid:isDark?'#30363d':'#f1f5f9',txt:isDark?'#8b949e':'#94a3b8'};}
+function updateChartColors(){
+  [tSnack,tMeal,dSnack,dMeal,mChart].forEach(function(ch){
+    if(!ch) return;
+    var c=gc();
+    if(ch.options.scales) Object.keys(ch.options.scales).forEach(function(k){
+      if(ch.options.scales[k].grid) ch.options.scales[k].grid.color=c.grid;
+      if(ch.options.scales[k].ticks) ch.options.scales[k].ticks.color=c.txt;
+    });
     ch.update();
   });
 }
 
-// ═══════════════════════════════════════════════════════════════
+// ══════════════════════════════════════════════════
 //  RANGE FILTER
-// ═══════════════════════════════════════════════════════════════
-function setRange(mode) {
-  rangeMode = mode;
-  ['btnDay','btnWeek','btnMonth','btnCustom'].forEach(function(id) {
-    var el = document.getElementById(id);
-    if (el) el.classList.remove('active');
-  });
-  var map = { day:'btnDay', week:'btnWeek', month:'btnMonth', custom:'btnCustom' };
-  var btn = document.getElementById(map[mode]);
-  if (btn) btn.classList.add('active');
-
-  document.getElementById('wrapMonth').style.display  = (mode === 'month')  ? '' : 'none';
-  document.getElementById('wrapCustom').style.display = (mode === 'custom') ? '' : 'none';
-
-  if (mode !== 'custom' && D) applyRangeFilter();
+// ══════════════════════════════════════════════════
+function setRange(mode){
+  rangeMode=mode;
+  ['btnDay','btnWeek','btnMonth','btnCustom'].forEach(function(id){var el=document.getElementById(id);if(el)el.classList.remove('active');});
+  var btn=document.getElementById({day:'btnDay',week:'btnWeek',month:'btnMonth',custom:'btnCustom'}[mode]);
+  if(btn) btn.classList.add('active');
+  document.getElementById('wrapMonth').style.display  =(mode==='month') ?'':'none';
+  document.getElementById('wrapCustom').style.display =(mode==='custom')?'':'none';
+  if(mode!=='custom'&&D) applyRangeFilter();
 }
 
-function applyRangeFilter() {
-  if (!D || !D.allRows) return;
-  var rows  = D.allRows;
-  var label = D.selectedMonth || selMonth;
-  var now   = new Date();
-
-  if (rangeMode === 'day') {
-    var todayStr = toYMD(now);
-    var filtered = rows.filter(function(r) { return r.rawDate === todayStr; });
-    // Fallback: use the most recent entry if today has no data
-    if (!filtered.length && rows.length) filtered = [rows[rows.length - 1]];
-    rows  = filtered;
-    label = 'Today — ' + now.toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' });
-
-  } else if (rangeMode === 'week') {
-    var weekAgo    = new Date(now);
-    weekAgo.setDate(weekAgo.getDate() - 6);
-    var weekAgoStr = toYMD(weekAgo);
-    var filtered   = rows.filter(function(r) { return r.rawDate >= weekAgoStr; });
-    // Fallback: last 7 entries
-    if (!filtered.length && rows.length) filtered = rows.slice(-7);
-    rows  = filtered;
-    label = 'Last 7 days';
+function applyRangeFilter(){
+  if(!D||!D.allRows) return;
+  var rows=D.allRows, label=D.selectedMonth||selMonth, now=new Date();
+  if(rangeMode==='day'){
+    var td=toYMD(now);
+    var f=rows.filter(function(r){return r.rawDate===td;});
+    if(!f.length&&rows.length) f=[rows[rows.length-1]];
+    rows=f; label='Today — '+now.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
+  } else if(rangeMode==='week'){
+    var wa=new Date(now); wa.setDate(wa.getDate()-6);
+    var ws=toYMD(wa);
+    var f=rows.filter(function(r){return r.rawDate>=ws;});
+    if(!f.length&&rows.length) f=rows.slice(-7);
+    rows=f; label='Last 7 days';
   }
-  // month: use all rows already loaded for that month
-
-  filteredRows  = rows;
-  filteredLabel = label;
-  renderAll(rows, label);
+  filteredRows=rows; filteredLabel=label;
+  renderAll(rows,label);
 }
 
-// Custom range (explicit Apply click)
-function applyCustomRange() {
-  var from = document.getElementById('dateFrom').value;
-  var to   = document.getElementById('dateTo').value;
-  if (!from || !to) { alert('Please select both start and end dates.'); return; }
-  if (from > to)    { alert('Start date must be before end date.'); return; }
-  if (!D || !D.allRows) { alert('No data loaded yet.'); return; }
-
-  // We may need to reload if the range spans months not in current D.allRows
-  var fromMonth = from.substring(0, 7);
-  var toMonth   = to.substring(0, 7);
-
-  if (fromMonth === toMonth && fromMonth === selMonth) {
-    // Same month as already loaded — just filter in memory
-    _applyCustomFilter(from, to);
-  } else {
-    // Different month — need to load all data for a broader range
-    // Strategy: load "all" months and filter (GAS endpoint only supports one month at a time,
-    // so we load the from-month and filter; multi-month range shows a notice)
-    if (fromMonth !== toMonth) {
-      alert('Note: Cross-month ranges filter from already-loaded data.\nFor full cross-month reports, select each month individually.');
-    }
-    // Load the from-month first then filter
-    selMonth = fromMonth;
-    var sel = document.getElementById('monthSel');
-    for (var i = 0; i < sel.options.length; i++) {
-      if (sel.options[i].value === fromMonth) { sel.selectedIndex = i; break; }
-    }
-    loadMonth(fromMonth, function() { _applyCustomFilter(from, to); });
-  }
+function applyCustomRange(){
+  var from=document.getElementById('dateFrom').value, to=document.getElementById('dateTo').value;
+  if(!from||!to){alert('Select both dates.');return;}
+  if(from>to){alert('Start must be before end.');return;}
+  if(!D||!D.allRows){alert('No data loaded.');return;}
+  var rows=D.allRows.filter(function(r){return r.rawDate&&r.rawDate>=from&&r.rawDate<=to;});
+  if(!rows.length){alert('No data for this range.');return;}
+  var fmt=function(s){return new Date(s+'T00:00:00').toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});};
+  var label=fmt(from)+' – '+fmt(to);
+  filteredRows=rows; filteredLabel=label;
+  renderAll(rows,label);
 }
 
-function _applyCustomFilter(from, to) {
-  if (!D || !D.allRows) return;
-  var rows = D.allRows.filter(function(r) { return r.rawDate && r.rawDate >= from && r.rawDate <= to; });
-  if (!rows.length) { alert('No data found for this date range.'); return; }
-  var fmt = function(s) {
-    var d = new Date(s + 'T00:00:00');
-    return d.toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' });
-  };
-  var label = fmt(from) + ' – ' + fmt(to);
-  filteredRows  = rows;
-  filteredLabel = label;
-  renderAll(rows, label);
+function onMonthSelChange(val){
+  if(val!==selMonth){selMonth=val;loadMonth(val);}
 }
 
-function onMonthSelChange(val) {
-  if (val !== selMonth) {
-    selMonth = val;
-    loadMonth(val);
-  }
-}
-
-// ═══════════════════════════════════════════════════════════════
-//  LOAD FROM API
-// ═══════════════════════════════════════════════════════════════
-function loadMonth(m, callback) {
-  selMonth = m;
-  document.getElementById('loader').innerHTML = '<div class="spin"></div><span class="load-txt">Loading data…</span>';
-  document.getElementById('loader').style.display = 'flex';
-  document.getElementById('dash').style.display = 'none';
-
-  fetch(GAS_URL + '?action=dashboard&month=' + m, { redirect: 'follow' })
-    .then(function(r) {
-      if (!r.ok) throw new Error('HTTP ' + r.status);
-      return r.json();
-    })
-    .then(function(data) {
-      if (!data.success) throw new Error(data.message || 'API returned success=false');
-      D = data;
-      D.allRows = data.chartData || [];
+// ══════════════════════════════════════════════════
+//  LOAD
+// ══════════════════════════════════════════════════
+function loadMonth(m,cb){
+  selMonth=m;
+  document.getElementById('loader').innerHTML='<div class="spin"></div><span class="load-txt">Loading…</span>';
+  document.getElementById('loader').style.display='flex';
+  document.getElementById('dash').style.display='none';
+  fetch(GAS_URL+'?action=dashboard&month='+m,{redirect:'follow'})
+    .then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.json();})
+    .then(function(data){
+      if(!data.success) throw new Error(data.message||'API error');
+      D=data; D.allRows=data.chartData||[];
       fillMonthSel(data.availableMonths);
-      document.getElementById('loader').style.display = 'none';
-      document.getElementById('dash').style.display = '';
-      // Apply active range filter to freshly-loaded data
-      rangeMode = 'month'; // reset to month after a fresh load
-      ['btnDay','btnWeek','btnMonth','btnCustom'].forEach(function(id) {
-        var el = document.getElementById(id);
-        if (el) el.classList.remove('active');
-      });
-      var btnM = document.getElementById('btnMonth');
-      if (btnM) btnM.classList.add('active');
-      document.getElementById('wrapMonth').style.display  = '';
-      document.getElementById('wrapCustom').style.display = 'none';
-
-      filteredRows  = D.allRows;
-      filteredLabel = data.selectedMonth || m;
-      renderAll(D.allRows, filteredLabel);
-      if (typeof callback === 'function') callback();
+      document.getElementById('loader').style.display='none';
+      document.getElementById('dash').style.display='';
+      // Reset to month mode after fresh load
+      rangeMode='month';
+      ['btnDay','btnWeek','btnCustom'].forEach(function(id){var el=document.getElementById(id);if(el)el.classList.remove('active');});
+      var bm=document.getElementById('btnMonth'); if(bm) bm.classList.add('active');
+      document.getElementById('wrapMonth').style.display='';
+      document.getElementById('wrapCustom').style.display='none';
+      filteredRows=D.allRows; filteredLabel=data.selectedMonth||m;
+      renderAll(D.allRows,filteredLabel);
+      if(typeof cb==='function') cb();
     })
-    .catch(function(e) {
-      showError('Cannot reach GAS API.<br><small style="color:var(--text-3)">' + e.message + '</small>');
+    .catch(function(e){
+      document.getElementById('loader').innerHTML=
+        '<div style="color:var(--red);font-size:11px;text-align:center;padding:32px;line-height:1.8">Cannot reach API.<br><small style="color:var(--text-3)">'+e.message+'</small></div>';
     });
 }
 
-function showError(html) {
-  document.getElementById('loader').innerHTML =
-    '<div style="color:var(--red);font-size:12px;text-align:center;padding:32px;line-height:1.8">' + html + '</div>';
-  document.getElementById('loader').style.display = 'flex';
-  document.getElementById('dash').style.display = 'none';
-}
-
-// ═══════════════════════════════════════════════════════════════
+// ══════════════════════════════════════════════════
 //  RENDER ALL
-// ═══════════════════════════════════════════════════════════════
-function renderAll(rows, label) {
-  document.getElementById('periodBadge').textContent = label || '—';
-  document.getElementById('sumPeriod').textContent   = label || '—';
-
-  var thr = (D && D.config && D.config.threshold) ? Number(D.config.threshold) : 15;
-  var k   = buildKPI(rows);
-
-  renderKPI(k, rows.length);
-  renderRemarks(k, rows, label);
+// ══════════════════════════════════════════════════
+function renderAll(rows,label){
+  document.getElementById('periodBadge').textContent=label||'—';
+  document.getElementById('sumPeriodS').textContent=label||'—';
+  document.getElementById('sumPeriodM').textContent=label||'—';
+  var thr=(D&&D.config)?+D.config.threshold:15;
+  var k=buildKPI(rows);
+  renderKPI(k);
+  renderRemarks(k,rows,label);
   renderSummary(k);
-  renderTrend(rows);
-  renderDonut(k);
-  renderShiftBars(D ? D.shiftData : null, shiftMode);
-  renderMonthly(D ? D.monthlyRows : null);
-  renderHeatmap(rows, thr);
-  renderTable(rows, thr);
-  renderHistory(D ? D.monthlyRows : null);
+  renderTrendSnack(rows);
+  renderTrendMeal(rows);
+  renderDonutSnack(k);
+  renderDonutMeal(k);
+  renderMonthly(D?D.monthlyRows:null);
+  renderShifts(D?D.shiftData:null);
+  renderHeatmaps(rows,thr);
+  renderTable(rows,thr);
+  renderHistory(D?D.monthlyRows:null);
 }
 
-// ═══════════════════════════════════════════════════════════════
+// ══════════════════════════════════════════════════
 //  HELPERS
-// ═══════════════════════════════════════════════════════════════
-function n(v)   { return Number(v) || 0; }
-function f(v)   { return Number(v || 0).toLocaleString(); }
-function set(id, v) { var el = document.getElementById(id); if (el) el.textContent = v; }
-function toYMD(d) {
-  return d.getFullYear() + '-' +
-    String(d.getMonth() + 1).padStart(2, '0') + '-' +
-    String(d.getDate()).padStart(2, '0');
-}
-function eb(v) {
-  var val = parseFloat(v) || 0;
-  var cls = val >= 98 ? 'eg' : val >= 95 ? 'eo' : 'er';
-  return '<span class="eb ' + cls + '">' + val.toFixed(1) + '%</span>';
-}
+// ══════════════════════════════════════════════════
+function n(v){return Number(v)||0;}
+function f(v){return Number(v||0).toLocaleString();}
+function set(id,v){var el=document.getElementById(id);if(el)el.textContent=v;}
+function toYMD(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+function eb(v){var val=parseFloat(v)||0;var c=val>=98?'eg':val>=95?'eo':'er';return '<span class="eb '+c+'">'+val.toFixed(1)+'%</span>';}
 
-// ═══════════════════════════════════════════════════════════════
-//  KPI
-// ═══════════════════════════════════════════════════════════════
-function buildKPI(rows) {
-  var a = rows.reduce(function(acc, r) {
-    acc.tso += n(r.snackOrder);    acc.tsl += n(r.snackLeftover); acc.tsc += n(r.snackConsumed); acc.seS += n(r.snackEff);
-    acc.tmo += n(r.mealOrder);     acc.tml += n(r.mealLeftover);  acc.tmc += n(r.mealConsumed);  acc.meS += n(r.mealEff);
+function buildKPI(rows){
+  var a=rows.reduce(function(acc,r){
+    acc.tso+=n(r.snackOrder);acc.tsl+=n(r.snackLeftover);acc.tsc+=n(r.snackConsumed);acc.seS+=n(r.snackEff);
+    acc.tmo+=n(r.mealOrder); acc.tml+=n(r.mealLeftover); acc.tmc+=n(r.mealConsumed); acc.meS+=n(r.mealEff);
     return acc;
-  }, { tso:0, tsl:0, tsc:0, tmo:0, tml:0, tmc:0, seS:0, meS:0 });
-
-  var d = rows.length || 1;
-  return {
-    days:              rows.length,
-    totalSnackOrder:   a.tso, totalSnackConsumed: a.tsc, totalSnackLeftover: a.tsl,
-    totalMealOrder:    a.tmo, totalMealConsumed:  a.tmc, totalMealLeftover:  a.tml,
-    snackEff:          rows.length ? Math.round(a.seS / d * 100) / 100 : 0,
-    mealEff:           rows.length ? Math.round(a.meS / d * 100) / 100 : 0,
-    avgSO:             Math.round(a.tso / d),
-    avgMO:             Math.round(a.tmo / d)
+  },{tso:0,tsl:0,tsc:0,tmo:0,tml:0,tmc:0,seS:0,meS:0});
+  var d=rows.length||1;
+  return{
+    days:rows.length,
+    tso:a.tso,tsl:a.tsl,tsc:a.tsc,
+    tmo:a.tmo,tml:a.tml,tmc:a.tmc,
+    se:rows.length?Math.round(a.seS/d*100)/100:0,
+    me:rows.length?Math.round(a.meS/d*100)/100:0,
+    avgSO:Math.round(a.tso/d),avgMO:Math.round(a.tmo/d)
   };
 }
 
-function renderKPI(k) {
-  var avg = Math.round((k.snackEff + k.mealEff) / 2 * 10) / 10;
-  var ec  = avg >= 98 ? '#1a6b3f' : avg >= 95 ? '#002366' : avg >= 90 ? '#b45309' : '#b91c1c';
-  document.getElementById('kpiGrid').innerHTML = [
-    { l:'Total Ordered',    v:f(k.totalSnackOrder + k.totalMealOrder),      s:'Snack + Meal', a:'#002366' },
-    { l:'Total Consumed',   v:f(k.totalSnackConsumed + k.totalMealConsumed),s:'Snack + Meal', a:'#1a6b3f' },
-    { l:'Total Leftover',   v:f(k.totalSnackLeftover + k.totalMealLeftover),s:'Snack + Meal', a:'#b45309' },
-    { l:'Snack Efficiency', v:k.snackEff + '%',                             s:'Period avg',   a:'#1a6b3f' },
-    { l:'Meal Efficiency',  v:k.mealEff  + '%',                             s:'Period avg',   a:'#002366' },
-    { l:'Overall Eff.',     v:avg + '%',                                    s:k.days + ' days', a:ec       }
-  ].map(function(c) {
-    return '<div class="kpi-card">' +
-      '<div class="kpi-accent" style="background:' + c.a + '"></div>' +
-      '<div class="kpi-lbl">' + c.l + '</div>' +
-      '<div class="kpi-val">' + c.v + '</div>' +
-      '<div class="kpi-sub">' + c.s + '</div></div>';
-  }).join('');
+// ══════════════════════════════════════════════════
+//  KPI CARDS — separated
+// ══════════════════════════════════════════════════
+function renderKPI(k){
+  var avg=Math.round((k.se+k.me)/2*10)/10;
+  var ec=avg>=98?'#1a6b3f':avg>=95?'#002366':avg>=90?'#b45309':'#b91c1c';
+
+  // Snack cards
+  document.getElementById('kpiSnack').innerHTML=[
+    {l:'Ordered',  v:f(k.tso), s:'Total',     a:'#1a6b3f'},
+    {l:'Consumed', v:f(k.tsc), s:'Total',     a:'#1a6b3f'},
+    {l:'Leftover', v:f(k.tsl), s:'Total',     a:'#b45309'},
+    {l:'Efficiency',v:k.se+'%',s:'Period avg',a:'#1a6b3f'}
+  ].map(kpiCard).join('');
+
+  // Meal cards
+  document.getElementById('kpiMeal').innerHTML=[
+    {l:'Ordered',  v:f(k.tmo), s:'Total',     a:'#002366'},
+    {l:'Consumed', v:f(k.tmc), s:'Total',     a:'#002366'},
+    {l:'Leftover', v:f(k.tml), s:'Total',     a:'#b45309'},
+    {l:'Efficiency',v:k.me+'%',s:'Period avg',a:'#002366'}
+  ].map(kpiCard).join('');
+
+  // Overall
+  document.getElementById('kpiOverall').innerHTML=[
+    {l:'Total Ordered',   v:f(k.tso+k.tmo),s:'Snack + Meal',a:'#475569'},
+    {l:'Total Consumed',  v:f(k.tsc+k.tmc),s:'Snack + Meal',a:'#1a6b3f'},
+    {l:'Overall Efficiency',v:avg+'%',     s:k.days+' days',a:ec}
+  ].map(kpiCard).join('');
 }
 
-// ═══════════════════════════════════════════════════════════════
+function kpiCard(c){
+  return '<div class="kpi-card"><div class="kpi-accent" style="background:'+c.a+'"></div>'+
+    '<div class="kpi-lbl">'+c.l+'</div><div class="kpi-val">'+c.v+'</div><div class="kpi-sub">'+c.s+'</div></div>';
+}
+
+// ══════════════════════════════════════════════════
 //  REMARKS
-// ═══════════════════════════════════════════════════════════════
-function renderRemarks(k, rows, label) {
-  var avg = Math.round((k.snackEff + k.mealEff) / 2 * 10) / 10;
-  var peak = 0, peakDate = '—';
-  rows.forEach(function(r) {
-    var v = n(r.snackLeftover) + n(r.mealLeftover);
-    if (v > peak) { peak = v; peakDate = r.date || '—'; }
+// ══════════════════════════════════════════════════
+function renderRemarks(k,rows,label){
+  var avg=Math.round((k.se+k.me)/2*10)/10;
+  var peakS=0,peakM=0,peakSDate='—',peakMDate='—';
+  rows.forEach(function(r){
+    if(n(r.snackLeftover)>peakS){peakS=n(r.snackLeftover);peakSDate=r.date||'—';}
+    if(n(r.mealLeftover)>peakM){peakM=n(r.mealLeftover);peakMDate=r.date||'—';}
   });
-  var verdict = avg >= 98 ? 'Excellent — minimal waste.' :
-                avg >= 95 ? 'Normal — within target range.' :
-                avg >= 90 ? 'Needs attention — leftover above average.' :
-                            'Poor — immediate review recommended.';
-  set('remTxt',
-    (label || '—') + ': Overall efficiency ' + avg + '% ' +
-    '(Snack ' + k.snackEff + '% / Meal ' + k.mealEff + '%). ' +
-    'Peak leftover on ' + peakDate + ' (' + f(peak) + ' portions). ' + verdict
-  );
+  var v=avg>=98?'Excellent — minimal waste.':avg>=95?'Normal — within target range.':avg>=90?'Needs attention — leftover above average.':'Poor — immediate review recommended.';
+  set('remTxt',(label||'—')+
+    ': Snack eff '+k.se+'% (peak leftover '+f(peakS)+' on '+peakSDate+') · '+
+    'Meal eff '+k.me+'% (peak leftover '+f(peakM)+' on '+peakMDate+'). '+
+    'Overall '+avg+'% — '+v);
 }
 
-// ═══════════════════════════════════════════════════════════════
+// ══════════════════════════════════════════════════
 //  SUMMARY
-// ═══════════════════════════════════════════════════════════════
-function renderSummary(k) {
-  set('s-ord', f(k.totalSnackOrder));    set('s-con', f(k.totalSnackConsumed));
-  set('s-lft', f(k.totalSnackLeftover)); set('s-avg', f(k.avgSO) + ' / day');
-  set('m-ord', f(k.totalMealOrder));     set('m-con', f(k.totalMealConsumed));
-  set('m-lft', f(k.totalMealLeftover));  set('m-avg', f(k.avgMO) + ' / day');
+// ══════════════════════════════════════════════════
+function renderSummary(k){
+  set('s-ord',f(k.tso));set('s-con',f(k.tsc));set('s-lft',f(k.tsl));
+  set('s-avg',f(k.avgSO)+' / day');set('s-eff',k.se+'%');
+  set('m-ord',f(k.tmo));set('m-con',f(k.tmc));set('m-lft',f(k.tml));
+  set('m-avg',f(k.avgMO)+' / day');set('m-eff',k.me+'%');
 }
 
-// ═══════════════════════════════════════════════════════════════
-//  TREND CHART
-// ═══════════════════════════════════════════════════════════════
-function renderTrend(rows) {
-  if (tChart) { tChart.destroy(); tChart = null; }
-  if (!rows.length) return;
-  var c   = gc();
-  var ctx = document.getElementById('trendChart').getContext('2d');
-  tChart  = new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels: rows.map(function(r) { return r.date; }),
-      datasets: [
-        { label:'Meal Ordered',   data:rows.map(function(r){ return n(r.mealOrder); }),   borderColor:'#002366', backgroundColor:'transparent', borderWidth:2,   pointRadius:2, tension:.3 },
-        { label:'Meal Consumed',  data:rows.map(function(r){ return n(r.mealConsumed); }),borderColor:'#93c5fd', backgroundColor:'transparent', borderWidth:1.5, borderDash:[4,3], pointRadius:0, tension:.3 },
-        { label:'Snack Ordered',  data:rows.map(function(r){ return n(r.snackOrder); }),  borderColor:'#1a6b3f', backgroundColor:'transparent', borderWidth:2,   pointRadius:2, tension:.3 },
-        { label:'Snack Consumed', data:rows.map(function(r){ return n(r.snackConsumed);}),borderColor:'#86efac', backgroundColor:'transparent', borderWidth:1.5, borderDash:[4,3], pointRadius:0, tension:.3 }
+// ══════════════════════════════════════════════════
+//  TREND CHARTS
+// ══════════════════════════════════════════════════
+function makeTrendChart(canvasId, rows, ordKey, conKey, lftKey, ordColor, conColor){
+  var old=canvasId==='trendSnack'?tSnack:tMeal;
+  if(old){old.destroy();}
+  if(!rows.length) return null;
+  var c=gc(), ctx=document.getElementById(canvasId).getContext('2d');
+  var ch=new Chart(ctx,{
+    type:'line',
+    data:{
+      labels:rows.map(function(r){return r.date;}),
+      datasets:[
+        {label:'Ordered', data:rows.map(function(r){return n(r[ordKey]);}),borderColor:ordColor,backgroundColor:'transparent',borderWidth:1.5,pointRadius:1.5,tension:.3},
+        {label:'Consumed',data:rows.map(function(r){return n(r[conKey]);}),borderColor:conColor,backgroundColor:'transparent',borderWidth:1.5,borderDash:[4,3],pointRadius:0,tension:.3},
+        {label:'Leftover',data:rows.map(function(r){return n(r[lftKey]);}),borderColor:'#fca5a5',backgroundColor:'rgba(252,165,165,.15)',borderWidth:1,pointRadius:0,tension:.3,fill:true}
       ]
     },
-    options: {
-      responsive:true, maintainAspectRatio:true, animation:{ duration:400 },
-      plugins: {
-        legend: { display:false },
-        tooltip: { callbacks: { label:function(ctx){ return ctx.dataset.label + ': ' + n(ctx.raw).toLocaleString(); } } }
-      },
-      scales: {
-        x: { grid:{ color:c.grid }, ticks:{ color:c.txt, font:{ size:9 }, maxTicksLimit:14 } },
-        y: { grid:{ color:c.grid }, ticks:{ color:c.txt, font:{ size:9 }, callback:function(v){ return v.toLocaleString(); } }, beginAtZero:true }
+    options:{
+      responsive:true,maintainAspectRatio:true,animation:{duration:350},
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:function(ctx){return ctx.dataset.label+': '+n(ctx.raw).toLocaleString();}}}},
+      scales:{
+        x:{grid:{color:c.grid},ticks:{color:c.txt,font:{size:8},maxTicksLimit:12}},
+        y:{grid:{color:c.grid},ticks:{color:c.txt,font:{size:8},callback:function(v){return v.toLocaleString();}},beginAtZero:true}
       }
     }
   });
+  if(canvasId==='trendSnack') tSnack=ch; else tMeal=ch;
+  return ch;
 }
 
-// ═══════════════════════════════════════════════════════════════
-//  DONUT
-// ═══════════════════════════════════════════════════════════════
-function renderDonut(k) {
-  if (dChart) { dChart.destroy(); dChart = null; }
-  var ctx = document.getElementById('donutChart').getContext('2d');
-  var sLft = Math.max(0, 100 - k.snackEff);
-  var mLft = Math.max(0, 100 - k.mealEff);
-  dChart = new Chart(ctx, {
-    type: 'doughnut',
-    data: {
-      labels: ['Snack Consumed', 'Snack Leftover', 'Meal Consumed', 'Meal Leftover'],
-      datasets: [{
-        data: [k.snackEff, sLft, k.mealEff, mLft],
-        backgroundColor: ['#1a6b3f', '#e6f4ed', '#002366', '#e8edf7'],
-        borderWidth: 0,
-        cutout: '65%'
-      }]
+function renderTrendSnack(rows){makeTrendChart('trendSnack',rows,'snackOrder','snackConsumed','snackLeftover','#1a6b3f','#86efac');}
+function renderTrendMeal(rows) {makeTrendChart('trendMeal', rows,'mealOrder', 'mealConsumed', 'mealLeftover', '#002366','#93c5fd');}
+
+// ══════════════════════════════════════════════════
+//  DONUT CHARTS
+// ══════════════════════════════════════════════════
+function makeDonut(canvasId,eff,colFill,colEmpty,old){
+  if(old){old.destroy();}
+  var ctx=document.getElementById(canvasId).getContext('2d');
+  var lft=Math.max(0,100-eff);
+  var ch=new Chart(ctx,{
+    type:'doughnut',
+    data:{
+      labels:['Consumed','Leftover'],
+      datasets:[{data:[eff,lft],backgroundColor:[colFill,colEmpty],borderWidth:0,cutout:'70%'}]
     },
-    options: {
-      responsive:true, maintainAspectRatio:true, animation:{ duration:400 },
-      plugins: {
-        legend: { position:'bottom', labels:{ font:{ size:10 }, boxWidth:10, padding:10 } },
-        tooltip: { callbacks: { label:function(ctx){ return ctx.label + ': ' + parseFloat(ctx.raw).toFixed(1) + '%'; } } }
+    options:{
+      responsive:true,maintainAspectRatio:true,animation:{duration:350},
+      plugins:{
+        legend:{position:'bottom',labels:{font:{size:9},boxWidth:8,padding:8}},
+        tooltip:{callbacks:{label:function(ctx){return ctx.label+': '+parseFloat(ctx.raw).toFixed(1)+'%';}}}
       }
     }
   });
+  return ch;
 }
+function renderDonutSnack(k){dSnack=makeDonut('donutSnack',k.se,'#1a6b3f','#e6f4ed',dSnack);}
+function renderDonutMeal(k) {dMeal=makeDonut('donutMeal', k.me,'#002366','#e8edf7',dMeal);}
 
-// ═══════════════════════════════════════════════════════════════
-//  SHIFT BARS
-// ═══════════════════════════════════════════════════════════════
-function switchShift(m) {
-  shiftMode = m;
-  document.getElementById('togS').className = 's-tog' + (m === 'snack' ? ' on' : '');
-  document.getElementById('togM').className = 's-tog' + (m === 'meal'  ? ' on' : '');
-  if (D) renderShiftBars(D.shiftData, m);
-}
-
-function renderShiftBars(sd, m) {
-  var el = document.getElementById('shiftBars');
-  if (!sd) {
-    el.innerHTML = '<p style="font-size:11px;color:var(--text-3)">Shift data not available.</p>';
-    return;
-  }
-  var s1  = n(m === 'snack' ? sd.snackS1 : sd.mealS1);
-  var s2  = n(m === 'snack' ? sd.snackS2 : sd.mealS2);
-  var s3  = n(m === 'snack' ? sd.snackS3 : sd.mealS3);
-  var tot = (s1 + s2 + s3) || 1;
-  var col = m === 'snack' ? '#1a6b3f' : '#002366';
-
-  el.innerHTML = [['Shift 1','d1',s1],['Shift 2','d2',s2],['Shift 3','d3',s3]].map(function(sh) {
-    var pct = Math.round(sh[2] / tot * 1000) / 10;
-    return '<div class="eff-row">' +
-      '<div class="eff-top">' +
-        '<span class="eff-lbl"><span class="sdot ' + sh[1] + '" style="display:inline-block;margin-right:4px"></span>' + sh[0] + '</span>' +
-        '<span class="eff-val">' + f(sh[2]) + ' <small style="font-weight:400;color:var(--text-3)">' + pct + '%</small></span>' +
-      '</div>' +
-      '<div class="bar-bg"><div class="bar-fill" style="width:' + pct + '%;background:' + col + '"></div></div>' +
-    '</div>';
-  }).join('');
-}
-
-// ═══════════════════════════════════════════════════════════════
+// ══════════════════════════════════════════════════
 //  MONTHLY CHART
-// ═══════════════════════════════════════════════════════════════
-function renderMonthly(mrows) {
-  if (mChart) { mChart.destroy(); mChart = null; }
-  if (!mrows || !mrows.length) return;
-
-  // Compute dynamic y-axis min (floor to nearest 5, at least 5 below actual min)
-  var allEff = [];
-  mrows.forEach(function(r) {
-    if (r.snackEff) allEff.push(n(r.snackEff));
-    if (r.mealEff)  allEff.push(n(r.mealEff));
-  });
-  var minEff = allEff.length ? Math.min.apply(null, allEff) : 80;
-  var yMin   = Math.max(0, Math.floor((minEff - 5) / 5) * 5);
-
-  var c   = gc();
-  var ctx = document.getElementById('monthlyChart').getContext('2d');
-  mChart  = new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels: mrows.map(function(r) { return r.month; }),
-      datasets: [
-        { label:'Snack Eff %', data:mrows.map(function(r){ return n(r.snackEff); }), backgroundColor:'#86efac', borderRadius:3 },
-        { label:'Meal Eff %',  data:mrows.map(function(r){ return n(r.mealEff); }),  backgroundColor:'#93c5fd', borderRadius:3 }
+// ══════════════════════════════════════════════════
+function renderMonthly(mrows){
+  if(mChart){mChart.destroy();mChart=null;}
+  if(!mrows||!mrows.length) return;
+  var allEff=[]; mrows.forEach(function(r){if(r.snackEff)allEff.push(n(r.snackEff));if(r.mealEff)allEff.push(n(r.mealEff));});
+  var minEff=allEff.length?Math.min.apply(null,allEff):80;
+  var yMin=Math.max(0,Math.floor((minEff-5)/5)*5);
+  var c=gc(), ctx=document.getElementById('monthlyChart').getContext('2d');
+  mChart=new Chart(ctx,{
+    type:'bar',
+    data:{
+      labels:mrows.map(function(r){return r.month;}),
+      datasets:[
+        {label:'Snack',data:mrows.map(function(r){return n(r.snackEff);}),backgroundColor:'#86efac',borderRadius:3},
+        {label:'Meal', data:mrows.map(function(r){return n(r.mealEff);}), backgroundColor:'#93c5fd',borderRadius:3}
       ]
     },
-    options: {
-      responsive:true, maintainAspectRatio:true, animation:{ duration:400 },
-      plugins: { legend:{ labels:{ font:{ size:9 }, boxWidth:8, padding:8 } } },
-      scales: {
-        x: { grid:{ display:false }, ticks:{ color:c.txt, font:{ size:9 } } },
-        y: { min:yMin, max:100, grid:{ color:c.grid }, ticks:{ color:c.txt, font:{ size:9 }, callback:function(v){ return v + '%'; } } }
+    options:{
+      responsive:true,maintainAspectRatio:true,animation:{duration:350},
+      plugins:{legend:{labels:{font:{size:9},boxWidth:7,padding:7}}},
+      scales:{
+        x:{grid:{display:false},ticks:{color:c.txt,font:{size:8}}},
+        y:{min:yMin,max:100,grid:{color:c.grid},ticks:{color:c.txt,font:{size:8},callback:function(v){return v+'%';}}}
       }
     }
   });
 }
 
-// ═══════════════════════════════════════════════════════════════
-//  HEATMAP
-// ═══════════════════════════════════════════════════════════════
-function renderHeatmap(rows, thr) {
-  var grid = document.getElementById('hmGrid');
-  if (!rows.length) {
-    grid.innerHTML = '<p class="empty-state">No data for this period.</p>';
-    document.getElementById('hmLegBar').innerHTML = '';
-    return;
-  }
-  var vals = rows.map(function(r) { return n(r.snackLeftover) + n(r.mealLeftover); });
-  var maxV = Math.max.apply(null, vals) || 1;
-
-  function hmColor(v) {
-    if (v === 0) return isDark ? '#1c2128' : '#f0fdf4';
-    var r = v / maxV;
-    if (r < 0.25)  return '#86efac';
-    if (r < 0.50)  return '#fcd34d';
-    if (r < 0.75)  return '#fb923c';
-    return '#f87171';
-  }
-  function textColor(v) { return (v / maxV) > 0.45 ? '#1f2937' : '#374151'; }
-
-  grid.innerHTML = rows.map(function(r, i) {
-    var v   = vals[i];
-    var col = hmColor(v);
-    var tc  = textColor(v);
-    var lbl = r.rawDate ? r.rawDate.substring(8) : (r.date ? r.date.split(' ')[0] : i + 1);
-    // Escape for inline event attribute
-    var tipTxt = (r.date || r.rawDate || '') + ': ' + f(v) + ' leftover';
-    return '<div class="hm-cell" style="background:' + col + ';color:' + tc + '"' +
-      ' onmouseenter="showTip(event,\'' + tipTxt.replace(/'/g, '&#39;') + '\')"' +
-      ' onmouseleave="hideTip()">' + lbl + '</div>';
+// ══════════════════════════════════════════════════
+//  SHIFT BARS — separate Snack / Meal
+// ══════════════════════════════════════════════════
+function renderShifts(sd){
+  renderOneShiftBar('shiftSnack',sd,[sd?n(sd.snackS1):0,sd?n(sd.snackS2):0,sd?n(sd.snackS3):0],'#1a6b3f');
+  renderOneShiftBar('shiftMeal', sd,[sd?n(sd.mealS1):0, sd?n(sd.mealS2):0, sd?n(sd.mealS3):0], '#002366');
+}
+function renderOneShiftBar(elId,sd,vals,col){
+  var el=document.getElementById(elId);
+  if(!sd){el.innerHTML='<p style="font-size:10px;color:var(--text-3)">No shift data.</p>';return;}
+  var tot=vals[0]+vals[1]+vals[2]||1;
+  el.innerHTML=[['Shift 1','d1',vals[0]],['Shift 2','d2',vals[1]],['Shift 3','d3',vals[2]]].map(function(sh){
+    var pct=Math.round(sh[2]/tot*1000)/10;
+    return '<div class="eff-row"><div class="eff-top">'+
+      '<span class="eff-lbl"><span class="sdot '+sh[1]+'" style="display:inline-block;margin-right:4px"></span>'+sh[0]+'</span>'+
+      '<span class="eff-val">'+f(sh[2])+' <small style="font-weight:400;color:var(--text-3)">'+pct+'%</small></span></div>'+
+      '<div class="bar-bg"><div class="bar-fill" style="width:'+pct+'%;background:'+col+'"></div></div></div>';
   }).join('');
-
-  document.getElementById('hmLegBar').innerHTML =
-    ['#86efac','#fcd34d','#fb923c','#f87171']
-      .map(function(c) { return '<div class="hm-sq" style="background:' + c + '"></div>'; })
-      .join('');
 }
 
-// ═══════════════════════════════════════════════════════════════
+// ══════════════════════════════════════════════════
+//  HEATMAPS — separate Snack / Meal
+// ══════════════════════════════════════════════════
+function renderHeatmaps(rows,thr){
+  renderOneHeatmap('hmSnack','hmLegSnack',rows,'snackLeftover','#1a6b3f');
+  renderOneHeatmap('hmMeal', 'hmLegMeal', rows,'mealLeftover', '#002366');
+}
+function renderOneHeatmap(gridId,legId,rows,key,accent){
+  var grid=document.getElementById(gridId);
+  if(!rows.length){grid.innerHTML='<p class="empty-state">No data.</p>';return;}
+  var vals=rows.map(function(r){return n(r[key]);});
+  var maxV=Math.max.apply(null,vals)||1;
+  function hmColor(v){
+    if(v===0) return isDark?'#1c2128':'#f0fdf4';
+    var r=v/maxV;
+    if(r<0.25)return '#86efac'; if(r<0.5)return '#fcd34d'; if(r<0.75)return '#fb923c'; return '#f87171';
+  }
+  grid.innerHTML=rows.map(function(r,i){
+    var v=vals[i],col=hmColor(v);
+    var tc=v/maxV>0.45?'#1f2937':'#374151';
+    var lbl=r.rawDate?r.rawDate.substring(8):(r.date?r.date.split(' ')[0]:i+1);
+    var tip=(r.date||r.rawDate||'')+': '+f(v);
+    return '<div class="hm-cell" style="background:'+col+';color:'+tc+'"'+
+      ' onmouseenter="showTip(event,\''+tip.replace(/'/g,"&#39;")+'\')" onmouseleave="hideTip()">'+lbl+'</div>';
+  }).join('');
+  document.getElementById(legId).innerHTML=
+    ['#86efac','#fcd34d','#fb923c','#f87171'].map(function(c){return '<div class="hm-sq" style="background:'+c+'"></div>';}).join('');
+}
+
+// ══════════════════════════════════════════════════
 //  TOOLTIP
-// ═══════════════════════════════════════════════════════════════
-function showTip(e, txt) {
-  var t = document.getElementById('tip');
-  t.textContent  = txt;
-  t.style.display = 'block';
-  // Keep within viewport
-  var x = e.clientX + 14;
-  var y = e.clientY - 8;
-  if (x + 200 > window.innerWidth)  x = e.clientX - 214;
-  if (y + 40  > window.innerHeight) y = e.clientY - 48;
-  t.style.left = x + 'px';
-  t.style.top  = y + 'px';
+// ══════════════════════════════════════════════════
+function showTip(e,txt){
+  var t=document.getElementById('tip'); t.textContent=txt; t.style.display='block';
+  var x=e.clientX+12, y=e.clientY-8;
+  if(x+200>window.innerWidth) x=e.clientX-212;
+  if(y+36>window.innerHeight) y=e.clientY-44;
+  t.style.left=x+'px'; t.style.top=y+'px';
 }
-function hideTip() { document.getElementById('tip').style.display = 'none'; }
+function hideTip(){document.getElementById('tip').style.display='none';}
 
-// ═══════════════════════════════════════════════════════════════
+// ══════════════════════════════════════════════════
 //  DETAIL TABLE
-// ═══════════════════════════════════════════════════════════════
-function renderTable(rows, thr) {
-  set('tblCount', rows.length + ' entr' + (rows.length === 1 ? 'y' : 'ies'));
-  if (!rows.length) {
-    document.getElementById('tblBody').innerHTML =
-      '<tr><td colspan="9" class="empty-state">No data for this period.</td></tr>';
-    return;
-  }
-  document.getElementById('tblBody').innerHTML = rows.map(function(r) {
-    var leftover = n(r.snackLeftover) + n(r.mealLeftover);
-    var cls = leftover > thr ? ' warn-row' : '';
-    return '<tr class="' + cls + '">' +
-      '<td>' + (r.date || r.rawDate || '—') + '</td>' +
-      '<td>' + f(r.snackOrder)    + '</td>' +
-      '<td>' + f(r.snackConsumed) + '</td>' +
-      '<td>' + f(r.snackLeftover) + '</td>' +
-      '<td>' + eb(r.snackEff)     + '</td>' +
-      '<td>' + f(r.mealOrder)     + '</td>' +
-      '<td>' + f(r.mealConsumed)  + '</td>' +
-      '<td>' + f(r.mealLeftover)  + '</td>' +
-      '<td>' + eb(r.mealEff)      + '</td>' +
-    '</tr>';
+// ══════════════════════════════════════════════════
+function renderTable(rows,thr){
+  set('tblCount',rows.length+' entr'+(rows.length===1?'y':'ies'));
+  if(!rows.length){document.getElementById('tblBody').innerHTML='<tr><td colspan="9" class="empty-state">No data.</td></tr>';return;}
+  document.getElementById('tblBody').innerHTML=rows.map(function(r){
+    var lft=n(r.snackLeftover)+n(r.mealLeftover), cls=lft>thr?' warn-row':'';
+    return '<tr class="'+cls+'"><td>'+(r.date||r.rawDate||'—')+'</td>'+
+      '<td>'+f(r.snackOrder)+'</td><td>'+f(r.snackConsumed)+'</td><td>'+f(r.snackLeftover)+'</td><td>'+eb(r.snackEff)+'</td>'+
+      '<td>'+f(r.mealOrder)+'</td><td>'+f(r.mealConsumed)+'</td><td>'+f(r.mealLeftover)+'</td><td>'+eb(r.mealEff)+'</td></tr>';
   }).join('');
 }
 
-// ═══════════════════════════════════════════════════════════════
+// ══════════════════════════════════════════════════
 //  HISTORY TABLE
-// ═══════════════════════════════════════════════════════════════
-function renderHistory(mrows) {
-  var tbody = document.getElementById('histBody');
-  if (!mrows || !mrows.length) {
-    tbody.innerHTML = '<tr><td colspan="8" class="empty-state">No monthly history yet.</td></tr>';
-    return;
-  }
-  tbody.innerHTML = mrows.map(function(r) {
-    return '<tr>' +
-      '<td><strong>' + (r.month || '—') + '</strong></td>' +
-      '<td>' + (r.workingDays || 0) + '</td>' +
-      '<td>' + f(r.snackOrder)      + '</td>' +
-      '<td>' + eb(r.snackEff)       + '</td>' +
-      '<td>' + f(r.mealOrder)       + '</td>' +
-      '<td>' + eb(r.mealEff)        + '</td>' +
-      '<td>' + (r.peakDate  || '—') + '</td>' +
-      '<td style="font-size:10px;color:var(--text-3);max-width:180px;white-space:normal">' + (r.remarks || '—') + '</td>' +
-    '</tr>';
+// ══════════════════════════════════════════════════
+function renderHistory(mrows){
+  var tbody=document.getElementById('histBody');
+  if(!mrows||!mrows.length){tbody.innerHTML='<tr><td colspan="8" class="empty-state">No monthly history.</td></tr>';return;}
+  tbody.innerHTML=mrows.map(function(r){
+    return '<tr><td><strong>'+(r.month||'—')+'</strong></td><td>'+(r.workingDays||0)+'</td>'+
+      '<td>'+f(r.snackOrder)+'</td><td>'+eb(r.snackEff)+'</td>'+
+      '<td>'+f(r.mealOrder)+'</td><td>'+eb(r.mealEff)+'</td>'+
+      '<td>'+(r.peakDate||'—')+'</td>'+
+      '<td style="font-size:10px;color:var(--text-3);max-width:180px;white-space:normal">'+(r.remarks||'—')+'</td></tr>';
   }).join('');
 }
 
-// ═══════════════════════════════════════════════════════════════
+// ══════════════════════════════════════════════════
 //  MONTH SELECT
-// ═══════════════════════════════════════════════════════════════
-function fillMonthSel(months) {
-  var sel = document.getElementById('monthSel');
-  sel.innerHTML = '';
-  if (!months || !months.length) {
-    sel.innerHTML = '<option value="">No data</option>';
-    return;
-  }
-  // months already sorted ascending from API; show descending in UI (most recent first)
-  var list = months.slice().reverse();
-  list.forEach(function(m) {
-    var o = document.createElement('option');
-    o.value       = m.value;
-    o.textContent = m.label;
-    if (m.value === selMonth) o.selected = true;
+// ══════════════════════════════════════════════════
+function fillMonthSel(months){
+  var sel=document.getElementById('monthSel'); sel.innerHTML='';
+  if(!months||!months.length){sel.innerHTML='<option>No data</option>';return;}
+  months.slice().reverse().forEach(function(m){
+    var o=document.createElement('option');
+    o.value=m.value; o.textContent=m.label;
+    if(m.value===selMonth) o.selected=true;
     sel.appendChild(o);
   });
 }
 
-// ═══════════════════════════════════════════════════════════════
+// ══════════════════════════════════════════════════
 //  EXPORT
-// ═══════════════════════════════════════════════════════════════
-function exportCSV() {
-  // Export the currently visible (filtered) rows, not always the full month
-  var rows = filteredRows.length ? filteredRows : (D ? D.allRows : []);
-  if (!rows.length) { alert('No data to export.'); return; }
-
-  var csv = 'Date,Snack Ordered,Snack Consumed,Snack Leftover,Snack Eff%,Meal Ordered,Meal Consumed,Meal Leftover,Meal Eff%\n';
-  csv += rows.map(function(r) {
-    return [
-      r.date || r.rawDate,
-      n(r.snackOrder), n(r.snackConsumed), n(r.snackLeftover), n(r.snackEff),
-      n(r.mealOrder),  n(r.mealConsumed),  n(r.mealLeftover),  n(r.mealEff)
-    ].join(',');
-  }).join('\n');
-
-  var filename = 'canteen_' + (filteredLabel || selMonth).replace(/[^a-zA-Z0-9_-]/g, '_') + '.csv';
-  var a = document.createElement('a');
-  a.href     = URL.createObjectURL(new Blob([csv], { type:'text/csv;charset=utf-8;' }));
-  a.download = filename;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(a.href);
+// ══════════════════════════════════════════════════
+function exportCSV(){
+  var rows=filteredRows.length?filteredRows:(D?D.allRows:[]);
+  if(!rows.length){alert('No data.');return;}
+  var csv='Date,Snack Ordered,Snack Consumed,Snack Leftover,Snack Eff%,Meal Ordered,Meal Consumed,Meal Leftover,Meal Eff%\n';
+  csv+=rows.map(function(r){return[r.date||r.rawDate,n(r.snackOrder),n(r.snackConsumed),n(r.snackLeftover),n(r.snackEff),n(r.mealOrder),n(r.mealConsumed),n(r.mealLeftover),n(r.mealEff)].join(',');}).join('\n');
+  var name='canteen_'+(filteredLabel||selMonth).replace(/[^a-zA-Z0-9_-]/g,'_')+'.csv';
+  var a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8;'}));
+  a.download=name; document.body.appendChild(a); a.click(); document.body.removeChild(a);
 }
-
-function exportPDF() { window.print(); }
+function exportPDF(){window.print();}
 </script>
 </body>
 </html>
