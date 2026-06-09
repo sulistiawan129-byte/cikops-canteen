@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Daily Report – Canteen</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --navy:#002366;--navy-dk:#001a4d;
+  --green:#1e7c4a;--green-lt:#e8f5ee;
+  --red:#dc2626;--red-lt:#fee2e2;
+  --amber:#d97706;
+  --gray-50:#f9fafb;--gray-100:#f3f4f6;--gray-200:#e5e7eb;
+  --gray-400:#9ca3af;--gray-500:#6b7280;--gray-600:#4b5563;--gray-800:#1f2937;
+  --white:#fff;
+  --font:'Segoe UI',system-ui,-apple-system,sans-serif;
+}
+body{font-family:var(--font);background:var(--gray-100);color:var(--gray-800);min-height:100vh;-webkit-font-smoothing:antialiased;}
+
+/* HEADER */
+.hdr{background:var(--navy);}
+.hdr-top{display:flex;align-items:center;justify-content:space-between;padding:12px 16px 10px;border-bottom:1px solid rgba(255,255,255,.12);}
+.brand{display:flex;align-items:center;gap:9px;}
+.logo{width:34px;height:34px;border-radius:8px;background:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.logo span{font-size:10px;font-weight:700;color:var(--navy);}
+.co-name{font-size:12px;font-weight:500;color:rgba(255,255,255,.95);}
+.co-plant{font-size:10px;color:rgba(255,255,255,.5);}
+.vendor-pill{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);border-radius:20px;padding:4px 11px;font-size:10px;font-weight:500;color:rgba(255,255,255,.8);}
+.hdr-bottom{padding:10px 16px 14px;}
+.hdr-title{font-size:17px;font-weight:500;color:#fff;margin-bottom:2px;}
+.hdr-sub{font-size:11px;color:rgba(255,255,255,.5);}
+
+/* BODY */
+.body{padding:14px 14px 40px;display:flex;flex-direction:column;gap:12px;}
+
+/* CARDS */
+.card{background:var(--white);border-radius:12px;border:1px solid var(--gray-200);padding:14px 15px;}
+.card-lbl{font-size:10px;font-weight:500;color:var(--gray-400);text-transform:uppercase;letter-spacing:.07em;margin-bottom:9px;}
+
+/* DATE */
+input[type=date]{width:100%;border:1px solid var(--gray-200);border-radius:8px;padding:11px 13px;font-size:15px;font-weight:500;color:var(--gray-800);font-family:var(--font);background:var(--gray-50);-webkit-appearance:none;}
+input[type=date]:focus{outline:none;border-color:var(--navy);background:#fff;}
+
+/* SECTION TITLE */
+.sec-title{display:flex;align-items:center;gap:7px;font-size:13px;font-weight:500;color:var(--gray-800);margin-bottom:11px;}
+.badge{font-size:10px;font-weight:500;padding:2px 8px;border-radius:20px;}
+.bs{background:var(--green-lt);color:var(--green);}
+.bm{background:#e8edf7;color:var(--navy);}
+
+/* GRID */
+.grid-hdr{display:grid;grid-template-columns:68px 1fr 1fr;gap:5px;padding:0 2px 5px;border-bottom:1px solid var(--gray-200);margin-bottom:3px;}
+.grid-hdr span{font-size:10px;font-weight:500;color:var(--gray-400);text-align:center;}
+.grid-hdr span:first-child{text-align:left;}
+.grid-row{display:grid;grid-template-columns:68px 1fr 1fr;gap:5px;align-items:center;margin-bottom:5px;}
+.shift-lbl{display:flex;align-items:center;gap:5px;font-size:11px;font-weight:500;color:var(--gray-600);}
+.dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+.d1{background:#f59e0b;}.d2{background:#3b82f6;}.d3{background:#8b5cf6;}
+
+/* NUMBER INPUT */
+input[type=number]{width:100%;border:1px solid var(--gray-200);border-radius:7px;padding:10px 6px;font-size:16px;font-weight:500;text-align:center;color:var(--gray-800);font-family:var(--font);background:var(--gray-50);-webkit-appearance:none;min-height:44px;}
+input[type=number]:focus{outline:none;border-color:var(--navy);background:#fff;}
+input[type=number].warn{border-color:#fca5a5;background:var(--red-lt);color:var(--red);}
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;}
+
+/* DIVIDER */
+.div{height:1px;background:var(--gray-100);margin:10px 0;}
+
+/* SUMMARY */
+.sum-row{display:flex;justify-content:space-between;align-items:center;padding:4px 0;}
+.sum-row+.sum-row{border-top:1px solid var(--gray-100);}
+.sum-lbl{font-size:12px;color:var(--gray-400);}
+.sum-val{font-size:13px;font-weight:500;color:var(--gray-800);}
+.sum-val.g{color:var(--green);}.sum-val.r{color:var(--red);}
+.eff-bg{height:4px;background:var(--gray-100);border-radius:4px;margin-top:9px;overflow:hidden;}
+.eff-fill{height:100%;border-radius:4px;transition:width .35s;}
+
+/* NOTE */
+.note{background:var(--green-lt);border:1px solid #86efac;border-radius:8px;padding:10px 13px;font-size:12px;color:#15803d;line-height:1.5;}
+
+/* WARN BANNER */
+.warn-banner{background:#fef3c7;border:1px solid #fcd34d;border-radius:8px;padding:9px 13px;font-size:12px;color:#92400e;display:none;}
+
+/* SUBMIT */
+.btn-submit{width:100%;background:var(--navy);color:#fff;border:none;border-radius:11px;padding:15px;font-size:15px;font-weight:500;font-family:var(--font);display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;min-height:52px;-webkit-tap-highlight-color:transparent;}
+.btn-submit:active{background:var(--navy-dk);}
+.btn-submit:disabled{background:var(--gray-400);cursor:not-allowed;}
+.spinner{width:18px;height:18px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;display:none;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--gray-800);color:#fff;padding:11px 20px;border-radius:24px;font-size:13px;font-weight:500;font-family:var(--font);transition:transform .3s ease;z-index:999;white-space:nowrap;}
+.toast.show{transform:translateX(-50%) translateY(0);}
+.toast.ok{background:var(--green);}
+.toast.err{background:var(--red);}
+
+/* DASHBOARD LINK */
+.dash-link{display:block;text-align:center;padding:10px;font-size:12px;color:var(--gray-400);text-decoration:none;}
+.dash-link:hover{color:var(--navy);}
+</style>
+</head>
+<body>
+
+<!-- Replace this with your actual GAS Web App URL -->
+<script>var GAS_URL = "https://script.google.com/macros/s/AKfycbywIW79lgCQOvlqUX0XuIsKk8A4NPGMnHx0shd573HZ-VXzjnijSuzSQ4PnpYf4zHKE/exec";</script>
+
+<div class="hdr">
+  <div class="hdr-top">
+    <div class="brand">
+      <div class="logo"><span>FFI</span></div>
+      <div>
+        <div class="co-name">PT Frisian Flag Indonesia</div>
+        <div class="co-plant">Cikarang Plant</div>
+      </div>
+    </div>
+    <div class="vendor-pill">GDSK</div>
+  </div>
+  <div class="hdr-bottom">
+    <div class="hdr-title">Canteen Operational Report</div>
+    <div class="hdr-sub">Daily input &middot; Shift 1 / 2 / 3</div>
+  </div>
+</div>
+
+<div class="body">
+
+  <!-- Warning banner -->
+  <div class="warn-banner" id="warnBanner">
+    A report for today may already exist. Submitting again will add a new entry.
+  </div>
+
+  <!-- Date -->
+  <div class="card">
+    <div class="card-lbl">Report Date</div>
+    <input type="date" id="reportDate" required>
+  </div>
+
+  <!-- Snack -->
+  <div class="card">
+    <div class="sec-title">
+      <span style="font-size:16px;">&#127850;</span>
+      Snack Data
+      <span class="badge bs">Snack</span>
+    </div>
+    <div class="grid-hdr">
+      <span></span><span>Ordered</span><span>Leftover</span>
+    </div>
+    <div class="grid-row">
+      <span class="shift-lbl"><span class="dot d1"></span>Shift 1</span>
+      <input type="number" id="snackOrder1" placeholder="0" min="0" inputmode="numeric">
+      <input type="number" id="snackLeftover1" placeholder="0" min="0" inputmode="numeric" class="lft-inp" data-sec="snack">
+    </div>
+    <div class="grid-row">
+      <span class="shift-lbl"><span class="dot d2"></span>Shift 2</span>
+      <input type="number" id="snackOrder2" placeholder="0" min="0" inputmode="numeric">
+      <input type="number" id="snackLeftover2" placeholder="0" min="0" inputmode="numeric" class="lft-inp" data-sec="snack">
+    </div>
+    <div class="grid-row">
+      <span class="shift-lbl"><span class="dot d3"></span>Shift 3</span>
+      <input type="number" id="snackOrder3" placeholder="0" min="0" inputmode="numeric">
+      <input type="number" id="snackLeftover3" placeholder="0" min="0" inputmode="numeric" class="lft-inp" data-sec="snack">
+    </div>
+    <div class="div"></div>
+    <div class="sum-row"><span class="sum-lbl">Total Ordered</span><span class="sum-val" id="s-ord">—</span></div>
+    <div class="sum-row"><span class="sum-lbl">Total Leftover</span><span class="sum-val r" id="s-lft">—</span></div>
+    <div class="sum-row"><span class="sum-lbl">Total Consumed</span><span class="sum-val g" id="s-con">—</span></div>
+    <div class="eff-bg"><div class="eff-fill" id="s-bar" style="background:var(--green);width:0%"></div></div>
+    <div style="display:flex;justify-content:space-between;margin-top:4px;">
+      <span style="font-size:10px;color:var(--gray-400);">Efficiency</span>
+      <span style="font-size:10px;font-weight:500;color:var(--green);" id="s-eff">—</span>
+    </div>
+  </div>
+
+  <!-- Meal -->
+  <div class="card">
+    <div class="sec-title">
+      <span style="font-size:16px;">&#127869;</span>
+      Meal Data
+      <span class="badge bm">Meal</span>
+    </div>
+    <div class="grid-hdr">
+      <span></span><span>Ordered</span><span>Leftover</span>
+    </div>
+    <div class="grid-row">
+      <span class="shift-lbl"><span class="dot d1"></span>Shift 1</span>
+      <input type="number" id="mealOrder1" placeholder="0" min="0" inputmode="numeric">
+      <input type="number" id="mealLeftover1" placeholder="0" min="0" inputmode="numeric" class="lft-inp" data-sec="meal">
+    </div>
+    <div class="grid-row">
+      <span class="shift-lbl"><span class="dot d2"></span>Shift 2</span>
+      <input type="number" id="mealOrder2" placeholder="0" min="0" inputmode="numeric">
+      <input type="number" id="mealLeftover2" placeholder="0" min="0" inputmode="numeric" class="lft-inp" data-sec="meal">
+    </div>
+    <div class="grid-row">
+      <span class="shift-lbl"><span class="dot d3"></span>Shift 3</span>
+      <input type="number" id="mealOrder3" placeholder="0" min="0" inputmode="numeric">
+      <input type="number" id="mealLeftover3" placeholder="0" min="0" inputmode="numeric" class="lft-inp" data-sec="meal">
+    </div>
+    <div class="div"></div>
+    <div class="sum-row"><span class="sum-lbl">Total Ordered</span><span class="sum-val" id="m-ord">—</span></div>
+    <div class="sum-row"><span class="sum-lbl">Total Leftover</span><span class="sum-val r" id="m-lft">—</span></div>
+    <div class="sum-row"><span class="sum-lbl">Total Consumed</span><span class="sum-val g" id="m-con">—</span></div>
+    <div class="eff-bg"><div class="eff-fill" id="m-bar" style="background:var(--navy);width:0%"></div></div>
+    <div style="display:flex;justify-content:space-between;margin-top:4px;">
+      <span style="font-size:10px;color:var(--gray-400);">Efficiency</span>
+      <span style="font-size:10px;font-weight:500;color:var(--navy);" id="m-eff">—</span>
+    </div>
+  </div>
+
+  <div class="note">Consumed and efficiency are calculated automatically. Leftover inputs highlighted in red exceed the warning threshold (15 portions).</div>
+
+  <button class="btn-submit" id="submitBtn" onclick="submitForm()">
+    <span id="submitLbl">&#10148; Submit Report</span>
+    <div class="spinner" id="spinner"></div>
+  </button>
+
+  <a class="dash-link" href="dashboard.html">View Dashboard &#8594;</a>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+var THR = 15;
+
+// ── DEFAULT DATE
+(function(){
+  var d=new Date(), y=d.getFullYear(),
+      m=String(d.getMonth()+1).padStart(2,'0'),
+      day=String(d.getDate()).padStart(2,'0');
+  document.getElementById('reportDate').value=y+'-'+m+'-'+day;
+})();
+
+// ── LIVE CALC
+function g(id){ return parseInt(document.getElementById(id).value)||0; }
+function f(n){ return n.toLocaleString(); }
+
+function calcSnack(){
+  var o=g('snackOrder1')+g('snackOrder2')+g('snackOrder3');
+  var l=g('snackLeftover1')+g('snackLeftover2')+g('snackLeftover3');
+  var c=o-l, eff=o>0?Math.round(c/o*1000)/10:0;
+  set('s-ord',o?f(o):'—'); set('s-lft',l?f(l):'—'); set('s-con',c&&o?f(c):'—');
+  document.getElementById('s-bar').style.width=(o?eff:0)+'%';
+  document.getElementById('s-eff').textContent=o?eff.toFixed(1)+'%':'—';
+}
+function calcMeal(){
+  var o=g('mealOrder1')+g('mealOrder2')+g('mealOrder3');
+  var l=g('mealLeftover1')+g('mealLeftover2')+g('mealLeftover3');
+  var c=o-l, eff=o>0?Math.round(c/o*1000)/10:0;
+  set('m-ord',o?f(o):'—'); set('m-lft',l?f(l):'—'); set('m-con',c&&o?f(c):'—');
+  document.getElementById('m-bar').style.width=(o?eff:0)+'%';
+  document.getElementById('m-eff').textContent=o?eff.toFixed(1)+'%':'—';
+}
+function set(id,v){ var el=document.getElementById(id); if(el) el.textContent=v; }
+
+// ── ATTACH INPUTS
+['snackOrder1','snackOrder2','snackOrder3','snackLeftover1','snackLeftover2','snackLeftover3']
+  .forEach(function(id){
+    document.getElementById(id).addEventListener('input',function(){
+      calcSnack();
+      if(this.classList.contains('lft-inp')) warnInput(this);
+    });
+  });
+['mealOrder1','mealOrder2','mealOrder3','mealLeftover1','mealLeftover2','mealLeftover3']
+  .forEach(function(id){
+    document.getElementById(id).addEventListener('input',function(){
+      calcMeal();
+      if(this.classList.contains('lft-inp')) warnInput(this);
+    });
+  });
+
+function warnInput(el){
+  var v=parseInt(el.value)||0;
+  v>THR?el.classList.add('warn'):el.classList.remove('warn');
+}
+
+// ── SUBMIT
+function submitForm(){
+  var date=document.getElementById('reportDate').value;
+  if(!date){ toast('Please select a report date.','err'); return; }
+
+  var allZero=['snackOrder1','snackOrder2','snackOrder3','mealOrder1','mealOrder2','mealOrder3']
+    .every(function(id){ return !g(id); });
+  if(allZero){ toast('Please enter at least one order value.','err'); return; }
+
+  if(!GAS_URL||GAS_URL==='YOUR_GAS_WEB_APP_URL_HERE'){
+    toast('GAS URL not configured. Check form.html','err'); return;
+  }
+
+  setLoading(true);
+  var payload = {
+    date: date,
+    snackOrder1:g('snackOrder1'), snackOrder2:g('snackOrder2'), snackOrder3:g('snackOrder3'),
+    snackLeftover1:g('snackLeftover1'), snackLeftover2:g('snackLeftover2'), snackLeftover3:g('snackLeftover3'),
+    mealOrder1:g('mealOrder1'), mealOrder2:g('mealOrder2'), mealOrder3:g('mealOrder3'),
+    mealLeftover1:g('mealLeftover1'), mealLeftover2:g('mealLeftover2'), mealLeftover3:g('mealLeftover3'),
+    submittedBy: 'Canteen Operator'
+  };
+  var url = GAS_URL + '?action=save&payload=' + encodeURIComponent(JSON.stringify(payload));
+  fetch(url, { redirect: 'follow' })
+  .then(function(r){ return r.json(); })
+  .then(function(res){
+    setLoading(false);
+    if(res.success){ toast('Report submitted successfully!','ok'); resetForm(); }
+    else toast('Error: '+res.message,'err');
+  })
+  .catch(function(){ setLoading(false); toast('Network error. Check connection.','err'); });
+}
+
+function setLoading(s){
+  document.getElementById('submitBtn').disabled=s;
+  document.getElementById('submitLbl').style.display=s?'none':'inline';
+  document.getElementById('spinner').style.display=s?'block':'none';
+}
+
+function resetForm(){
+  ['snackOrder1','snackOrder2','snackOrder3','snackLeftover1','snackLeftover2','snackLeftover3',
+   'mealOrder1','mealOrder2','mealOrder3','mealLeftover1','mealLeftover2','mealLeftover3']
+    .forEach(function(id){
+      var el=document.getElementById(id);
+      el.value=''; el.classList.remove('warn');
+    });
+  calcSnack(); calcMeal();
+}
+
+function toast(msg, type){
+  var t=document.getElementById('toast');
+  t.textContent=msg; t.className='toast '+(type||'');
+  t.classList.add('show');
+  setTimeout(function(){ t.classList.remove('show'); },3500);
+}
+</script>
+</body>
+</html>

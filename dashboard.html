@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard – Canteen Report</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --navy:#002366;--navy-lt:#e8edf7;
+  --green:#1e7c4a;--green-lt:#e8f5ee;
+  --amber:#d97706;--amber-lt:#fef3c7;
+  --red:#dc2626;--red-lt:#fee2e2;
+  --gray-100:#f3f4f6;--gray-200:#e5e7eb;
+  --gray-400:#9ca3af;--gray-500:#6b7280;--gray-600:#4b5563;--gray-800:#1f2937;
+  --white:#fff;
+  --font:'Segoe UI',system-ui,-apple-system,sans-serif;
+}
+body{font-family:var(--font);background:var(--gray-100);color:var(--gray-800);-webkit-font-smoothing:antialiased;}
+
+/* HEADER */
+.hdr{background:var(--navy);}
+.hdr-inner{max-width:1100px;margin:0 auto;padding:14px 20px 0;}
+.hdr-top{display:flex;align-items:center;justify-content:space-between;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,.12);margin-bottom:12px;}
+.brand{display:flex;align-items:center;gap:10px;}
+.logo{width:38px;height:38px;border-radius:9px;background:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.logo span{font-size:11px;font-weight:700;color:var(--navy);}
+.co-name{font-size:13px;font-weight:500;color:rgba(255,255,255,.95);}
+.co-plant{font-size:11px;color:rgba(255,255,255,.5);margin-top:1px;}
+.vendor-pill{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);border-radius:20px;padding:5px 12px;font-size:11px;font-weight:500;color:rgba(255,255,255,.8);}
+.hdr-bottom{display:flex;align-items:flex-end;justify-content:space-between;padding-bottom:14px;gap:12px;flex-wrap:wrap;}
+.dash-title{font-size:20px;font-weight:500;color:#fff;}
+.dash-sub{font-size:12px;color:rgba(255,255,255,.5);margin-top:2px;}
+.controls{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+select{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;border-radius:7px;padding:7px 12px;font-size:12px;font-family:var(--font);cursor:pointer;min-width:150px;}
+select option{background:var(--navy);}
+.btn-w{display:flex;align-items:center;gap:5px;background:#fff;color:var(--navy);border:none;border-radius:7px;padding:7px 14px;font-size:12px;font-weight:500;font-family:var(--font);cursor:pointer;text-decoration:none;white-space:nowrap;}
+.btn-d{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.85);border-radius:7px;padding:7px 12px;font-size:12px;font-family:var(--font);cursor:pointer;white-space:nowrap;}
+
+/* MAIN */
+.main{max-width:1100px;margin:0 auto;padding:20px;}
+
+/* ERROR / SETUP BANNER */
+.setup-banner{background:var(--amber-lt);border:1px solid #fcd34d;border-radius:10px;padding:14px 16px;margin-bottom:20px;font-size:13px;color:#92400e;line-height:1.6;display:none;}
+.setup-banner code{background:rgba(0,0,0,.08);padding:1px 5px;border-radius:4px;font-size:12px;}
+
+/* KPI */
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:12px;margin-bottom:20px;}
+.kpi{background:var(--white);border-radius:10px;border:1px solid var(--gray-200);padding:14px 16px;border-left:4px solid var(--navy);}
+.kpi.green{border-left-color:var(--green);}
+.kpi.amber{border-left-color:var(--amber);}
+.kpi.red{border-left-color:var(--red);}
+.kpi-lbl{font-size:10px;font-weight:500;color:var(--gray-400);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;}
+.kpi-val{font-size:22px;font-weight:500;color:var(--gray-800);line-height:1.1;margin-bottom:2px;}
+.kpi-sub{font-size:11px;color:var(--gray-400);}
+
+/* REMARKS */
+.remarks{background:var(--navy-lt);border:1px solid #c7d4ef;border-radius:10px;padding:13px 16px;margin-bottom:20px;display:flex;gap:10px;align-items:flex-start;}
+.rem-icon{font-size:15px;flex-shrink:0;margin-top:1px;}
+.rem-lbl{font-size:10px;font-weight:500;color:var(--navy);text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px;}
+.rem-txt{font-size:13px;color:#003087;line-height:1.6;}
+
+/* CARDS */
+.card{background:var(--white);border-radius:10px;border:1px solid var(--gray-200);padding:16px 18px;}
+.card-title{font-size:13px;font-weight:500;color:var(--gray-800);margin-bottom:3px;}
+.card-sub{font-size:11px;color:var(--gray-400);margin-bottom:12px;}
+
+/* GRID */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px;}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px;}
+@media(max-width:700px){.g2,.g3{grid-template-columns:1fr;}}
+@media(min-width:701px) and (max-width:900px){.g3{grid-template-columns:1fr 1fr;}}
+
+/* SUMMARY CARD ROWS */
+.sum-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;}
+.sum-row+.sum-row{border-top:1px solid var(--gray-100);}
+.sum-lbl{font-size:12px;color:var(--gray-500);}
+.sum-val{font-size:13px;font-weight:500;color:var(--gray-800);}
+.sum-val.g{color:var(--green);}.sum-val.r{color:var(--red);}
+.eff-bg{height:5px;background:var(--gray-100);border-radius:5px;margin-top:10px;overflow:hidden;}
+.eff-fill{height:100%;border-radius:5px;transition:width .4s;}
+
+/* BADGE */
+.badge{display:inline-block;font-size:10px;font-weight:500;padding:2px 8px;border-radius:20px;}
+.bs{background:var(--green-lt);color:var(--green);}
+.bm{background:var(--navy-lt);color:var(--navy);}
+
+/* SHIFT MINI TABLE */
+.shift-tbl{width:100%;border-collapse:collapse;font-size:13px;}
+.shift-tbl th{font-size:10px;font-weight:500;color:var(--gray-400);text-transform:uppercase;letter-spacing:.05em;padding:0 0 6px;text-align:right;border-bottom:1px solid var(--gray-200);}
+.shift-tbl th:first-child{text-align:left;}
+.shift-tbl td{padding:7px 0;color:var(--gray-600);text-align:right;border-bottom:1px solid var(--gray-100);}
+.shift-tbl td:first-child{text-align:left;color:var(--gray-800);font-weight:500;}
+.shift-tbl tr:last-child td{border-bottom:none;}
+.dot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:5px;vertical-align:middle;}
+.d1{background:#f59e0b;}.d2{background:#3b82f6;}.d3{background:#8b5cf6;}
+
+/* TABLE */
+.tbl-card{background:var(--white);border-radius:10px;border:1px solid var(--gray-200);overflow:hidden;margin-bottom:20px;}
+.tbl-hdr{padding:14px 18px;border-bottom:1px solid var(--gray-200);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;}
+.tbl-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+table{width:100%;border-collapse:collapse;font-size:13px;}
+thead th{padding:8px 12px;text-align:right;font-size:10px;font-weight:500;color:var(--gray-400);text-transform:uppercase;letter-spacing:.05em;background:var(--gray-100);border-bottom:1px solid var(--gray-200);white-space:nowrap;}
+thead th:first-child{text-align:left;}
+tbody tr{border-bottom:1px solid var(--gray-100);}
+tbody tr:last-child{border-bottom:none;}
+tbody tr:hover{background:#fafafa;}
+tbody td{padding:8px 12px;color:var(--gray-600);text-align:right;white-space:nowrap;}
+tbody td:first-child{color:var(--gray-800);font-weight:500;text-align:left;}
+.eb{display:inline-block;padding:2px 7px;border-radius:10px;font-size:11px;font-weight:500;}
+.eg{background:var(--green-lt);color:var(--green);}
+.eo{background:var(--amber-lt);color:var(--amber);}
+.er{background:var(--red-lt);color:var(--red);}
+.warn-row{background:#fffbeb!important;}
+
+/* LOADING */
+.loading{display:flex;align-items:center;justify-content:center;padding:48px;flex-direction:column;gap:10px;}
+.spin{width:24px;height:24px;border:2.5px solid var(--gray-200);border-top-color:var(--navy);border-radius:50%;animation:spin .7s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.load-txt{font-size:12px;color:var(--gray-400);}
+
+@media(max-width:600px){
+  .main{padding:12px;}
+  .hdr-inner{padding:12px 14px 0;}
+  .kpi-grid{grid-template-columns:repeat(2,1fr);}
+  .kpi-val{font-size:18px;}
+  .dash-title{font-size:17px;}
+}
+</style>
+</head>
+<body>
+
+<!-- Replace with your actual GAS Web App URL -->
+<script>var GAS_URL = "https://script.google.com/macros/s/AKfycbywIW79lgCQOvlqUX0XuIsKk8A4NPGMnHx0shd573HZ-VXzjnijSuzSQ4PnpYf4zHKE/exec";</script>
+
+<div class="hdr">
+  <div class="hdr-inner">
+    <div class="hdr-top">
+      <div class="brand">
+        <div class="logo"><span>FFI</span></div>
+        <div>
+          <div class="co-name">PT Frisian Flag Indonesia</div>
+          <div class="co-plant">Cikarang Plant</div>
+        </div>
+      </div>
+      <div class="vendor-pill">GDSK</div>
+    </div>
+    <div class="hdr-bottom">
+      <div>
+        <div class="dash-title">Canteen Operations Dashboard</div>
+        <div class="dash-sub" id="dashSub">Loading…</div>
+      </div>
+      <div class="controls">
+        <select id="monthSel" onchange="load(this.value)"><option>Loading…</option></select>
+        <a class="btn-w" href="index.html">+ New Entry</a>
+        <button class="btn-d" onclick="doExport()">&#8595; Export CSV</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- Setup warning -->
+  <div class="setup-banner" id="setupBanner">
+    <strong>&#9888; GAS URL not configured.</strong> Open <code>dashboard.html</code> and <code>form.html</code>,
+    replace <code>YOUR_GAS_WEB_APP_URL_HERE</code> with your actual GAS Web App URL, then re-upload to Netlify.
+  </div>
+
+  <!-- KPI -->
+  <div class="kpi-grid" id="kpiGrid">
+    <div class="loading" style="grid-column:1/-1">
+      <div class="spin"></div><span class="load-txt">Connecting to API…</span>
+    </div>
+  </div>
+
+  <!-- Remarks -->
+  <div class="remarks" id="remarks" style="display:none">
+    <span class="rem-icon">&#128202;</span>
+    <div>
+      <div class="rem-lbl">Auto Analysis</div>
+      <div class="rem-txt" id="remTxt"></div>
+    </div>
+  </div>
+
+  <!-- Snack & Meal summary -->
+  <div class="g2" id="sumSection" style="display:none">
+    <div class="card">
+      <div class="card-title"><span class="badge bs">Snack</span> &nbsp;Monthly summary</div>
+      <div class="card-sub" id="sumSub">—</div>
+      <div class="sum-row"><span class="sum-lbl">Total Ordered</span><span class="sum-val" id="s-ord">—</span></div>
+      <div class="sum-row"><span class="sum-lbl">Total Consumed</span><span class="sum-val g" id="s-con">—</span></div>
+      <div class="sum-row"><span class="sum-lbl">Total Leftover</span><span class="sum-val r" id="s-lft">—</span></div>
+      <div class="sum-row"><span class="sum-lbl">Avg Daily Order</span><span class="sum-val" id="s-avg">—</span></div>
+      <div class="sum-row"><span class="sum-lbl">Efficiency</span><span class="sum-val g" id="s-eff">—</span></div>
+      <div class="eff-bg"><div class="eff-fill" id="s-bar" style="background:var(--green);width:0%"></div></div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="badge bm">Meal</span> &nbsp;Monthly summary</div>
+      <div class="card-sub" id="sumSubM">—</div>
+      <div class="sum-row"><span class="sum-lbl">Total Ordered</span><span class="sum-val" id="m-ord">—</span></div>
+      <div class="sum-row"><span class="sum-lbl">Total Consumed</span><span class="sum-val g" id="m-con">—</span></div>
+      <div class="sum-row"><span class="sum-lbl">Total Leftover</span><span class="sum-val r" id="m-lft">—</span></div>
+      <div class="sum-row"><span class="sum-lbl">Avg Daily Order</span><span class="sum-val" id="m-avg">—</span></div>
+      <div class="sum-row"><span class="sum-lbl">Efficiency</span><span class="sum-val g" id="m-eff">—</span></div>
+      <div class="eff-bg"><div class="eff-fill" id="m-bar" style="background:var(--navy);width:0%"></div></div>
+    </div>
+  </div>
+
+  <!-- Shift breakdown -->
+  <div class="g2" id="shiftSection" style="display:none">
+    <div class="card">
+      <div class="card-title">Shift breakdown — Snack</div>
+      <div class="card-sub">Ordered per shift this month</div>
+      <table class="shift-tbl">
+        <thead><tr><th>Shift</th><th>Ordered</th><th>Share</th></tr></thead>
+        <tbody id="shiftSnack"></tbody>
+      </table>
+    </div>
+    <div class="card">
+      <div class="card-title">Shift breakdown — Meal</div>
+      <div class="card-sub">Ordered per shift this month</div>
+      <table class="shift-tbl">
+        <thead><tr><th>Shift</th><th>Ordered</th><th>Share</th></tr></thead>
+        <tbody id="shiftMeal"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Daily table -->
+  <div class="tbl-card" id="tblCard" style="display:none">
+    <div class="tbl-hdr">
+      <div>
+        <div class="card-title">Daily report detail</div>
+        <div class="card-sub" style="margin-bottom:0" id="tblCount">—</div>
+      </div>
+    </div>
+    <div class="tbl-scroll">
+      <table>
+        <thead><tr>
+          <th>Date</th>
+          <th>Snack Ordered</th><th>Snack Consumed</th><th>Snack Leftover</th><th>Snack Eff</th>
+          <th>Meal Ordered</th><th>Meal Consumed</th><th>Meal Leftover</th><th>Meal Eff</th>
+        </tr></thead>
+        <tbody id="tblBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Monthly history -->
+  <div class="tbl-card" id="histCard" style="display:none">
+    <div class="tbl-hdr">
+      <div>
+        <div class="card-title">Monthly history</div>
+        <div class="card-sub" style="margin-bottom:0">All recorded months</div>
+      </div>
+    </div>
+    <div class="tbl-scroll">
+      <table>
+        <thead><tr>
+          <th>Month</th><th>Days</th>
+          <th>Snack Ordered</th><th>Snack Eff</th>
+          <th>Meal Ordered</th><th>Meal Eff</th>
+          <th>Peak Leftover Date</th><th>Remarks</th>
+        </tr></thead>
+        <tbody id="histBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<script>
+var D=null, selMonth='';
+
+window.onload=function(){
+  if(!GAS_URL||GAS_URL==='YOUR_GAS_WEB_APP_URL_HERE'){
+    document.getElementById('setupBanner').style.display='block';
+    document.getElementById('kpiGrid').innerHTML='<div style="padding:32px;text-align:center;color:var(--gray-400);font-size:13px;grid-column:1/-1">Configure GAS URL to load data.</div>';
+    return;
+  }
+  var n=new Date();
+  selMonth=n.getFullYear()+'-'+String(n.getMonth()+1).padStart(2,'0');
+  load(selMonth);
+};
+
+function load(m){
+  selMonth=m;
+  document.getElementById('kpiGrid').innerHTML='<div class="loading" style="grid-column:1/-1"><div class="spin"></div><span class="load-txt">Loading…</span></div>';
+  hide(['remarks','sumSection','shiftSection','tblCard','histCard']);
+
+  fetch(GAS_URL+'?action=dashboard&month='+m, { redirect: 'follow' })
+    .then(function(r){ return r.json(); })
+    .then(render)
+    .catch(function(e){ showErr('Cannot reach GAS API: '+e.message); });
+}
+
+function hide(ids){ ids.forEach(function(id){ document.getElementById(id).style.display='none'; }); }
+function show(ids){ ids.forEach(function(id){ document.getElementById(id).style.display=''; }); }
+function showErr(msg){ document.getElementById('kpiGrid').innerHTML='<div style="padding:40px;text-align:center;color:var(--red);font-size:13px;grid-column:1/-1">'+msg+'</div>'; }
+function f(n){ return Number(n||0).toLocaleString(); }
+function set(id,v){ var el=document.getElementById(id); if(el) el.textContent=v; }
+function eb(v){ var c=v>=98?'eg':v>=95?'eo':'er'; return '<span class="eb '+c+'">'+v+'%</span>'; }
+
+function render(data){
+  if(!data.success){ showErr(data.message||'Error loading data'); return; }
+  D=data;
+  var k=data.kpi;
+  document.getElementById('dashSub').textContent=data.selectedMonth+' · '+(k.workingDays||0)+' working days';
+
+  // Month selector
+  var sel=document.getElementById('monthSel');
+  sel.innerHTML='';
+  (data.availableMonths||[]).forEach(function(m){
+    var o=document.createElement('option');
+    o.value=m.value; o.textContent=m.label;
+    if(m.value===selMonth) o.selected=true;
+    sel.appendChild(o);
+  });
+
+  // KPI
+  var totOrd=(k.totalSnackOrder||0)+(k.totalMealOrder||0);
+  var totCon=(k.totalSnackConsumed||0)+(k.totalMealConsumed||0);
+  var totLft=(k.totalSnackLeftover||0)+(k.totalMealLeftover||0);
+  var avgEff=Math.round(((k.snackEfficiency||0)+(k.mealEfficiency||0))/2*10)/10;
+  var effCls=avgEff>=98?'green':avgEff>=95?'':avgEff>=90?'amber':'red';
+  document.getElementById('kpiGrid').innerHTML=[
+    {lbl:'Total Ordered',     val:f(totOrd),                  sub:'Snack + Meal',  cls:''},
+    {lbl:'Total Consumed',    val:f(totCon),                  sub:'Snack + Meal',  cls:'green'},
+    {lbl:'Total Leftover',    val:f(totLft),                  sub:'Snack + Meal',  cls:'amber'},
+    {lbl:'Snack Efficiency',  val:(k.snackEfficiency||0)+'%', sub:'Monthly avg',   cls:'green'},
+    {lbl:'Meal Efficiency',   val:(k.mealEfficiency||0)+'%',  sub:'Monthly avg',   cls:''},
+    {lbl:'Overall Efficiency',val:avgEff+'%',                 sub:'Combined avg',  cls:effCls}
+  ].map(function(c){
+    return '<div class="kpi '+c.cls+'"><div class="kpi-lbl">'+c.lbl+'</div><div class="kpi-val">'+c.val+'</div><div class="kpi-sub">'+c.sub+'</div></div>';
+  }).join('');
+
+  // Remarks
+  var peak=0,peakDate='—';
+  (data.chartData||[]).forEach(function(r){ var v=(r.snackLeftover||0)+(r.mealLeftover||0); if(v>peak){peak=v;peakDate=r.date;} });
+  var verdict=avgEff>=98?'Excellent — minimal waste this month.':avgEff>=95?'Normal — within target range.':avgEff>=90?'Needs attention — leftover above average.':'Poor efficiency — immediate review recommended.';
+  document.getElementById('remTxt').textContent=data.selectedMonth+': overall efficiency '+avgEff+'% (Snack '+(k.snackEfficiency||0)+'% / Meal '+(k.mealEfficiency||0)+'%). Peak leftover on '+peakDate+' ('+f(peak)+' portions). '+verdict;
+  show(['remarks']);
+
+  // Summary cards
+  var days=k.workingDays||1;
+  var sub=data.selectedMonth+' · '+(k.workingDays||0)+' days';
+  set('sumSub',sub); set('sumSubM',sub);
+  set('s-ord',f(k.totalSnackOrder)); set('s-con',f(k.totalSnackConsumed)); set('s-lft',f(k.totalSnackLeftover));
+  set('s-avg',f(Math.round((k.totalSnackOrder||0)/days))+' / day');
+  set('s-eff',(k.snackEfficiency||0)+'%');
+  document.getElementById('s-bar').style.width=(k.snackEfficiency||0)+'%';
+  set('m-ord',f(k.totalMealOrder));  set('m-con',f(k.totalMealConsumed));  set('m-lft',f(k.totalMealLeftover));
+  set('m-avg',f(Math.round((k.totalMealOrder||0)/days))+' / day');
+  set('m-eff',(k.mealEfficiency||0)+'%');
+  document.getElementById('m-bar').style.width=(k.mealEfficiency||0)+'%';
+  show(['sumSection']);
+
+  // Shift breakdown
+  var sd=data.shiftData||{};
+  var sTot=(sd.snackS1||0)+(sd.snackS2||0)+(sd.snackS3||0)||1;
+  var mTot=(sd.mealS1||0)+(sd.mealS2||0)+(sd.mealS3||0)||1;
+  var dots=['d1','d2','d3'];
+  document.getElementById('shiftSnack').innerHTML=
+    [['Shift 1',sd.snackS1||0],['Shift 2',sd.snackS2||0],['Shift 3',sd.snackS3||0]].map(function(s,i){
+      return '<tr><td><span class="dot '+dots[i]+'"></span>'+s[0]+'</td><td>'+f(s[1])+'</td><td>'+Math.round(s[1]/sTot*1000)/10+'%</td></tr>';
+    }).join('');
+  document.getElementById('shiftMeal').innerHTML=
+    [['Shift 1',sd.mealS1||0],['Shift 2',sd.mealS2||0],['Shift 3',sd.mealS3||0]].map(function(s,i){
+      return '<tr><td><span class="dot '+dots[i]+'"></span>'+s[0]+'</td><td>'+f(s[1])+'</td><td>'+Math.round(s[1]/mTot*1000)/10+'%</td></tr>';
+    }).join('');
+  show(['shiftSection']);
+
+  // Daily table
+  var rows=data.chartData||[];
+  var thr=(data.config&&data.config.threshold)||15;
+  document.getElementById('tblCount').textContent=rows.length+' entries this month';
+  document.getElementById('tblBody').innerHTML=rows.map(function(r){
+    var w=((r.snackLeftover||0)+(r.mealLeftover||0))>thr?' warn-row':'';
+    return '<tr class="'+w+'">'+
+      '<td>'+r.date+'</td>'+
+      '<td>'+f(r.snackOrder)+'</td><td>'+f(r.snackConsumed)+'</td><td>'+f(r.snackLeftover)+'</td><td>'+eb(r.snackEff)+'</td>'+
+      '<td>'+f(r.mealOrder)+'</td><td>'+f(r.mealConsumed)+'</td><td>'+f(r.mealLeftover)+'</td><td>'+eb(r.mealEff)+'</td>'+
+      '</tr>';
+  }).join('');
+  show(['tblCard']);
+
+  // Monthly history
+  var mrows=data.monthlyRows||[];
+  if(mrows.length){
+    document.getElementById('histBody').innerHTML=mrows.map(function(r){
+      return '<tr>'+
+        '<td><strong>'+r.month+'</strong></td>'+
+        '<td>'+r.workingDays+'</td>'+
+        '<td>'+f(r.snackOrder)+'</td><td>'+eb(r.snackEff)+'</td>'+
+        '<td>'+f(r.mealOrder)+'</td><td>'+eb(r.mealEff)+'</td>'+
+        '<td>'+(r.peakDate||'—')+'</td>'+
+        '<td style="font-size:12px;color:var(--gray-500);max-width:200px;white-space:normal">'+(r.remarks||'—')+'</td>'+
+        '</tr>';
+    }).join('');
+    show(['histCard']);
+  }
+}
+
+function doExport(){
+  var rows=D?D.chartData:[];
+  if(!rows.length) return;
+  var csv='Date,Snack Ordered,Snack Consumed,Snack Leftover,Snack Eff%,Meal Ordered,Meal Consumed,Meal Leftover,Meal Eff%\n';
+  csv+=rows.map(function(r){
+    return [r.date,r.snackOrder,r.snackConsumed,r.snackLeftover,r.snackEff,r.mealOrder,r.mealConsumed,r.mealLeftover,r.mealEff].join(',');
+  }).join('\n');
+  var a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
+  a.download='canteen_'+selMonth+'.csv'; a.click();
+}
+</script>
+</body>
+</html>
