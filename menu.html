@@ -129,19 +129,21 @@ select.inp{cursor:pointer;}
 .cal-title{font-size:14px;font-weight:600;color:var(--text-1);}
 .cal-btn{padding:5px 12px;border:1px solid var(--border);border-radius:6px;background:var(--surface-2);font-size:11px;font-family:var(--font);cursor:pointer;color:var(--text-2);}
 .cal-btn:hover{background:var(--border);}
-.week-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:4px;}
+.week-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:3px;}
 .week-day-hdr{font-size:10px;font-weight:600;color:var(--text-3);text-align:center;padding:4px 0;text-transform:uppercase;}
-.cal-cell{background:var(--surface-2);border:1px solid var(--border);border-radius:7px;padding:7px 8px;min-height:80px;position:relative;cursor:pointer;transition:border-color .12s;}
-.cal-cell:hover{border-color:var(--navy);}
-.cal-cell.has-data{background:var(--surface);}
+.cal-cell{background:var(--surface-2);border:1px solid var(--border);border-radius:6px;padding:5px 6px;min-height:64px;position:relative;cursor:pointer;transition:border-color .12s;overflow:hidden;}
+.cal-cell:hover{border-color:var(--navy);background:var(--surface);}
+.cal-cell.has-data{background:var(--surface);box-shadow:var(--shadow);}
 .cal-cell.today{border-color:var(--navy);border-width:2px;}
-.cal-cell.empty{background:transparent;border:1px dashed var(--border);cursor:default;}
-.cal-date{font-size:10px;font-weight:600;color:var(--text-3);margin-bottom:4px;}
-.cal-menu-item{font-size:9px;font-weight:500;padding:2px 5px;border-radius:4px;margin-bottom:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.cal-cell.empty{background:transparent;border:1px dashed var(--border);cursor:default;min-height:64px;}
+.cal-date{font-size:11px;font-weight:700;color:var(--text-2);margin-bottom:3px;line-height:1;}
+.cal-date.today-num{color:var(--navy);}
+.cal-menu-item{font-size:9px;font-weight:500;padding:2px 5px;border-radius:3px;margin-bottom:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%;display:block;line-height:1.3;}
 .cal-snack{background:var(--amber-lt);color:var(--amber);}
 .cal-meal{background:var(--navy-lt);color:var(--navy);}
 [data-theme="dark"] .cal-meal{color:#7fa8ff;}
-.cal-more{font-size:9px;color:var(--text-3);}
+.cal-more{font-size:9px;color:var(--text-3);padding:0 2px;}
+.week-day-hdr{font-size:10px;font-weight:600;color:var(--text-3);text-align:center;padding:6px 0 4px;text-transform:uppercase;letter-spacing:.06em;}
 
 /* ── WEEK LIST VIEW ── */
 .week-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);margin-bottom:12px;overflow:hidden;box-shadow:var(--shadow);}
@@ -368,7 +370,7 @@ select.inp{cursor:pointer;}
       </select>
     </div>
 
-    <div class="card" id="calCard">
+    <div class="card" id="calCard" style="padding:14px 16px;">
       <!-- Month view -->
       <div id="calMonthView">
         <div class="week-grid" style="margin-bottom:4px;">
@@ -928,31 +930,53 @@ function buildWeekSelector() {
 function jumpToWeek(key) { if(key){calWeekKey=key; renderCalWeek();} }
 
 function renderCalMonth() {
-  var MN=['January','February','March','April','May','June','July','August','September','October','November','December'];
-  document.getElementById('calMonthLabel').textContent=MN[calMonth]+' '+calYear;
-  var first=(new Date(calYear,calMonth,1).getDay()+6)%7;
-  var last=new Date(calYear,calMonth+1,0).getDate();
-  var today=new Date();
-  var byDate=(DATA&&DATA.byDate)||{};
+  var MN=['January','February','March','April','May','June',
+          'July','August','September','October','November','December'];
+  document.getElementById('calMonthLabel').textContent = MN[calMonth] + ' ' + calYear;
+
+  var first  = (new Date(calYear,calMonth,1).getDay()+6)%7;
+  var last   = new Date(calYear,calMonth+1,0).getDate();
+  var today  = new Date();
+  var byDate = (DATA&&DATA.byDate)||{};
+
+  function trunc(s,n){ if(!s)return''; s=s.charAt(0).toUpperCase()+s.slice(1).toLowerCase(); return s.length>n?s.substring(0,n)+'…':s; }
+
   var cells='';
   for(var i=0;i<first;i++) cells+='<div class="cal-cell empty"></div>';
+
   for(var d=1;d<=last;d++){
-    var dt=new Date(calYear,calMonth,d);
-    var rk=dt.getFullYear()+'-'+String(dt.getMonth()+1).padStart(2,'0')+'-'+String(dt.getDate()).padStart(2,'0');
-    var isT=dt.toDateString()===today.toDateString();
-    var day=byDate[rk]||null;
-    var cls='cal-cell'+(day?' has-data':'')+(isT?' today':'');
-    var inner='<div class="cal-date">'+d+'</div>';
+    var dt  = new Date(calYear,calMonth,d);
+    var rk  = dt.getFullYear()+'-'+String(dt.getMonth()+1).padStart(2,'0')+'-'+String(dt.getDate()).padStart(2,'0');
+    var isT = dt.toDateString()===today.toDateString();
+    var day = byDate[rk]||null;
+    var cls = 'cal-cell'+(day?' has-data':'')+(isT?' today':'');
+    var dateSt = isT
+      ? 'display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;background:var(--navy);color:#fff;border-radius:50%;font-size:10px;font-weight:700;'
+      : 'font-size:11px;font-weight:700;color:var(--text-2);';
+    var inner = '<div class="cal-date"><span style="'+dateSt+'">'+d+'</span></div>';
+
     if(day){
-      if(day.snack&&day.snack.length) inner+='<div class="cal-menu-item cal-snack">🥐 '+cap(day.snack[0].menuName)+'</div>';
+      if(day.snack&&day.snack.length){
+        inner+='<div class="cal-menu-item cal-snack" title="'+day.snack[0].menuName+'">'+
+          '<span style="display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--amber);margin-right:3px;vertical-align:middle"></span>'+
+          trunc(day.snack[0].menuName,20)+'</div>';
+      }
       if(day.meal&&day.meal.length){
-        inner+='<div class="cal-menu-item cal-meal">🍱 '+cap(day.meal[0].menuName)+'</div>';
-        if(day.meal.length>1) inner+='<div class="cal-more">+'+(day.meal.length-1)+' more</div>';
+        var shown=0;
+        day.meal.forEach(function(ml){
+          if(shown>=2)return;
+          inner+='<div class="cal-menu-item cal-meal" title="'+ml.menuName+'">'+
+            '<span style="display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--navy);margin-right:3px;vertical-align:middle"></span>'+
+            trunc(ml.menuName,20)+'</div>';
+          shown++;
+        });
+        if(day.meal.length>2) inner+='<div class="cal-more">+'+(day.meal.length-2)+' more dish</div>';
       }
     }
-    var oc=day ? ' onclick="openDayModal(\''+rk+'\')"' : '';
+    var oc=day?' onclick="openDayModal("'+rk+'")"':'';
     cells+='<div class="'+cls+'"'+oc+'>'+inner+'</div>';
   }
+
   var rem=(first+last)%7;
   if(rem>0) for(var j=0;j<7-rem;j++) cells+='<div class="cal-cell empty"></div>';
   document.getElementById('calGrid').innerHTML=cells;
