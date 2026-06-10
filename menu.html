@@ -1,0 +1,1061 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Menu Plan — Canteen FFI Cikarang</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{font-size:14px;}
+:root{
+  --navy:#002366;--navy-lt:#e8edf7;
+  --green:#1a6b3f;--green-lt:#e6f4ed;
+  --amber:#b45309;--amber-lt:#fef3c7;
+  --red:#b91c1c;--red-lt:#fee2e2;
+  --purple:#6d28d9;--purple-lt:#ede9fe;
+  --bg:#f0f2f5;--surface:#fff;--surface-2:#f8f9fb;
+  --border:#e2e5eb;--text-1:#0f172a;--text-2:#475569;--text-3:#94a3b8;
+  --font:'Inter','Segoe UI',system-ui,sans-serif;
+  --r:10px;--shadow:0 1px 3px rgba(0,0,0,.05),0 3px 10px rgba(0,0,0,.04);
+}
+[data-theme="dark"]{
+  --bg:#0d1117;--surface:#161b22;--surface-2:#1c2128;--border:#30363d;
+  --text-1:#e6edf3;--text-2:#8b949e;--text-3:#484f58;
+  --navy-lt:#1a2540;--green-lt:#0d2b1e;--amber-lt:#2d1f06;--red-lt:#2d0c0c;--purple-lt:#2d1f4e;
+}
+body{font-family:var(--font);background:var(--bg);color:var(--text-1);min-height:100vh;-webkit-font-smoothing:antialiased;}
+
+/* ── HEADER ── */
+.hdr{background:var(--navy);padding:0;}
+.hdr-inner{max-width:1100px;margin:0 auto;padding:14px 20px;}
+.hdr-top{display:flex;align-items:center;justify-content:space-between;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,.1);margin-bottom:12px;}
+.brand{display:flex;align-items:center;gap:10px;}
+.logo-sq{width:34px;height:34px;border-radius:8px;background:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.logo-sq span{font-size:10px;font-weight:700;color:var(--navy);}
+.co-name{font-size:13px;font-weight:600;color:rgba(255,255,255,.95);}
+.co-plant{font-size:10px;color:rgba(255,255,255,.45);}
+.vendor-tag{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);border-radius:20px;padding:3px 10px;font-size:10px;color:rgba(255,255,255,.65);}
+.hdr-bottom{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;}
+.page-title{font-size:20px;font-weight:600;color:#fff;}
+.page-sub{font-size:11px;color:rgba(255,255,255,.5);margin-top:2px;}
+.hdr-nav{display:flex;gap:6px;flex-wrap:wrap;}
+.hn-btn{padding:6px 14px;border-radius:7px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.08);color:rgba(255,255,255,.75);font-size:11px;font-weight:500;font-family:var(--font);cursor:pointer;transition:all .12s;text-decoration:none;}
+.hn-btn:hover{background:rgba(255,255,255,.15);color:#fff;}
+.hn-btn.active{background:#fff;color:var(--navy);}
+
+/* ── MAIN ── */
+.main{max-width:1100px;margin:0 auto;padding:20px;}
+
+/* ── TABS ── */
+.tabs{display:flex;gap:4px;background:var(--surface-2);border:1px solid var(--border);border-radius:9px;padding:4px;margin-bottom:20px;}
+.tab{flex:1;padding:8px 12px;border-radius:6px;border:none;background:none;font-size:12px;font-weight:500;font-family:var(--font);color:var(--text-3);cursor:pointer;transition:all .12s;text-align:center;}
+.tab.active{background:var(--surface);color:var(--text-1);box-shadow:0 1px 3px rgba(0,0,0,.08);}
+
+/* ── CARDS ── */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:16px 18px;box-shadow:var(--shadow);}
+.card-title{font-size:13px;font-weight:600;color:var(--text-1);margin-bottom:2px;}
+.card-sub{font-size:11px;color:var(--text-3);margin-bottom:14px;}
+
+/* ── GRID ── */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px;}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:16px;}
+.mb{margin-bottom:16px;}
+@media(max-width:700px){.g2,.g3{grid-template-columns:1fr;}}
+
+/* ── BADGE ── */
+.badge{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:600;padding:2px 8px;border-radius:20px;}
+.b-snack{background:var(--amber-lt);color:var(--amber);}
+.b-meal{background:var(--navy-lt);color:var(--navy);}
+[data-theme="dark"] .b-meal{color:#7fa8ff;}
+.b-green{background:var(--green-lt);color:var(--green);}
+.b-red{background:var(--red-lt);color:var(--red);}
+.b-purple{background:var(--purple-lt);color:var(--purple);}
+
+/* ── FORM ── */
+.form-section{margin-bottom:20px;}
+.form-label{font-size:11px;font-weight:600;color:var(--text-2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;display:block;}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;}
+@media(max-width:600px){.form-row{grid-template-columns:1fr;}}
+.inp{width:100%;border:1px solid var(--border);border-radius:7px;padding:8px 11px;font-size:13px;font-family:var(--font);background:var(--surface-2);color:var(--text-1);}
+.inp:focus{outline:none;border-color:var(--navy);background:var(--surface);}
+textarea.inp{resize:vertical;min-height:72px;line-height:1.5;}
+select.inp{cursor:pointer;}
+.type-toggle{display:flex;gap:6px;margin-bottom:10px;}
+.type-btn{flex:1;padding:8px;border:2px solid var(--border);border-radius:7px;font-size:12px;font-weight:500;font-family:var(--font);cursor:pointer;background:var(--surface-2);color:var(--text-3);transition:all .12s;}
+.type-btn.active-snack{border-color:var(--amber);background:var(--amber-lt);color:var(--amber);}
+.type-btn.active-meal{border-color:var(--navy);background:var(--navy-lt);color:var(--navy);}
+[data-theme="dark"] .type-btn.active-meal{color:#7fa8ff;}
+
+/* ── PASTE AREA ── */
+.paste-wrap{position:relative;}
+.paste-area{width:100%;border:2px dashed var(--border);border-radius:9px;padding:14px;font-size:12px;font-family:var(--font);background:var(--surface-2);color:var(--text-1);resize:vertical;min-height:110px;line-height:1.7;}
+.paste-area:focus{outline:none;border-color:var(--navy);}
+.paste-hint{font-size:10px;color:var(--text-3);margin-top:5px;line-height:1.5;}
+.parse-btn{margin-top:8px;padding:7px 14px;background:var(--navy);color:#fff;border:none;border-radius:7px;font-size:11px;font-weight:500;font-family:var(--font);cursor:pointer;}
+.parse-btn:hover{opacity:.9;}
+
+/* ── PREVIEW PARSED ── */
+.parsed-preview{background:var(--surface-2);border:1px solid var(--border);border-radius:8px;padding:12px 14px;margin-top:10px;display:none;}
+.parsed-preview h4{font-size:11px;font-weight:600;color:var(--text-2);margin-bottom:8px;text-transform:uppercase;letter-spacing:.06em;}
+.parsed-item{display:flex;align-items:flex-start;gap:8px;padding:6px 0;border-bottom:1px solid var(--border);font-size:12px;}
+.parsed-item:last-child{border-bottom:none;}
+.parsed-date{font-size:10px;color:var(--text-3);white-space:nowrap;min-width:80px;}
+.parsed-menu{color:var(--text-1);font-weight:500;}
+.parsed-comp{font-size:11px;color:var(--text-3);margin-top:2px;}
+
+/* ── COMPONENT TAGS ── */
+.comp-wrap{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px;}
+.comp-tag{display:inline-flex;align-items:center;gap:4px;background:var(--surface-2);border:1px solid var(--border);border-radius:20px;padding:2px 8px;font-size:11px;color:var(--text-2);}
+.comp-tag button{background:none;border:none;cursor:pointer;color:var(--text-3);font-size:13px;line-height:1;padding:0;}
+.comp-inp-row{display:flex;gap:6px;margin-top:8px;}
+.comp-inp{flex:1;border:1px solid var(--border);border-radius:7px;padding:6px 10px;font-size:12px;font-family:var(--font);background:var(--surface-2);color:var(--text-1);}
+.comp-inp:focus{outline:none;border-color:var(--navy);}
+.comp-add-btn{padding:6px 12px;background:var(--surface-2);border:1px solid var(--border);border-radius:7px;font-size:11px;font-family:var(--font);cursor:pointer;color:var(--text-2);white-space:nowrap;}
+.comp-add-btn:hover{background:var(--border);}
+
+/* ── SUBMIT BTN ── */
+.btn-primary{width:100%;padding:12px;background:var(--navy);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:600;font-family:var(--font);cursor:pointer;transition:opacity .12s;}
+.btn-primary:hover{opacity:.9;}
+.btn-primary:disabled{background:var(--text-3);cursor:not-allowed;}
+
+/* ── CALENDAR ── */
+.cal-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.cal-title{font-size:14px;font-weight:600;color:var(--text-1);}
+.cal-btn{padding:5px 12px;border:1px solid var(--border);border-radius:6px;background:var(--surface-2);font-size:11px;font-family:var(--font);cursor:pointer;color:var(--text-2);}
+.cal-btn:hover{background:var(--border);}
+.week-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:4px;}
+.week-day-hdr{font-size:10px;font-weight:600;color:var(--text-3);text-align:center;padding:4px 0;text-transform:uppercase;}
+.cal-cell{background:var(--surface-2);border:1px solid var(--border);border-radius:7px;padding:7px 8px;min-height:80px;position:relative;cursor:pointer;transition:border-color .12s;}
+.cal-cell:hover{border-color:var(--navy);}
+.cal-cell.has-data{background:var(--surface);}
+.cal-cell.today{border-color:var(--navy);border-width:2px;}
+.cal-cell.empty{background:transparent;border:1px dashed var(--border);cursor:default;}
+.cal-date{font-size:10px;font-weight:600;color:var(--text-3);margin-bottom:4px;}
+.cal-menu-item{font-size:9px;font-weight:500;padding:2px 5px;border-radius:4px;margin-bottom:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.cal-snack{background:var(--amber-lt);color:var(--amber);}
+.cal-meal{background:var(--navy-lt);color:var(--navy);}
+[data-theme="dark"] .cal-meal{color:#7fa8ff;}
+.cal-more{font-size:9px;color:var(--text-3);}
+
+/* ── WEEK LIST VIEW ── */
+.week-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);margin-bottom:12px;overflow:hidden;box-shadow:var(--shadow);}
+.week-hdr{background:var(--navy);color:#fff;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;}
+.week-hdr-title{font-size:12px;font-weight:600;}
+.week-hdr-range{font-size:10px;color:rgba(255,255,255,.6);}
+.week-body{padding:12px 16px;}
+.day-row{display:grid;grid-template-columns:90px 1fr 1fr;gap:12px;padding:8px 0;border-bottom:1px solid var(--surface-2);}
+.day-row:last-child{border-bottom:none;}
+.day-label{font-size:11px;font-weight:600;color:var(--text-2);}
+.day-date{font-size:10px;color:var(--text-3);}
+.menu-pill-wrap{display:flex;flex-direction:column;gap:3px;}
+.menu-pill{font-size:11px;font-weight:500;color:var(--text-1);}
+.menu-comps{font-size:10px;color:var(--text-3);line-height:1.4;}
+.no-menu{font-size:11px;color:var(--text-3);font-style:italic;}
+
+/* ── ANALYSIS ── */
+.analysis-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px;}
+@media(max-width:800px){.analysis-grid{grid-template-columns:1fr 1fr;}}
+@media(max-width:500px){.analysis-grid{grid-template-columns:1fr;}}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px;text-align:center;box-shadow:var(--shadow);}
+.stat-val{font-size:28px;font-weight:700;color:var(--text-1);line-height:1;margin-bottom:3px;}
+.stat-lbl{font-size:10px;font-weight:500;color:var(--text-3);text-transform:uppercase;letter-spacing:.06em;}
+.stat-sub{font-size:11px;color:var(--text-3);margin-top:3px;}
+
+/* ── REPEAT ALERT ── */
+.repeat-card{border-left:3px solid;border-radius:var(--r);padding:12px 14px;margin-bottom:8px;background:var(--surface);}
+.repeat-card.warn{border-color:var(--amber);}
+.repeat-card.danger{border-color:var(--red);}
+.repeat-card.ok{border-color:var(--green);}
+.repeat-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;}
+.repeat-name{font-size:12px;font-weight:600;color:var(--text-1);text-transform:capitalize;}
+.repeat-weeks{font-size:11px;color:var(--text-3);}
+.repeat-bar-bg{height:4px;background:var(--surface-2);border-radius:4px;overflow:hidden;margin-top:6px;}
+.repeat-bar-fill{height:100%;border-radius:4px;}
+
+/* ── ROTATION SCORE ── */
+.score-ring{display:flex;align-items:center;justify-content:center;gap:20px;padding:16px 0;}
+.ring-wrap{text-align:center;}
+.ring-svg{width:80px;height:80px;}
+.ring-pct{font-size:16px;font-weight:700;fill:var(--text-1);}
+.ring-lbl{font-size:11px;color:var(--text-2);margin-top:5px;}
+
+/* ── SUGGESTION CARDS ── */
+.suggestion-list{display:flex;flex-direction:column;gap:8px;}
+.sug-card{background:var(--surface-2);border:1px solid var(--border);border-radius:8px;padding:11px 13px;display:flex;gap:10px;align-items:flex-start;}
+.sug-icon{font-size:20px;flex-shrink:0;}
+.sug-title{font-size:12px;font-weight:600;color:var(--text-1);margin-bottom:2px;}
+.sug-desc{font-size:11px;color:var(--text-2);line-height:1.5;}
+
+/* ── TOP MENU LIST ── */
+.top-list{display:flex;flex-direction:column;gap:5px;}
+.top-item{display:flex;align-items:center;gap:8px;}
+.top-rank{font-size:10px;font-weight:700;color:var(--text-3);min-width:16px;}
+.top-name{font-size:12px;color:var(--text-1);text-transform:capitalize;flex:1;}
+.top-bar-bg{width:80px;height:5px;background:var(--surface-2);border-radius:5px;overflow:hidden;}
+.top-bar-fill{height:100%;border-radius:5px;}
+.top-count{font-size:10px;color:var(--text-3);min-width:30px;text-align:right;}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--text-1);color:var(--surface);padding:10px 18px;border-radius:20px;font-size:12px;font-weight:500;transition:transform .3s;z-index:999;white-space:nowrap;}
+.toast.show{transform:translateX(-50%) translateY(0);}
+.toast.ok{background:var(--green);}
+.toast.err{background:var(--red);}
+
+/* ── LOADING ── */
+.loading{display:flex;align-items:center;justify-content:center;padding:40px;flex-direction:column;gap:10px;}
+.spin{width:22px;height:22px;border:2px solid var(--border);border-top-color:var(--navy);border-radius:50%;animation:spin .7s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.load-txt{font-size:11px;color:var(--text-3);}
+
+/* ── EMPTY ── */
+.empty{padding:40px;text-align:center;color:var(--text-3);font-size:12px;}
+.empty-icon{font-size:36px;display:block;margin-bottom:10px;}
+
+/* ── MODAL ── */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;align-items:center;justify-content:center;}
+.modal-overlay.show{display:flex;}
+.modal{background:var(--surface);border-radius:12px;padding:20px;max-width:480px;width:90%;max-height:80vh;overflow-y:auto;box-shadow:0 8px 32px rgba(0,0,0,.2);}
+.modal-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.modal-title{font-size:14px;font-weight:600;color:var(--text-1);}
+.modal-close{background:none;border:none;cursor:pointer;font-size:20px;color:var(--text-3);}
+.modal-item{padding:7px 0;border-bottom:1px solid var(--surface-2);font-size:12px;}
+.modal-item:last-child{border-bottom:none;}
+.modal-item-name{font-weight:500;color:var(--text-1);text-transform:capitalize;}
+.modal-item-comps{color:var(--text-3);margin-top:2px;font-size:11px;}
+</style>
+</head>
+<body>
+
+<script>
+  var GAS_URL = "YOUR_GAS_WEB_APP_URL_HERE";
+</script>
+
+<!-- HEADER -->
+<div class="hdr">
+  <div class="hdr-inner">
+    <div class="hdr-top">
+      <div class="brand">
+        <div class="logo-sq"><span>FFI</span></div>
+        <div>
+          <div class="co-name">PT Frisian Flag Indonesia</div>
+          <div class="co-plant">Cikarang Plant</div>
+        </div>
+      </div>
+      <span class="vendor-tag">Vendor: GDSK</span>
+    </div>
+    <div class="hdr-bottom">
+      <div>
+        <div class="page-title">🍽️ Menu Plan</div>
+        <div class="page-sub">Weekly & monthly menu management + analysis</div>
+      </div>
+      <div class="hdr-nav">
+        <a class="hn-btn" href="index.html">📋 Form</a>
+        <a class="hn-btn" href="dashboard.html">📊 Dashboard</a>
+        <button class="hn-btn" onclick="toggleTheme()">🌓 Theme</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- MONTH FILTER -->
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px;">
+    <div style="display:flex;align-items:center;gap:8px;">
+      <span style="font-size:12px;color:var(--text-2);font-weight:500;">Period:</span>
+      <select class="inp" id="monthFilter" onchange="onMonthChange(this.value)" style="width:auto;padding:5px 10px;font-size:12px;">
+        <option value="">Loading…</option>
+      </select>
+    </div>
+    <button onclick="openTab('input')" style="padding:7px 16px;background:var(--navy);color:#fff;border:none;border-radius:7px;font-size:12px;font-weight:600;font-family:var(--font);cursor:pointer;">+ Add Menu</button>
+  </div>
+
+  <!-- TABS -->
+  <div class="tabs">
+    <button class="tab active" id="tab-analysis" onclick="openTab('analysis')">📊 Analysis</button>
+    <button class="tab" id="tab-calendar" onclick="openTab('calendar')">📅 Calendar</button>
+    <button class="tab" id="tab-weekly" onclick="openTab('weekly')">📋 Weekly List</button>
+    <button class="tab" id="tab-input" onclick="openTab('input')">✏️ Input Menu</button>
+  </div>
+
+  <!-- ════════════════════════════════════ -->
+  <!--  TAB: ANALYSIS                       -->
+  <!-- ════════════════════════════════════ -->
+  <div id="pane-analysis">
+    <div class="loading" id="analysisLoader"><div class="spin"></div><span class="load-txt">Loading analysis…</span></div>
+    <div id="analysisContent" style="display:none">
+
+      <!-- Stats row -->
+      <div class="analysis-grid" id="statsGrid"></div>
+
+      <!-- Rotation score -->
+      <div class="card mb">
+        <div class="card-title">🔄 Menu Rotation Score</div>
+        <div class="card-sub">Higher score = more variety. Target: above 70%</div>
+        <div class="score-ring" id="scoreRing"></div>
+      </div>
+
+      <!-- Suggestions -->
+      <div class="card mb">
+        <div class="card-title">💡 Smart Suggestions</div>
+        <div class="card-sub">Based on your menu history this period</div>
+        <div class="suggestion-list" id="suggestionList"></div>
+      </div>
+
+      <div class="g2">
+        <!-- Repeated menus -->
+        <div>
+          <div class="card">
+            <div class="card-title">⚠️ Repeated Snack Menus</div>
+            <div class="card-sub">Same snack appearing in multiple weeks</div>
+            <div id="repeatedSnack"></div>
+          </div>
+        </div>
+        <div>
+          <div class="card">
+            <div class="card-title">⚠️ Repeated Meal Menus</div>
+            <div class="card-sub">Same meal appearing in multiple weeks</div>
+            <div id="repeatedMeal"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="g2">
+        <!-- Top menus -->
+        <div class="card">
+          <div class="card-title">🏆 Most Frequent Snack</div>
+          <div class="card-sub">All-time ranking</div>
+          <div class="top-list" id="topSnack"></div>
+        </div>
+        <div class="card">
+          <div class="card-title">🏆 Most Frequent Meal</div>
+          <div class="card-sub">All-time ranking</div>
+          <div class="top-list" id="topMeal"></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════ -->
+  <!--  TAB: CALENDAR                       -->
+  <!-- ════════════════════════════════════ -->
+  <div id="pane-calendar" style="display:none">
+    <div class="card">
+      <div class="cal-nav">
+        <button class="cal-btn" onclick="calPrev()">← Prev</button>
+        <span class="cal-title" id="calMonthLabel">—</span>
+        <button class="cal-btn" onclick="calNext()">Next →</button>
+      </div>
+      <div class="week-grid">
+        <div class="week-day-hdr">Mon</div>
+        <div class="week-day-hdr">Tue</div>
+        <div class="week-day-hdr">Wed</div>
+        <div class="week-day-hdr">Thu</div>
+        <div class="week-day-hdr">Fri</div>
+        <div class="week-day-hdr">Sat</div>
+        <div class="week-day-hdr">Sun</div>
+      </div>
+      <div id="calGrid" class="week-grid"></div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════ -->
+  <!--  TAB: WEEKLY LIST                    -->
+  <!-- ════════════════════════════════════ -->
+  <div id="pane-weekly" style="display:none">
+    <div id="weeklyList"></div>
+  </div>
+
+  <!-- ════════════════════════════════════ -->
+  <!--  TAB: INPUT                          -->
+  <!-- ════════════════════════════════════ -->
+  <div id="pane-input" style="display:none">
+    <div class="g2">
+
+      <!-- Manual input -->
+      <div class="card">
+        <div class="card-title">✏️ Manual Input</div>
+        <div class="card-sub">Add one menu entry at a time</div>
+
+        <div class="form-section">
+          <label class="form-label">Date</label>
+          <input type="date" class="inp" id="menuDate">
+        </div>
+
+        <div class="form-section">
+          <label class="form-label">Type</label>
+          <div class="type-toggle">
+            <button class="type-btn active-snack" id="typeSnack" onclick="setType('snack')">🥐 Snack</button>
+            <button class="type-btn" id="typeMeal" onclick="setType('meal')">🍱 Meal</button>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <label class="form-label">Menu Name <span style="color:var(--text-3)">(main dish)</span></label>
+          <input type="text" class="inp" id="menuName" placeholder="e.g. Bubur Ayam / Chicken Yakiniku">
+        </div>
+
+        <div class="form-section">
+          <label class="form-label">Components <span style="color:var(--text-3)">(sides, soup, etc.)</span></label>
+          <div class="comp-wrap" id="compTags"></div>
+          <div class="comp-inp-row">
+            <input type="text" class="comp-inp" id="compInput" placeholder="Add component…" onkeydown="if(event.key==='Enter'){addComp();event.preventDefault();}">
+            <button class="comp-add-btn" onclick="addComp()">+ Add</button>
+          </div>
+        </div>
+
+        <button class="btn-primary" onclick="submitManual()">Save Menu Entry</button>
+      </div>
+
+      <!-- Bulk paste -->
+      <div class="card">
+        <div class="card-title">📋 Bulk Paste</div>
+        <div class="card-sub">Paste menu data in the format from your records</div>
+
+        <div class="form-section">
+          <label class="form-label">Type</label>
+          <div class="type-toggle">
+            <button class="type-btn active-snack" id="pasteTypeSnack" onclick="setPasteType('snack')">🥐 Snack</button>
+            <button class="type-btn" id="pasteTypeMeal" onclick="setPasteType('meal')">🍱 Meal</button>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <label class="form-label">Paste your menu data</label>
+          <div class="paste-wrap">
+            <textarea class="paste-area" id="pasteArea" placeholder="Format contoh:&#10;&#10;20-Apr-26&#9;Bubur ayam&#10;20-Apr-26&#9;Kuah kaldu&#10;20-Apr-26&#9;Sambal&#10;20-Apr-26&#9;Kerupuk&#10;&#10;atau&#10;&#10;14-Apr-26&#9;Chicken yakiniku&#10;&#9;Egg drop soup&#10;&#9;Nasi putih&#10;&#9;Melon"></textarea>
+          </div>
+          <p class="paste-hint">
+            Baris pertama dengan tanggal = menu utama.<br>
+            Baris berikutnya tanpa tanggal = komponen/pendukung.<br>
+            Pisah tanggal & nama dengan Tab atau spasi.
+          </p>
+          <button class="parse-btn" onclick="parsePaste()">🔍 Preview & Parse</button>
+        </div>
+
+        <div class="parsed-preview" id="parsedPreview">
+          <h4>Parsed Result — review before saving</h4>
+          <div id="parsedList"></div>
+          <div style="margin-top:12px;display:flex;gap:8px;">
+            <button class="btn-primary" style="flex:1" onclick="submitParsed()">✅ Save All</button>
+            <button onclick="document.getElementById('parsedPreview').style.display='none'" style="flex:1;padding:10px;border:1px solid var(--border);border-radius:8px;font-size:12px;font-family:var(--font);cursor:pointer;background:var(--surface-2);color:var(--text-2);">Cancel</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div><!-- .main -->
+
+<!-- DAY DETAIL MODAL -->
+<div class="modal-overlay" id="dayModal" onclick="if(event.target===this)closeDayModal()">
+  <div class="modal">
+    <div class="modal-hdr">
+      <span class="modal-title" id="modalDate">—</span>
+      <button class="modal-close" onclick="closeDayModal()">×</button>
+    </div>
+    <div id="modalBody"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ══════════════════════════════════════════════
+//  STATE
+// ══════════════════════════════════════════════
+var DATA       = null;
+var selMonth   = '';
+var activeType = 'snack';
+var pasteType  = 'snack';
+var components = [];
+var parsedEntries = [];
+var calYear    = new Date().getFullYear();
+var calMonth   = new Date().getMonth(); // 0-based
+var isDark     = false;
+
+// ── INIT
+window.onload = function() {
+  if (window.matchMedia('(prefers-color-scheme: dark)').matches) toggleTheme();
+  // Set default date to today
+  var now = new Date();
+  document.getElementById('menuDate').value = toYMD(now);
+  loadData('');
+};
+
+// ── THEME
+function toggleTheme() {
+  isDark = !isDark;
+  document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+}
+
+// ── TABS
+function openTab(name) {
+  ['analysis','calendar','weekly','input'].forEach(function(t) {
+    document.getElementById('pane-' + t).style.display = t === name ? '' : 'none';
+    var btn = document.getElementById('tab-' + t);
+    if (btn) btn.classList.toggle('active', t === name);
+  });
+  if (name === 'calendar' && DATA) renderCalendar();
+  if (name === 'weekly'   && DATA) renderWeekly();
+}
+
+// ── MONTH CHANGE
+function onMonthChange(val) {
+  selMonth = val;
+  loadData(val);
+}
+
+// ── LOAD DATA
+function loadData(month) {
+  document.getElementById('analysisLoader').style.display = 'flex';
+  document.getElementById('analysisContent').style.display = 'none';
+
+  var url = GAS_URL + '?action=menu&month=' + encodeURIComponent(month);
+  fetch(url, { redirect: 'follow' })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      if (!data.success) throw new Error(data.message);
+      DATA = data;
+      fillMonthFilter(data.availableMonths, data.selectedMonth);
+      calYear  = selMonth ? parseInt(selMonth.split(' ')[1]||new Date().getFullYear()) : new Date().getFullYear();
+      calMonth = selMonth ? getMonthIndex(selMonth) : new Date().getMonth();
+      renderAnalysis(data);
+      document.getElementById('analysisLoader').style.display = 'none';
+      document.getElementById('analysisContent').style.display = '';
+    })
+    .catch(function(e) {
+      document.getElementById('analysisLoader').innerHTML =
+        '<div style="color:var(--red);font-size:12px;text-align:center;padding:24px">' +
+        'Cannot load menu data.<br><small>' + e.message + '</small></div>';
+    });
+}
+
+function getMonthIndex(monthStr) {
+  var months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  var parts  = monthStr.split(' ');
+  var idx    = months.indexOf(parts[0]);
+  return idx >= 0 ? idx : new Date().getMonth();
+}
+
+function fillMonthFilter(months, selected) {
+  var sel = document.getElementById('monthFilter');
+  sel.innerHTML = '<option value="">All months</option>';
+  (months || []).slice().reverse().forEach(function(m) {
+    var o = document.createElement('option');
+    o.value       = m;
+    o.textContent = m;
+    if (m === selected || m === selMonth) o.selected = true;
+    sel.appendChild(o);
+  });
+}
+
+// ══════════════════════════════════════════════
+//  ANALYSIS
+// ══════════════════════════════════════════════
+function renderAnalysis(data) {
+  var a = data.analysis || {};
+
+  // Stats
+  document.getElementById('statsGrid').innerHTML = [
+    { icon:'🥐', val: a.uniqueSnack || 0,  lbl:'Unique Snacks',  sub:'Different menus',      col:'var(--amber)' },
+    { icon:'🍱', val: a.uniqueMeal  || 0,  lbl:'Unique Meals',   sub:'Different main dishes', col:'var(--navy)'  },
+    { icon:'📅', val: data.entries ? [...new Set(data.entries.map(function(e){return e.date;}))].length : 0,
+      lbl:'Days Recorded', sub:'With menu data', col:'var(--green)' },
+    { icon:'⚠️', val: (a.repeatedSnack||[]).length, lbl:'Repeated Snacks', sub:'Appear 2+ weeks', col:'var(--amber)' },
+    { icon:'⚠️', val: (a.repeatedMeal||[]).length,  lbl:'Repeated Meals',  sub:'Appear 2+ weeks', col:'var(--red)'   },
+    { icon:'✅', val: Math.round(((a.rotationScore||{}).snack||0) + ((a.rotationScore||{}).meal||0)) / 2 + '%',
+      lbl:'Avg Rotation', sub:'Variety score', col:'var(--green)' }
+  ].map(function(s) {
+    return '<div class="stat-card">' +
+      '<div style="font-size:22px;margin-bottom:4px">' + s.icon + '</div>' +
+      '<div class="stat-val" style="color:' + s.col + '">' + s.val + '</div>' +
+      '<div class="stat-lbl">' + s.lbl + '</div>' +
+      '<div class="stat-sub">' + s.sub + '</div>' +
+      '</div>';
+  }).join('');
+
+  // Rotation score rings
+  renderScoreRings(a.rotationScore || { snack:0, meal:0 });
+
+  // Suggestions
+  renderSuggestions(a);
+
+  // Repeated menus
+  renderRepeated('repeatedSnack', a.repeatedSnack || [], 'var(--amber)');
+  renderRepeated('repeatedMeal',  a.repeatedMeal  || [], 'var(--navy)');
+
+  // Top menus
+  renderTopMenu('topSnack', a.topSnack || [], 'var(--amber)');
+  renderTopMenu('topMeal',  a.topMeal  || [], 'var(--navy)');
+}
+
+function renderScoreRings(score) {
+  function ring(pct, col, lbl) {
+    var r = 30, cx = 40, cy = 40;
+    var circ = 2 * Math.PI * r;
+    var dash  = circ * (pct / 100);
+    var grade = pct >= 80 ? '🟢 Excellent' : pct >= 60 ? '🟡 Good' : '🔴 Needs variety';
+    return '<div class="ring-wrap">' +
+      '<svg class="ring-svg" viewBox="0 0 80 80">' +
+        '<circle cx="' + cx + '" cy="' + cy + '" r="' + r + '" fill="none" stroke="var(--border)" stroke-width="7"/>' +
+        '<circle cx="' + cx + '" cy="' + cy + '" r="' + r + '" fill="none" stroke="' + col + '" stroke-width="7"' +
+          ' stroke-dasharray="' + dash + ' ' + (circ-dash) + '"' +
+          ' stroke-dashoffset="' + (circ/4) + '" stroke-linecap="round"/>' +
+        '<text x="' + cx + '" y="' + cy + '" text-anchor="middle" dominant-baseline="middle"' +
+          ' font-size="14" font-weight="700" fill="var(--text-1)" font-family="Inter,sans-serif">' + pct + '%</text>' +
+      '</svg>' +
+      '<div class="ring-lbl" style="font-weight:600">' + lbl + '</div>' +
+      '<div style="font-size:10px;color:var(--text-3);margin-top:2px">' + grade + '</div>' +
+      '</div>';
+  }
+  document.getElementById('scoreRing').innerHTML =
+    ring(score.snack, 'var(--amber)', '🥐 Snack Rotation') +
+    '<div style="width:1px;height:80px;background:var(--border);flex-shrink:0"></div>' +
+    ring(score.meal,  'var(--navy)',  '🍱 Meal Rotation');
+}
+
+function renderSuggestions(a) {
+  var sugs = [];
+  var snackScore = (a.rotationScore || {}).snack || 0;
+  var mealScore  = (a.rotationScore || {}).meal  || 0;
+  var repSnack   = (a.repeatedSnack || []).length;
+  var repMeal    = (a.repeatedMeal  || []).length;
+
+  if (snackScore < 60) {
+    sugs.push({ icon:'🔄', title:'Increase snack variety', desc:'Your snack rotation score is ' + snackScore + '%. Try introducing at least 3-4 different snack themes each month (e.g. traditional, modern, western) to improve variety.' });
+  } else if (snackScore >= 80) {
+    sugs.push({ icon:'🌟', title:'Excellent snack variety!', desc:'Rotation score of ' + snackScore + '% shows great menu diversity. Keep it up and document successful menus for future reference.' });
+  }
+
+  if (mealScore < 60) {
+    sugs.push({ icon:'🍽️', title:'Diversify meal menu', desc:'Meal rotation at ' + mealScore + '%. Consider rotating protein sources weekly: Chicken week → Fish week → Beef week → Tofu/Tempe week. This ensures nutritional balance too.' });
+  }
+
+  if (repSnack > 2) {
+    var names = (a.repeatedSnack || []).slice(0,2).map(function(r){return r.name;}).join(', ');
+    sugs.push({ icon:'⚡', title:'Snack repetition detected', desc:repSnack + ' snack menu(s) repeated across weeks (' + names + '…). Aim to space the same menu at least 3 weeks apart to maintain freshness.' });
+  }
+
+  if (repMeal > 3) {
+    sugs.push({ icon:'📋', title:'Create a meal rotation calendar', desc:'With ' + repMeal + ' repeated meals, consider making a 4-week rotation plan. This ensures each meal appears max once per cycle and workers anticipate variety.' });
+  }
+
+  if (!sugs.length) {
+    sugs.push({ icon:'✅', title:'Menu planning looks great!', desc:'No major issues detected this period. Continue monitoring variety and consider collecting worker feedback on favorite menus.' });
+    sugs.push({ icon:'💾', title:'Document your menu winners', desc:'Track which menus consistently get low leftover. These are your "star menus" — schedule them strategically on high-attendance days.' });
+  }
+
+  sugs.push({ icon:'🥗', title:'Nutritional balance tip', desc:'Ensure each meal includes: protein (meat/tofu/egg), vegetables (cooked + fresh), carb (rice/noodle), and a refreshing element (fruit/soup). This reduces leftover from boredom.' });
+
+  document.getElementById('suggestionList').innerHTML = sugs.map(function(s) {
+    return '<div class="sug-card">' +
+      '<span class="sug-icon">' + s.icon + '</span>' +
+      '<div><div class="sug-title">' + s.title + '</div><div class="sug-desc">' + s.desc + '</div></div>' +
+      '</div>';
+  }).join('');
+}
+
+function renderRepeated(elId, items, col) {
+  var el = document.getElementById(elId);
+  if (!items.length) {
+    el.innerHTML = '<div style="padding:16px;text-align:center;font-size:11px;color:var(--green)">✅ No repeated menus detected this period.</div>';
+    return;
+  }
+  var maxCount = Math.max.apply(null, items.map(function(i){return i.count;}));
+  el.innerHTML = items.map(function(item) {
+    var pct   = Math.round(item.count / maxCount * 100);
+    var cls   = item.count >= 3 ? 'danger' : 'warn';
+    var wkLbl = item.weeks.map(function(w){return 'W'+w;}).join(', ');
+    return '<div class="repeat-card ' + cls + '">' +
+      '<div class="repeat-hdr">' +
+        '<span class="repeat-name">' + item.name + '</span>' +
+        '<span class="repeat-weeks">' + item.count + '× (' + wkLbl + ')</span>' +
+      '</div>' +
+      '<div class="repeat-bar-bg"><div class="repeat-bar-fill" style="width:' + pct + '%;background:' + col + '"></div></div>' +
+      '</div>';
+  }).join('');
+}
+
+function renderTopMenu(elId, items, col) {
+  var el = document.getElementById(elId);
+  if (!items.length) { el.innerHTML = '<div class="empty" style="padding:12px">No data yet.</div>'; return; }
+  var max = items[0] ? items[0].count : 1;
+  el.innerHTML = '<div class="top-list">' + items.map(function(item, i) {
+    var pct = Math.round(item.count / max * 100);
+    return '<div class="top-item">' +
+      '<span class="top-rank">' + (i+1) + '</span>' +
+      '<span class="top-name">' + item.name + '</span>' +
+      '<div class="top-bar-bg"><div class="top-bar-fill" style="width:' + pct + '%;background:' + col + '"></div></div>' +
+      '<span class="top-count">' + item.count + '×</span>' +
+      '</div>';
+  }).join('') + '</div>';
+}
+
+// ══════════════════════════════════════════════
+//  CALENDAR
+// ══════════════════════════════════════════════
+function calPrev() {
+  calMonth--;
+  if (calMonth < 0) { calMonth = 11; calYear--; }
+  renderCalendar();
+}
+function calNext() {
+  calMonth++;
+  if (calMonth > 11) { calMonth = 0; calYear++; }
+  renderCalendar();
+}
+
+function renderCalendar() {
+  var months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  document.getElementById('calMonthLabel').textContent = months[calMonth] + ' ' + calYear;
+
+  var firstDay = new Date(calYear, calMonth, 1).getDay(); // 0=Sun
+  // Convert to Mon-first: Mon=0, Tue=1, ..., Sun=6
+  var startOffset = (firstDay + 6) % 7;
+  var daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
+  var today = new Date();
+  var byDate = (DATA && DATA.byDate) || {};
+
+  var cells = '';
+  // Empty cells before first day
+  for (var i = 0; i < startOffset; i++) {
+    cells += '<div class="cal-cell empty"></div>';
+  }
+
+  for (var d = 1; d <= daysInMonth; d++) {
+    var dateObj  = new Date(calYear, calMonth, d);
+    var dateStr  = dateObj.toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' });
+    var isToday  = dateObj.toDateString() === today.toDateString();
+    var dayData  = byDate[dateStr] || null;
+    var hasData  = !!dayData;
+    var clsList  = 'cal-cell' + (hasData?' has-data':'') + (isToday?' today':'');
+    var onclick  = hasData ? 'openDayModal(\'' + dateStr.replace(/'/g,"\\'") + '\')' : '';
+
+    var inner = '<div class="cal-date">' + d + '</div>';
+    if (dayData) {
+      if (dayData.snack && dayData.snack.length) {
+        inner += '<div class="cal-menu-item cal-snack">🥐 ' + cap(dayData.snack[0].menuName) + '</div>';
+      }
+      if (dayData.meal && dayData.meal.length) {
+        inner += '<div class="cal-menu-item cal-meal">🍱 ' + cap(dayData.meal[0].menuName) + '</div>';
+        if (dayData.meal.length > 1) inner += '<div class="cal-more">+' + (dayData.meal.length-1) + ' more</div>';
+      }
+    }
+    cells += '<div class="' + clsList + '"' + (onclick?' onclick="'+onclick+'"':'') + '>' + inner + '</div>';
+  }
+
+  // Fill remaining cells to complete last row
+  var totalCells = startOffset + daysInMonth;
+  var remainder  = totalCells % 7;
+  if (remainder > 0) {
+    for (var j = 0; j < 7 - remainder; j++) {
+      cells += '<div class="cal-cell empty"></div>';
+    }
+  }
+
+  document.getElementById('calGrid').innerHTML = cells;
+}
+
+// ══════════════════════════════════════════════
+//  WEEKLY LIST
+// ══════════════════════════════════════════════
+function renderWeekly() {
+  if (!DATA || !DATA.byWeek) {
+    document.getElementById('weeklyList').innerHTML = '<div class="empty"><span class="empty-icon">📋</span>No menu data available.</div>';
+    return;
+  }
+  var weeks = Object.keys(DATA.byWeek).sort(function(a,b) {
+    var wa = DATA.byWeek[a], wb = DATA.byWeek[b];
+    return (wa.year * 100 + wa.weekNum) - (wb.year * 100 + wb.weekNum);
+  });
+
+  if (!weeks.length) {
+    document.getElementById('weeklyList').innerHTML = '<div class="empty"><span class="empty-icon">📋</span>No weekly data for this period.</div>';
+    return;
+  }
+
+  document.getElementById('weeklyList').innerHTML = weeks.map(function(wk) {
+    var w = DATA.byWeek[wk];
+    // Group by date within the week
+    var dayMap = {};
+    (w.snack || []).concat(w.meal || []).forEach(function(e) {
+      if (!dayMap[e.date]) dayMap[e.date] = { snack:[], meal:[] };
+      if (e.type.toLowerCase() === 'snack') dayMap[e.date].snack.push(e);
+      else dayMap[e.date].meal.push(e);
+    });
+    var dayKeys = Object.keys(dayMap).sort();
+
+    var rows = dayKeys.map(function(dt) {
+      var day = dayMap[dt];
+      var snackHtml = day.snack.length
+        ? '<div class="menu-pill">🥐 ' + cap(day.snack[0].menuName) + '</div>' +
+          (day.snack[0].components.length ? '<div class="menu-comps">' + day.snack[0].components.slice(0,4).join(' · ') + '</div>' : '')
+        : '<span class="no-menu">No snack</span>';
+      var mealHtml  = day.meal.length
+        ? day.meal.map(function(m) {
+            return '<div class="menu-pill">🍱 ' + cap(m.menuName) + '</div>';
+          }).join('') +
+          (day.meal[0] && day.meal[0].components.length ? '<div class="menu-comps">' + day.meal[0].components.slice(0,3).join(' · ') + '</div>' : '')
+        : '<span class="no-menu">No meal</span>';
+      return '<div class="day-row">' +
+        '<div><div class="day-label">' + dt.split(' ')[1] + ' ' + dt.split(' ')[0] + '</div></div>' +
+        '<div class="menu-pill-wrap">' + snackHtml + '</div>' +
+        '<div class="menu-pill-wrap">' + mealHtml  + '</div>' +
+        '</div>';
+    }).join('');
+
+    return '<div class="week-card">' +
+      '<div class="week-hdr">' +
+        '<span class="week-hdr-title">Week ' + w.weekNum + ' · ' + w.year + '</span>' +
+        '<span class="week-hdr-range">' + (dayKeys[0]||'') + ' – ' + (dayKeys[dayKeys.length-1]||'') + '</span>' +
+      '</div>' +
+      '<div class="week-body">' +
+        '<div class="day-row" style="font-size:10px;font-weight:700;color:var(--text-3);text-transform:uppercase;padding-bottom:6px;">' +
+          '<div>Date</div><div>Snack</div><div>Meal</div>' +
+        '</div>' +
+        rows +
+      '</div>' +
+      '</div>';
+  }).join('');
+}
+
+// ══════════════════════════════════════════════
+//  DAY MODAL
+// ══════════════════════════════════════════════
+function openDayModal(dateStr) {
+  if (!DATA || !DATA.byDate || !DATA.byDate[dateStr]) return;
+  var day = DATA.byDate[dateStr];
+  document.getElementById('modalDate').textContent = '📅 ' + dateStr;
+  var html = '';
+  if (day.snack && day.snack.length) {
+    html += '<div style="margin-bottom:12px"><div style="font-size:10px;font-weight:700;color:var(--amber);text-transform:uppercase;margin-bottom:8px">🥐 Snack</div>';
+    day.snack.forEach(function(e) {
+      html += '<div class="modal-item"><div class="modal-item-name">' + cap(e.menuName) + '</div>';
+      if (e.components.length) html += '<div class="modal-item-comps">Components: ' + e.components.join(', ') + '</div>';
+      html += '</div>';
+    });
+    html += '</div>';
+  }
+  if (day.meal && day.meal.length) {
+    html += '<div><div style="font-size:10px;font-weight:700;color:var(--navy);text-transform:uppercase;margin-bottom:8px">🍱 Meal</div>';
+    day.meal.forEach(function(e) {
+      html += '<div class="modal-item"><div class="modal-item-name">' + cap(e.menuName) + '</div>';
+      if (e.components.length) html += '<div class="modal-item-comps">Components: ' + e.components.join(', ') + '</div>';
+      html += '</div>';
+    });
+    html += '</div>';
+  }
+  document.getElementById('modalBody').innerHTML = html;
+  document.getElementById('dayModal').classList.add('show');
+}
+function closeDayModal() { document.getElementById('dayModal').classList.remove('show'); }
+
+// ══════════════════════════════════════════════
+//  INPUT — MANUAL
+// ══════════════════════════════════════════════
+function setType(t) {
+  activeType = t;
+  document.getElementById('typeSnack').className = 'type-btn' + (t==='snack'?' active-snack':'');
+  document.getElementById('typeMeal').className  = 'type-btn' + (t==='meal' ?' active-meal':'');
+}
+function setPasteType(t) {
+  pasteType = t;
+  document.getElementById('pasteTypeSnack').className = 'type-btn' + (t==='snack'?' active-snack':'');
+  document.getElementById('pasteTypeMeal').className  = 'type-btn' + (t==='meal' ?' active-meal':'');
+}
+
+function addComp() {
+  var inp = document.getElementById('compInput');
+  var val = inp.value.trim();
+  if (!val) return;
+  components.push(val);
+  inp.value = '';
+  renderCompTags();
+}
+function removeComp(i) {
+  components.splice(i, 1);
+  renderCompTags();
+}
+function renderCompTags() {
+  document.getElementById('compTags').innerHTML = components.map(function(c, i) {
+    return '<span class="comp-tag">' + c + '<button onclick="removeComp(' + i + ')">×</button></span>';
+  }).join('');
+}
+
+function submitManual() {
+  var date    = document.getElementById('menuDate').value;
+  var name    = document.getElementById('menuName').value.trim();
+  if (!date || !name) { toast('Please fill date and menu name.', 'err'); return; }
+
+  var entry = { date:date, type:activeType, menuName:name, components:components.slice() };
+  saveEntries([entry], function() {
+    document.getElementById('menuName').value = '';
+    components = [];
+    renderCompTags();
+    loadData(selMonth);
+  });
+}
+
+// ══════════════════════════════════════════════
+//  INPUT — BULK PASTE
+// ══════════════════════════════════════════════
+function parsePaste() {
+  var raw   = document.getElementById('pasteArea').value.trim();
+  if (!raw) { toast('Paste some menu data first.', 'err'); return; }
+  var lines = raw.split('\n');
+  parsedEntries = [];
+  var currentDate = '', currentMenu = null;
+
+  lines.forEach(function(line) {
+    if (!line.trim()) return;
+    // Try to detect date at start of line
+    var tabIdx = line.indexOf('\t');
+    var part1  = tabIdx > -1 ? line.substring(0, tabIdx).trim() : '';
+    var part2  = tabIdx > -1 ? line.substring(tabIdx+1).trim() : line.trim();
+
+    // Try parse date from part1
+    var tryDate = tryParseDate(part1);
+    if (tryDate) {
+      currentDate = tryDate;
+      if (part2) {
+        // This is the main menu line
+        if (currentMenu) parsedEntries.push(currentMenu);
+        currentMenu = { date:currentDate, type:pasteType, menuName:part2, components:[] };
+      }
+    } else {
+      // No date — might be a component or continuation
+      var text = line.trim();
+      if (!text) return;
+      // If starts with tab, it's a component
+      if (line.startsWith('\t') || line.startsWith('  ')) {
+        if (currentMenu) currentMenu.components.push(text);
+        else {
+          // First non-date line — treat as new menu on currentDate
+          if (currentDate) {
+            if (currentMenu) parsedEntries.push(currentMenu);
+            currentMenu = { date:currentDate, type:pasteType, menuName:text, components:[] };
+          }
+        }
+      } else {
+        // Non-indented, no date — new menu same date
+        if (currentDate) {
+          if (currentMenu) parsedEntries.push(currentMenu);
+          currentMenu = { date:currentDate, type:pasteType, menuName:text, components:[] };
+        }
+      }
+    }
+  });
+  if (currentMenu) parsedEntries.push(currentMenu);
+
+  if (!parsedEntries.length) { toast('Could not parse any entries. Check format.', 'err'); return; }
+
+  // Show preview
+  var preview = document.getElementById('parsedPreview');
+  document.getElementById('parsedList').innerHTML = parsedEntries.map(function(e) {
+    return '<div class="parsed-item">' +
+      '<span class="parsed-date">' + e.date + '</span>' +
+      '<div><div class="parsed-menu">' +
+        '<span class="badge ' + (e.type==='snack'?'b-snack':'b-meal') + '">' + e.type + '</span> ' +
+        cap(e.menuName) + '</div>' +
+        (e.components.length ? '<div class="parsed-comp">+ ' + e.components.join(', ') + '</div>' : '') +
+      '</div>' +
+      '</div>';
+  }).join('');
+  preview.style.display = 'block';
+}
+
+function tryParseDate(str) {
+  if (!str) return null;
+  // formats: 20-Apr-26, 20-Apr-2026, 14/04/26, 2026-04-14
+  str = str.trim();
+  var patterns = [
+    /^(\d{1,2})[-\/]([A-Za-z]{3})[-\/](\d{2,4})$/, // 20-Apr-26
+    /^(\d{4})[-\/](\d{1,2})[-\/](\d{1,2})$/,         // 2026-04-14
+    /^(\d{1,2})[-\/](\d{1,2})[-\/](\d{2,4})$/         // 14/04/26
+  ];
+  var months3 = {jan:0,feb:1,mar:2,apr:3,may:4,jun:5,jul:6,aug:7,sep:8,oct:9,nov:10,dec:11};
+  var m;
+
+  // Pattern 1: dd-Mon-yy
+  m = str.match(/^(\d{1,2})[-\/]([A-Za-z]{3})[-\/](\d{2,4})$/);
+  if (m) {
+    var mon = months3[m[2].toLowerCase()];
+    if (mon === undefined) return null;
+    var yr  = parseInt(m[3]); if (yr < 100) yr += 2000;
+    var dt  = new Date(yr, mon, parseInt(m[1]));
+    if (isNaN(dt.getTime())) return null;
+    return toYMD(dt);
+  }
+  // Pattern 2: yyyy-mm-dd
+  m = str.match(/^(\d{4})[-\/](\d{1,2})[-\/](\d{1,2})$/);
+  if (m) {
+    var dt = new Date(parseInt(m[1]), parseInt(m[2])-1, parseInt(m[3]));
+    return isNaN(dt.getTime()) ? null : toYMD(dt);
+  }
+  // Pattern 3: dd/mm/yy
+  m = str.match(/^(\d{1,2})[-\/](\d{1,2})[-\/](\d{2,4})$/);
+  if (m) {
+    var yr = parseInt(m[3]); if (yr < 100) yr += 2000;
+    var dt = new Date(yr, parseInt(m[2])-1, parseInt(m[1]));
+    return isNaN(dt.getTime()) ? null : toYMD(dt);
+  }
+  return null;
+}
+
+function submitParsed() {
+  if (!parsedEntries.length) return;
+  saveEntries(parsedEntries, function() {
+    document.getElementById('pasteArea').value = '';
+    document.getElementById('parsedPreview').style.display = 'none';
+    parsedEntries = [];
+    loadData(selMonth);
+    openTab('analysis');
+  });
+}
+
+// ══════════════════════════════════════════════
+//  SAVE TO GAS
+// ══════════════════════════════════════════════
+function saveEntries(entries, cb) {
+  var payload = { entries: entries };
+  var url = GAS_URL + '?action=savemenu&payload=' + encodeURIComponent(JSON.stringify(payload));
+  fetch(url, { redirect: 'follow' })
+    .then(function(r) { return r.json(); })
+    .then(function(res) {
+      if (res.success) {
+        toast(res.message || 'Saved!', 'ok');
+        if (typeof cb === 'function') cb();
+      } else {
+        toast('Error: ' + res.message, 'err');
+      }
+    })
+    .catch(function(e) { toast('Network error: ' + e.message, 'err'); });
+}
+
+// ══════════════════════════════════════════════
+//  UTILS
+// ══════════════════════════════════════════════
+function toYMD(d) {
+  return d.getFullYear() + '-' +
+    String(d.getMonth()+1).padStart(2,'0') + '-' +
+    String(d.getDate()).padStart(2,'0');
+}
+function cap(s) {
+  if (!s) return '';
+  return s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
+}
+function toast(msg, type) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className   = 'toast ' + (type||'');
+  t.classList.add('show');
+  setTimeout(function() { t.classList.remove('show'); }, 3200);
+}
+</script>
+</body>
+</html>
