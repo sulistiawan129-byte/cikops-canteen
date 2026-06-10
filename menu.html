@@ -120,6 +120,11 @@ select.inp{cursor:pointer;}
 .btn-primary:disabled{background:var(--text-3);cursor:not-allowed;}
 
 /* ── CALENDAR ── */
+.filter-group-cal{display:flex;border:1px solid var(--border);border-radius:7px;overflow:hidden;background:var(--surface-2);}
+.cal-view-btn{padding:6px 14px;font-size:11px;font-weight:500;font-family:var(--font);background:none;border:none;cursor:pointer;color:var(--text-3);transition:background .12s,color .12s;}
+.cal-view-btn.active{background:var(--navy);color:#fff;}
+.cal-week-row{display:grid;grid-template-columns:70px repeat(7,1fr);gap:4px;margin-bottom:4px;}
+.cal-week-time{font-size:10px;font-weight:600;color:var(--text-3);display:flex;align-items:flex-start;padding-top:8px;}
 .cal-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
 .cal-title{font-size:14px;font-weight:600;color:var(--text-1);}
 .cal-btn{padding:5px 12px;border:1px solid var(--border);border-radius:6px;background:var(--surface-2);font-size:11px;font-family:var(--font);cursor:pointer;color:var(--text-2);}
@@ -343,22 +348,43 @@ select.inp{cursor:pointer;}
   <!--  TAB: CALENDAR                       -->
   <!-- ════════════════════════════════════ -->
   <div id="pane-calendar" style="display:none">
-    <div class="card">
-      <div class="cal-nav">
+
+    <!-- Filter bar -->
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap;">
+      <div class="filter-group-cal">
+        <button class="cal-view-btn active" id="cvMonth" onclick="setCalView('month')">Monthly</button>
+        <button class="cal-view-btn" id="cvWeek" onclick="setCalView('week')">Weekly</button>
+      </div>
+      <div style="display:flex;align-items:center;gap:6px;">
         <button class="cal-btn" onclick="calPrev()">← Prev</button>
-        <span class="cal-title" id="calMonthLabel">—</span>
+        <span class="cal-title" id="calMonthLabel" style="min-width:180px;text-align:center;">—</span>
         <button class="cal-btn" onclick="calNext()">Next →</button>
       </div>
-      <div class="week-grid">
-        <div class="week-day-hdr">Mon</div>
-        <div class="week-day-hdr">Tue</div>
-        <div class="week-day-hdr">Wed</div>
-        <div class="week-day-hdr">Thu</div>
-        <div class="week-day-hdr">Fri</div>
-        <div class="week-day-hdr">Sat</div>
-        <div class="week-day-hdr">Sun</div>
+      <select id="calWeekSel" class="inp" onchange="jumpToWeek(this.value)"
+        style="display:none;width:auto;padding:4px 8px;font-size:11px;">
+        <option value="">Jump to week…</option>
+      </select>
+    </div>
+
+    <div class="card" id="calCard">
+      <!-- Month view -->
+      <div id="calMonthView">
+        <div class="week-grid" style="margin-bottom:4px;">
+          <div class="week-day-hdr">Mon</div>
+          <div class="week-day-hdr">Tue</div>
+          <div class="week-day-hdr">Wed</div>
+          <div class="week-day-hdr">Thu</div>
+          <div class="week-day-hdr">Fri</div>
+          <div class="week-day-hdr">Sat</div>
+          <div class="week-day-hdr">Sun</div>
+        </div>
+        <div id="calGrid" class="week-grid"></div>
       </div>
-      <div id="calGrid" class="week-grid"></div>
+
+      <!-- Week view -->
+      <div id="calWeekView" style="display:none">
+        <div id="calWeekGrid"></div>
+      </div>
     </div>
   </div>
 
@@ -531,6 +557,8 @@ window.onload = function() {
   if (window.matchMedia('(prefers-color-scheme: dark)').matches) toggleTheme();
   var now = new Date();
   document.getElementById('menuDate').value = toYMD(now);
+  // Init calendar week to current ISO week
+  calWeekKey = 'W' + getISOWeekYear(now) + '-' + String(getISOWeekNum(now)).padStart(2,'0');
   setParseMode('auto');
   loadData('');
 };
@@ -755,66 +783,206 @@ function renderTopMenu(elId, items, col) {
 // ══════════════════════════════════════════════
 //  CALENDAR
 // ══════════════════════════════════════════════
+var calView = 'month'; // 'month' | 'week'
+var calWeekKey = ''; // current ISO week key e.g. "W2026-17"
+
+function setCalView(v) {
+  calView = v;
+  document.getElementById('cvMonth').className = 'cal-view-btn' + (v==='month'?' active':'');
+  document.getElementById('cvWeek').className  = 'cal-view-btn' + (v==='week' ?' active':'');
+  document.getElementById('calMonthView').style.display = v==='month'?'':'none';
+  document.getElementById('calWeekView').style.display  = v==='week' ?'':'none';
+  document.getElementById('calWeekSel').style.display   = v==='week' ?'':'none';
+  if (v==='month') renderCalMonth();
+  else renderCalWeek();
+}
+
 function calPrev() {
-  calMonth--;
-  if (calMonth < 0) { calMonth = 11; calYear--; }
-  renderCalendar();
+  if (calView === 'month') {
+    calMonth--;
+    if (calMonth < 0) { calMonth = 11; calYear--; }
+    renderCalMonth();
+  } else {
+    // Previous ISO week
+    var d = isoWeekToMonday(calWeekKey);
+    d.setDate(d.getDate() - 7);
+    calWeekKey = 'W' + getISOWeekYear(d) + '-' + String(getISOWeekNum(d)).padStart(2,'0');
+    renderCalWeek();
+  }
 }
 function calNext() {
-  calMonth++;
-  if (calMonth > 11) { calMonth = 0; calYear++; }
-  renderCalendar();
+  if (calView === 'month') {
+    calMonth++;
+    if (calMonth > 11) { calMonth = 0; calYear++; }
+    renderCalMonth();
+  } else {
+    var d = isoWeekToMonday(calWeekKey);
+    d.setDate(d.getDate() + 7);
+    calWeekKey = 'W' + getISOWeekYear(d) + '-' + String(getISOWeekNum(d)).padStart(2,'0');
+    renderCalWeek();
+  }
 }
 
-function renderCalendar() {
-  var months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-  document.getElementById('calMonthLabel').textContent = months[calMonth] + ' ' + calYear;
+// Convert ISO week key "W2026-17" to its Monday Date
+function isoWeekToMonday(key) {
+  if (!key) {
+    var now = new Date();
+    return getMondayOf(now);
+  }
+  var parts = key.replace('W','').split('-');
+  var y = parseInt(parts[0]), w = parseInt(parts[1]);
+  // Jan 4 is always in week 1
+  var jan4   = new Date(y, 0, 4);
+  var monday = getMondayOf(jan4);
+  monday.setDate(monday.getDate() + (w - 1) * 7);
+  return monday;
+}
 
-  var firstDay = new Date(calYear, calMonth, 1).getDay(); // 0=Sun
-  // Convert to Mon-first: Mon=0, Tue=1, ..., Sun=6
-  var startOffset = (firstDay + 6) % 7;
+// Build week selector options from DATA.byWeek
+function buildWeekSelector() {
+  var sel = document.getElementById('calWeekSel');
+  if (!sel || !DATA || !DATA.byWeek) return;
+  var keys = Object.keys(DATA.byWeek).sort();
+  sel.innerHTML = '<option value="">Jump to week…</option>';
+  keys.forEach(function(k) {
+    var w = DATA.byWeek[k];
+    var o = document.createElement('option');
+    o.value = k;
+    o.textContent = k + ' · ' + (w.label || '');
+    if (k === calWeekKey) o.selected = true;
+    sel.appendChild(o);
+  });
+}
+
+function jumpToWeek(key) {
+  if (!key) return;
+  calWeekKey = key;
+  renderCalWeek();
+}
+
+// ── MONTH VIEW ────────────────────────────────
+function renderCalMonth() {
+  var MONTHS = ['January','February','March','April','May','June',
+                'July','August','September','October','November','December'];
+  document.getElementById('calMonthLabel').textContent = MONTHS[calMonth] + ' ' + calYear;
+
+  var firstDay    = new Date(calYear, calMonth, 1).getDay();
+  var startOffset = (firstDay + 6) % 7; // Mon=0
   var daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
-  var today = new Date();
-  var byDate = (DATA && DATA.byDate) || {};
+  var today       = new Date();
+  var byDate      = (DATA && DATA.byDate) || {};
 
   var cells = '';
-  // Empty cells before first day
-  for (var i = 0; i < startOffset; i++) {
-    cells += '<div class="cal-cell empty"></div>';
-  }
+  for (var i = 0; i < startOffset; i++) cells += '<div class="cal-cell empty"></div>';
 
   for (var d = 1; d <= daysInMonth; d++) {
-    var dateObj  = new Date(calYear, calMonth, d);
-    var dateStr  = dateObj.toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' });
-    var isToday  = dateObj.toDateString() === today.toDateString();
-    var dayData  = byDate[dateStr] || null;
-    var hasData  = !!dayData;
-    var clsList  = 'cal-cell' + (hasData?' has-data':'') + (isToday?' today':'');
-    var onclick  = hasData ? 'openDayModal(\'' + dateStr.replace(/'/g,"\\'") + '\')' : '';
-
-    var inner = '<div class="cal-date">' + d + '</div>';
-    if (dayData) {
-      if (dayData.snack && dayData.snack.length) {
-        inner += '<div class="cal-menu-item cal-snack">🥐 ' + cap(dayData.snack[0].menuName) + '</div>';
-      }
-      if (dayData.meal && dayData.meal.length) {
-        inner += '<div class="cal-menu-item cal-meal">🍱 ' + cap(dayData.meal[0].menuName) + '</div>';
-        if (dayData.meal.length > 1) inner += '<div class="cal-more">+' + (dayData.meal.length-1) + ' more</div>';
+    var dt      = new Date(calYear, calMonth, d);
+    var rawKey  = dt.getFullYear() + '-' +
+                  String(dt.getMonth()+1).padStart(2,'0') + '-' +
+                  String(dt.getDate()).padStart(2,'0');
+    var isToday = dt.toDateString() === today.toDateString();
+    var day     = byDate[rawKey] || null;
+    var cls     = 'cal-cell' + (day?' has-data':'') + (isToday?' today':'');
+    var onclick = day ? 'openDayModal("' + rawKey + '")' : '';
+    var inner   = '<div class="cal-date">' + d + '</div>';
+    if (day) {
+      if (day.snack && day.snack.length)
+        inner += '<div class="cal-menu-item cal-snack">🥐 ' + cap(day.snack[0].menuName) + '</div>';
+      if (day.meal && day.meal.length) {
+        inner += '<div class="cal-menu-item cal-meal">🍱 ' + cap(day.meal[0].menuName) + '</div>';
+        if (day.meal.length > 1) inner += '<div class="cal-more">+' + (day.meal.length-1) + ' more</div>';
       }
     }
-    cells += '<div class="' + clsList + '"' + (onclick?' onclick="'+onclick+'"':'') + '>' + inner + '</div>';
+    cells += '<div class="' + cls + '"' + (onclick ? 'onclick="' + onclick + '"' : '') + '>' + inner + '</div>';
   }
 
-  // Fill remaining cells to complete last row
-  var totalCells = startOffset + daysInMonth;
-  var remainder  = totalCells % 7;
-  if (remainder > 0) {
-    for (var j = 0; j < 7 - remainder; j++) {
-      cells += '<div class="cal-cell empty"></div>';
-    }
-  }
-
+  var rem = (startOffset + daysInMonth) % 7;
+  if (rem > 0) for (var j = 0; j < 7-rem; j++) cells += '<div class="cal-cell empty"></div>';
   document.getElementById('calGrid').innerHTML = cells;
+}
+
+// ── WEEK VIEW ─────────────────────────────────
+function renderCalWeek() {
+  if (!calWeekKey) {
+    // Default: current week
+    var now = new Date();
+    calWeekKey = 'W' + getISOWeekYear(now) + '-' + String(getISOWeekNum(now)).padStart(2,'0');
+  }
+
+  var mon    = isoWeekToMonday(calWeekKey);
+  var byDate = (DATA && DATA.byDate) || {};
+  var DAYS   = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+
+  // Build week range label
+  var sun = new Date(mon); sun.setDate(mon.getDate() + 6);
+  var fmt = function(dt) { return dt.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}); };
+  document.getElementById('calMonthLabel').textContent = fmt(mon) + ' – ' + fmt(sun);
+
+  buildWeekSelector();
+
+  var html = '';
+  for (var i = 0; i < 7; i++) {
+    var dt     = new Date(mon); dt.setDate(mon.getDate() + i);
+    var rawKey = dt.getFullYear() + '-' + String(dt.getMonth()+1).padStart(2,'0') + '-' + String(dt.getDate()).padStart(2,'0');
+    var day    = byDate[rawKey] || null;
+    var isToday= dt.toDateString() === new Date().toDateString();
+    var dayLbl = DAYS[i] + ' ' + dt.getDate();
+
+    html += '<div style="display:grid;grid-template-columns:64px 1fr 1fr;gap:8px;padding:10px 0;border-bottom:1px solid var(--surface-2);">';
+    // Day label
+    html += '<div style="font-size:11px;font-weight:600;color:' + (isToday?'var(--navy)':'var(--text-3)') + ';padding-top:4px;">' +
+      dayLbl + (isToday?' <span style="color:var(--navy);font-size:9px">Today</span>':'') + '</div>';
+
+    // Snack
+    html += '<div>';
+    if (day && day.snack && day.snack.length) {
+      day.snack.forEach(function(e) {
+        html += '<div style="font-size:12px;font-weight:500;color:var(--amber);margin-bottom:2px">🥐 ' + cap(e.menuName) + '</div>';
+        if (e.components.length)
+          html += '<div style="font-size:10px;color:var(--text-3);margin-bottom:4px">' + e.components.join(' · ') + '</div>';
+      });
+    } else {
+      html += '<span style="font-size:11px;color:var(--text-3);font-style:italic">—</span>';
+    }
+    html += '</div>';
+
+    // Meal
+    html += '<div>';
+    if (day && day.meal && day.meal.length) {
+      day.meal.forEach(function(e) {
+        html += '<div style="font-size:12px;font-weight:500;color:var(--navy);margin-bottom:2px">🍱 ' + cap(e.menuName) + '</div>';
+      });
+      if (day.meal[0] && day.meal[0].components.length)
+        html += '<div style="font-size:10px;color:var(--text-3)">' + day.meal[0].components.slice(0,4).join(' · ') + '</div>';
+    } else {
+      html += '<span style="font-size:11px;color:var(--text-3);font-style:italic">—</span>';
+    }
+    html += '</div>';
+
+    html += '</div>';
+  }
+
+  // Column headers
+  var hdrs = '<div style="display:grid;grid-template-columns:64px 1fr 1fr;gap:8px;padding-bottom:8px;border-bottom:2px solid var(--border);margin-bottom:4px;">' +
+    '<div style="font-size:10px;font-weight:700;color:var(--text-3);text-transform:uppercase">Day</div>' +
+    '<div style="font-size:10px;font-weight:700;color:var(--amber);text-transform:uppercase">🥐 Snack</div>' +
+    '<div style="font-size:10px;font-weight:700;color:var(--navy);text-transform:uppercase">🍱 Meal</div>' +
+    '</div>';
+  document.getElementById('calWeekGrid').innerHTML = hdrs + html;
+}
+
+// ── INIT CALENDAR ─────────────────────────────
+function renderCalendar() {
+  // Sync calYear/calMonth from selMonth
+  if (selMonth) {
+    var parts = selMonth.split('-');
+    if (parts.length === 2) {
+      calYear  = parseInt(parts[0]);
+      calMonth = parseInt(parts[1]) - 1;
+    }
+  }
+  if (calView === 'month') renderCalMonth();
+  else renderCalWeek();
 }
 
 // ══════════════════════════════════════════════
@@ -889,10 +1057,15 @@ function renderWeekly() {
 // ══════════════════════════════════════════════
 //  DAY MODAL
 // ══════════════════════════════════════════════
-function openDayModal(dateStr) {
-  if (!DATA || !DATA.byDate || !DATA.byDate[dateStr]) return;
-  var day = DATA.byDate[dateStr];
-  document.getElementById('modalDate').textContent = '📅 ' + dateStr;
+function openDayModal(rawKey) {
+  if (!DATA || !DATA.byDate) return;
+  var day = DATA.byDate[rawKey];
+  if (!day) return;
+  // Format display date
+  var d = new Date(rawKey + 'T00:00:00');
+  var displayDate = isNaN(d.getTime()) ? rawKey :
+    d.toLocaleDateString('en-GB', {weekday:'long', day:'2-digit', month:'long', year:'numeric'});
+  document.getElementById('modalDate').textContent = '📅 ' + displayDate;
   var html = '';
   if (day.snack && day.snack.length) {
     html += '<div style="margin-bottom:12px"><div style="font-size:10px;font-weight:700;color:var(--amber);text-transform:uppercase;margin-bottom:8px">🥐 Snack</div>';
