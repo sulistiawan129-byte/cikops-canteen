@@ -5,77 +5,66 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Menu Plan — Canteen FFI Cikarang</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 html{font-size:14px;}
 :root{
-  --navy:#1a2744;       --navy-grad:#2d4a8a;
-  --navy-lt:#eff6ff;
-  --green:#16a34a;      --green-lt:#dcfce7;
-  --amber:#d97706;      --amber-lt:#fef3c7;
-  --red:#dc2626;        --red-lt:#fee2e2;
-  --purple:#7c3aed;     --purple-lt:#ede9fe;
-  --brand:#3b82f6;      --brand-lt:#eff6ff;
-  --bg:#f8fafc;
-  --surface:#ffffff;    --surface-2:#f8fafc;
-  --border:#e2e8f0;
-  --text-1:#1a2744;     --text-2:#374151;    --text-3:#64748b;
-  --font:'Inter',system-ui,sans-serif;
-  --r:15px;             --r-card:15px;
-  --r-btn:9px;          --r-pill:99px;
-  --shadow:none;
-  --shadow-modal:0 20px 60px rgba(0,0,0,.2);
-  --overlay:rgba(0,0,0,.45);
-  --transition:0.4s ease;
+  --navy:#002366;--navy-lt:#e8edf7;
+  --green:#1a6b3f;--green-lt:#e6f4ed;
+  --amber:#b45309;--amber-lt:#fef3c7;
+  --red:#b91c1c;--red-lt:#fee2e2;
+  --purple:#6d28d9;--purple-lt:#ede9fe;
+  --bg:#f0f2f5;--surface:#fff;--surface-2:#f8f9fb;
+  --border:#e2e5eb;--text-1:#0f172a;--text-2:#475569;--text-3:#94a3b8;
+  --font:'Inter','Segoe UI',system-ui,sans-serif;
+  --r:10px;--shadow:0 1px 3px rgba(0,0,0,.05),0 3px 10px rgba(0,0,0,.04);
 }
 [data-theme="dark"]{
   --bg:#0d1117;--surface:#161b22;--surface-2:#1c2128;--border:#30363d;
-  --text-1:#e6edf3;--text-2:#8b949e;--text-3:#6b7280;
-  --navy-lt:#1a2540;--green-lt:#0d2b1e;--amber-lt:#2d1f06;
-  --red-lt:#2d0c0c;--purple-lt:#2d1f4e;--brand-lt:#1e3a5f;
-  --shadow:none;--shadow-modal:0 20px 60px rgba(0,0,0,.5);
+  --text-1:#e6edf3;--text-2:#8b949e;--text-3:#484f58;
+  --navy-lt:#1a2540;--green-lt:#0d2b1e;--amber-lt:#2d1f06;--red-lt:#2d0c0c;--purple-lt:#2d1f4e;
 }
 body{font-family:var(--font);background:var(--bg);color:var(--text-1);min-height:100vh;-webkit-font-smoothing:antialiased;}
 
-/* ── HEADER ── */
-.hdr{background:linear-gradient(135deg,var(--navy) 0%,var(--navy-grad) 100%);padding:0;}
+/* HEADER */
+.hdr{background:var(--navy);padding:0;}
 .hdr-inner{max-width:1100px;margin:0 auto;padding:14px 20px;}
 .hdr-top{display:flex;align-items:center;justify-content:space-between;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,.1);margin-bottom:12px;}
 .brand{display:flex;align-items:center;gap:10px;}
 .logo-sq{width:34px;height:34px;border-radius:8px;background:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-.logo-sq span{font-size:12px;font-weight:700;color:var(--navy);}
+.logo-sq span{font-size:10px;font-weight:700;color:var(--navy);}
 .co-name{font-size:13px;font-weight:600;color:rgba(255,255,255,.95);}
-.co-plant{font-size:12px;color:rgba(255,255,255,.45);}
-.vendor-tag{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);border-radius:99px;padding:4px 12px;font-size:12px;color:rgba(255,255,255,.65);}
+.co-plant{font-size:10px;color:rgba(255,255,255,.45);}
+.vendor-tag{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);border-radius:20px;padding:3px 10px;font-size:10px;color:rgba(255,255,255,.65);}
 .hdr-bottom{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;}
 .page-title{font-size:20px;font-weight:600;color:#fff;}
-.page-sub{font-size:13px;color:rgba(255,255,255,.5);margin-top:2px;}
+.page-sub{font-size:11px;color:rgba(255,255,255,.5);margin-top:2px;}
 .hdr-nav{display:flex;gap:6px;flex-wrap:wrap;}
-.hn-btn{padding:7px 16px;border-radius:8px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.08);color:rgba(255,255,255,.75);font-size:13px;font-weight:500;font-family:var(--font);cursor:pointer;transition:all .12s;text-decoration:none;}
+.hn-btn{padding:6px 14px;border-radius:7px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.08);color:rgba(255,255,255,.75);font-size:11px;font-weight:500;font-family:var(--font);cursor:pointer;transition:all .12s;text-decoration:none;display:inline-block;}
 .hn-btn:hover{background:rgba(255,255,255,.15);color:#fff;}
 .hn-btn.active{background:#fff;color:var(--navy);}
 
-/* ── MAIN ── */
+/* MAIN */
 .main{max-width:1100px;margin:0 auto;padding:20px;}
 
-/* ── TABS ── */
-.tabs{display:flex;gap:4px;background:var(--surface-2);border:1.5px solid var(--border);border-radius:var(--r-card);padding:4px;margin-bottom:20px;}
-.tab{flex:1;padding:9px 12px;border-radius:12px;border:none;background:none;font-size:13px;font-weight:500;font-family:var(--font);color:var(--text-3);cursor:pointer;transition:all .12s;text-align:center;}
-.tab.active{background:var(--surface);color:var(--navy);box-shadow:0 1px 4px rgba(0,0,0,.08);font-weight:600;}
+/* TABS */
+.tabs{display:flex;gap:4px;background:var(--surface-2);border:1px solid var(--border);border-radius:9px;padding:4px;margin-bottom:20px;}
+.tab{flex:1;padding:8px 12px;border-radius:6px;border:none;background:none;font-size:12px;font-weight:500;font-family:var(--font);color:var(--text-3);cursor:pointer;transition:all .12s;text-align:center;}
+.tab.active{background:var(--surface);color:var(--text-1);box-shadow:0 1px 3px rgba(0,0,0,.08);}
 
-/* ── CARDS ── */
-.card{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r-card);padding:18px 20px;box-shadow:none;}
-.card-title{font-size:15px;font-weight:700;color:var(--text-1);margin-bottom:3px;}
-.card-sub{font-size:12px;color:var(--text-3);margin-bottom:14px;}
+/* CARDS */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:16px 18px;box-shadow:var(--shadow);}
+.card-title{font-size:13px;font-weight:600;color:var(--text-1);margin-bottom:2px;}
+.card-sub{font-size:11px;color:var(--text-3);margin-bottom:14px;}
 
-/* ── GRID ── */
+/* GRID */
 .g2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px;}
 .g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:16px;}
 .mb{margin-bottom:16px;}
 @media(max-width:700px){.g2,.g3{grid-template-columns:1fr;}}
 
-/* ── BADGE ── */
-.badge{display:inline-flex;align-items:center;gap:4px;font-size:13px;font-weight:600;padding:2px 10px;border-radius:var(--r-pill);}
+/* BADGE */
+.badge{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:600;padding:2px 8px;border-radius:20px;}
 .b-snack{background:var(--amber-lt);color:var(--amber);}
 .b-meal{background:var(--navy-lt);color:var(--navy);}
 [data-theme="dark"] .b-meal{color:#7fa8ff;}
@@ -83,13 +72,13 @@ body{font-family:var(--font);background:var(--bg);color:var(--text-1);min-height
 .b-red{background:var(--red-lt);color:var(--red);}
 .b-purple{background:var(--purple-lt);color:var(--purple);}
 
-/* ── FORM ── */
+/* FORM */
 .form-section{margin-bottom:20px;}
-.form-label{font-size:13px;font-weight:600;color:var(--text-2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;display:block;}
+.form-label{font-size:11px;font-weight:600;color:var(--text-2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;display:block;}
 .form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;}
 @media(max-width:600px){.form-row{grid-template-columns:1fr;}}
-.inp{width:100%;border:1.5px solid var(--border);border-radius:var(--r-btn);padding:9px 12px;font-size:13px;font-family:var(--font);background:var(--surface-2);color:var(--text-1);}
-.inp:focus{outline:none;border-color:var(--brand);background:var(--surface);}
+.inp{width:100%;border:1px solid var(--border);border-radius:7px;padding:8px 11px;font-size:13px;font-family:var(--font);background:var(--surface-2);color:var(--text-1);}
+.inp:focus{outline:none;border-color:var(--navy);background:var(--surface);}
 textarea.inp{resize:vertical;min-height:72px;line-height:1.5;}
 select.inp{cursor:pointer;}
 .type-toggle{display:flex;gap:6px;margin-bottom:10px;}
@@ -98,259 +87,155 @@ select.inp{cursor:pointer;}
 .type-btn.active-meal{border-color:var(--navy);background:var(--navy-lt);color:var(--navy);}
 [data-theme="dark"] .type-btn.active-meal{color:#7fa8ff;}
 
-/* ── PASTE AREA ── */
+/* PASTE AREA */
 .paste-wrap{position:relative;}
 .paste-area{width:100%;border:2px dashed var(--border);border-radius:9px;padding:14px;font-size:12px;font-family:var(--font);background:var(--surface-2);color:var(--text-1);resize:vertical;min-height:110px;line-height:1.7;}
 .paste-area:focus{outline:none;border-color:var(--navy);}
-.paste-hint{font-size:12px;color:var(--text-3);margin-top:5px;line-height:1.5;}
-.parse-btn{margin-top:8px;padding:8px 16px;background:var(--brand);color:#fff;border:none;border-radius:var(--r-btn);font-size:13px;font-weight:500;font-family:var(--font);cursor:pointer;}
+.paste-hint{font-size:10px;color:var(--text-3);margin-top:5px;line-height:1.5;}
+.parse-btn{margin-top:8px;padding:7px 14px;background:var(--navy);color:#fff;border:none;border-radius:7px;font-size:11px;font-weight:500;font-family:var(--font);cursor:pointer;}
 .parse-btn:hover{opacity:.9;}
 
-/* ── PREVIEW PARSED ── */
+/* PREVIEW PARSED */
 .parsed-preview{background:var(--surface-2);border:1px solid var(--border);border-radius:8px;padding:12px 14px;margin-top:10px;display:none;}
-.parsed-preview h4{font-size:13px;font-weight:600;color:var(--text-2);margin-bottom:8px;text-transform:uppercase;letter-spacing:.06em;}
+.parsed-preview h4{font-size:11px;font-weight:600;color:var(--text-2);margin-bottom:8px;text-transform:uppercase;letter-spacing:.06em;}
 .parsed-item{display:flex;align-items:flex-start;gap:8px;padding:6px 0;border-bottom:1px solid var(--border);font-size:12px;}
 .parsed-item:last-child{border-bottom:none;}
-.parsed-date{font-size:12px;color:var(--text-3);white-space:nowrap;min-width:80px;}
+.parsed-date{font-size:10px;color:var(--text-3);white-space:nowrap;min-width:80px;}
 .parsed-menu{color:var(--text-1);font-weight:500;}
-.parsed-comp{font-size:13px;color:var(--text-3);margin-top:2px;}
+.parsed-comp{font-size:11px;color:var(--text-3);margin-top:2px;}
 
-/* ── COMPONENT TAGS ── */
+/* COMPONENT TAGS */
 .comp-wrap{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px;}
-.comp-tag{display:inline-flex;align-items:center;gap:4px;background:var(--surface-2);border:1.5px solid var(--border);border-radius:99px;padding:3px 10px;font-size:13px;color:var(--text-2);}
+.comp-tag{display:inline-flex;align-items:center;gap:4px;background:var(--surface-2);border:1px solid var(--border);border-radius:20px;padding:2px 8px;font-size:11px;color:var(--text-2);}
 .comp-tag button{background:none;border:none;cursor:pointer;color:var(--text-3);font-size:13px;line-height:1;padding:0;}
 .comp-inp-row{display:flex;gap:6px;margin-top:8px;}
-.comp-inp{flex:1;border:1.5px solid var(--border);border-radius:8px;padding:8px 12px;font-size:14px;font-family:var(--font);background:var(--surface-2);color:var(--text-1);}
+.comp-inp{flex:1;border:1px solid var(--border);border-radius:7px;padding:6px 10px;font-size:12px;font-family:var(--font);background:var(--surface-2);color:var(--text-1);}
 .comp-inp:focus{outline:none;border-color:var(--navy);}
-.comp-add-btn{padding:8px 14px;background:var(--surface-2);border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-family:var(--font);cursor:pointer;color:var(--text-2);white-space:nowrap;}
+.comp-add-btn{padding:6px 12px;background:var(--surface-2);border:1px solid var(--border);border-radius:7px;font-size:11px;font-family:var(--font);cursor:pointer;color:var(--text-2);white-space:nowrap;}
 .comp-add-btn:hover{background:var(--border);}
 
-/* ── SUBMIT BTN ── */
-.btn-primary{width:100%;padding:12px;background:var(--brand);color:#fff;border:none;border-radius:var(--r-btn);font-size:13px;font-weight:600;font-family:var(--font);cursor:pointer;transition:opacity .12s;}
+/* SUBMIT BTN */
+.btn-primary{width:100%;padding:12px;background:var(--navy);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:600;font-family:var(--font);cursor:pointer;transition:opacity .12s;}
 .btn-primary:hover{opacity:.9;}
 .btn-primary:disabled{background:var(--text-3);cursor:not-allowed;}
 
-/* ── CALENDAR ── */
+/* CALENDAR */
 .filter-group-cal{display:flex;border:1px solid var(--border);border-radius:7px;overflow:hidden;background:var(--surface-2);}
-.cal-view-btn{padding:7px 16px;font-size:13px;font-weight:500;font-family:var(--font);background:none;border:none;cursor:pointer;color:var(--text-3);transition:background .12s,color .12s;}
+.cal-view-btn{padding:6px 14px;font-size:11px;font-weight:500;font-family:var(--font);background:none;border:none;cursor:pointer;color:var(--text-3);transition:background .12s,color .12s;}
 .cal-view-btn.active{background:var(--navy);color:#fff;}
-.cal-week-row{display:grid;grid-template-columns:70px repeat(7,1fr);gap:4px;margin-bottom:4px;}
-.cal-week-time{font-size:12px;font-weight:600;color:var(--text-3);display:flex;align-items:flex-start;padding-top:8px;}
 .cal-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
-.cal-title{font-size:16px;font-weight:700;color:var(--text-1);}
-.cal-btn{padding:6px 14px;border:1.5px solid var(--border);border-radius:8px;background:var(--surface-2);font-size:13px;font-family:var(--font);cursor:pointer;color:var(--text-2);}
+.cal-title{font-size:14px;font-weight:600;color:var(--text-1);}
+.cal-btn{padding:5px 12px;border:1px solid var(--border);border-radius:6px;background:var(--surface-2);font-size:11px;font-family:var(--font);cursor:pointer;color:var(--text-2);}
 .cal-btn:hover{background:var(--border);}
 .week-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:3px;}
-.week-day-hdr{font-size:12px;font-weight:600;color:var(--text-3);text-align:center;padding:4px 0;text-transform:uppercase;}
-.cal-cell{background:var(--surface-2);border:1.5px solid var(--border);border-radius:10px;padding:6px 7px;min-height:64px;position:relative;cursor:pointer;transition:border-color .12s;overflow:hidden;}
+.week-day-hdr{font-size:10px;font-weight:600;color:var(--text-3);text-align:center;padding:6px 0 4px;text-transform:uppercase;letter-spacing:.06em;}
+.cal-cell{background:var(--surface-2);border:1px solid var(--border);border-radius:6px;padding:5px 6px;min-height:64px;position:relative;cursor:pointer;transition:border-color .12s;overflow:hidden;}
 .cal-cell:hover{border-color:var(--navy);background:var(--surface);}
-.cal-cell.has-data{background:var(--surface);}
+.cal-cell.has-data{background:var(--surface);box-shadow:var(--shadow);}
 .cal-cell.today{border-color:var(--navy);border-width:2px;}
 .cal-cell.empty{background:transparent;border:1px dashed var(--border);cursor:default;min-height:64px;}
-.cal-date{font-size:13px;font-weight:700;color:var(--text-2);margin-bottom:3px;line-height:1;}
-.cal-date.today-num{color:var(--navy);}
-.cal-menu-item{font-size:13px;font-weight:500;padding:2px 6px;border-radius:4px;margin-bottom:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%;display:block;line-height:1.3;}
+.cal-cell.empty:hover{border-color:var(--border);background:transparent;}
+.cal-date{font-size:11px;font-weight:700;color:var(--text-2);margin-bottom:3px;line-height:1;}
+.cal-menu-item{font-size:9px;font-weight:500;padding:2px 5px;border-radius:3px;margin-bottom:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%;display:block;line-height:1.3;}
 .cal-snack{background:var(--amber-lt);color:var(--amber);}
 .cal-meal{background:var(--navy-lt);color:var(--navy);}
 [data-theme="dark"] .cal-meal{color:#7fa8ff;}
-.cal-more{font-size:12px;color:var(--text-3);padding:0 2px;}
-.week-day-hdr{font-size:12px;font-weight:600;color:var(--text-3);text-align:center;padding:6px 0 4px;text-transform:uppercase;letter-spacing:.06em;}
+.cal-more{font-size:9px;color:var(--text-3);padding:0 2px;}
 
-/* ── WEEK LIST VIEW ── */
-.week-card{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r-card);margin-bottom:14px;overflow:hidden;box-shadow:none;}
-.week-hdr{background:linear-gradient(135deg,var(--navy) 0%,var(--navy-grad) 100%);color:#fff;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;}
+/* WEEK LIST VIEW */
+.week-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);margin-bottom:12px;overflow:hidden;box-shadow:var(--shadow);}
+.week-hdr{background:var(--navy);color:#fff;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;}
 .week-hdr-title{font-size:12px;font-weight:600;}
-.week-hdr-range{font-size:12px;color:rgba(255,255,255,.6);}
+.week-hdr-range{font-size:10px;color:rgba(255,255,255,.6);}
 .week-body{padding:12px 16px;}
 .day-row{display:grid;grid-template-columns:90px 1fr 1fr;gap:12px;padding:8px 0;border-bottom:1px solid var(--surface-2);}
 .day-row:last-child{border-bottom:none;}
-.day-label{font-size:13px;font-weight:600;color:var(--text-2);}
-.day-date{font-size:12px;color:var(--text-3);}
+.day-label{font-size:11px;font-weight:600;color:var(--text-2);}
+.day-date{font-size:10px;color:var(--text-3);}
 .menu-pill-wrap{display:flex;flex-direction:column;gap:3px;}
-.menu-pill{font-size:13px;font-weight:500;color:var(--text-1);}
-.menu-comps{font-size:12px;color:var(--text-3);line-height:1.4;}
-.no-menu{font-size:13px;color:var(--text-3);font-style:italic;}
+.menu-pill{font-size:11px;font-weight:500;color:var(--text-1);}
+.menu-comps{font-size:10px;color:var(--text-3);line-height:1.4;}
+.no-menu{font-size:11px;color:var(--text-3);font-style:italic;}
 
-/* ── ANALYSIS ── */
+/* DELETE BUTTON */
+.btn-del{background:none;border:1px solid var(--border);border-radius:5px;padding:2px 7px;font-size:10px;color:var(--red);cursor:pointer;font-family:var(--font);transition:all .12s;white-space:nowrap;}
+.btn-del:hover{background:var(--red-lt);border-color:var(--red);}
+
+/* ANALYSIS */
 .analysis-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px;}
 @media(max-width:800px){.analysis-grid{grid-template-columns:1fr 1fr;}}
 @media(max-width:500px){.analysis-grid{grid-template-columns:1fr;}}
-.stat-card{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r-card);padding:16px;text-align:center;box-shadow:none;}
-.stat-val{font-size:26px;font-weight:800;color:var(--text-1);line-height:1;margin-bottom:3px;}
-.stat-lbl{font-size:12px;font-weight:500;color:var(--text-3);text-transform:uppercase;letter-spacing:.06em;}
-.stat-sub{font-size:13px;color:var(--text-3);margin-top:3px;}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px;text-align:center;box-shadow:var(--shadow);}
+.stat-val{font-size:28px;font-weight:700;color:var(--text-1);line-height:1;margin-bottom:3px;}
+.stat-lbl{font-size:10px;font-weight:500;color:var(--text-3);text-transform:uppercase;letter-spacing:.06em;}
+.stat-sub{font-size:11px;color:var(--text-3);margin-top:3px;}
 
-/* ── REPEAT ALERT ── */
-.repeat-card{border-left:3px solid;border-radius:var(--r-card);padding:13px 15px;margin-bottom:8px;background:var(--surface);}
+/* REPEAT ALERT */
+.repeat-card{border-left:3px solid;border-radius:var(--r);padding:12px 14px;margin-bottom:8px;background:var(--surface);}
 .repeat-card.warn{border-color:var(--amber);}
 .repeat-card.danger{border-color:var(--red);}
 .repeat-card.ok{border-color:var(--green);}
 .repeat-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;}
-.repeat-name{font-size:14px;font-weight:600;color:var(--text-1);text-transform:capitalize;}
-.repeat-weeks{font-size:13px;color:var(--text-3);}
+.repeat-name{font-size:12px;font-weight:600;color:var(--text-1);text-transform:capitalize;}
+.repeat-weeks{font-size:11px;color:var(--text-3);}
 .repeat-bar-bg{height:4px;background:var(--surface-2);border-radius:4px;overflow:hidden;margin-top:6px;}
 .repeat-bar-fill{height:100%;border-radius:4px;}
 
-/* ── ROTATION SCORE ── */
+/* ROTATION SCORE */
 .score-ring{display:flex;align-items:center;justify-content:center;gap:20px;padding:16px 0;}
 .ring-wrap{text-align:center;}
 .ring-svg{width:80px;height:80px;}
-.ring-pct{font-size:16px;font-weight:700;fill:var(--text-1);}
-.ring-lbl{font-size:13px;color:var(--text-2);margin-top:5px;}
+.ring-lbl{font-size:11px;color:var(--text-2);margin-top:5px;}
 
-/* ── SUGGESTION CARDS ── */
+/* SUGGESTION CARDS */
 .suggestion-list{display:flex;flex-direction:column;gap:8px;}
-.sug-card{background:var(--surface-2);border:1.5px solid var(--border);border-radius:var(--r-card);padding:12px 14px;display:flex;gap:10px;align-items:flex-start;}
+.sug-card{background:var(--surface-2);border:1px solid var(--border);border-radius:8px;padding:11px 13px;display:flex;gap:10px;align-items:flex-start;}
 .sug-icon{font-size:20px;flex-shrink:0;}
 .sug-title{font-size:12px;font-weight:600;color:var(--text-1);margin-bottom:2px;}
-.sug-desc{font-size:13px;color:var(--text-2);line-height:1.5;}
+.sug-desc{font-size:11px;color:var(--text-2);line-height:1.5;}
 
-/* ── TOP MENU LIST ── */
+/* TOP MENU LIST */
 .top-list{display:flex;flex-direction:column;gap:5px;}
 .top-item{display:flex;align-items:center;gap:8px;}
-.top-rank{font-size:12px;font-weight:700;color:var(--text-3);min-width:16px;}
+.top-rank{font-size:10px;font-weight:700;color:var(--text-3);min-width:16px;}
 .top-name{font-size:12px;color:var(--text-1);text-transform:capitalize;flex:1;}
 .top-bar-bg{width:80px;height:5px;background:var(--surface-2);border-radius:5px;overflow:hidden;}
 .top-bar-fill{height:100%;border-radius:5px;}
-.top-count{font-size:12px;color:var(--text-3);min-width:30px;text-align:right;}
+.top-count{font-size:10px;color:var(--text-3);min-width:30px;text-align:right;}
 
-/* ── TOAST ── */
-.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--text-1);color:var(--surface);padding:12px 20px;border-radius:99px;font-size:14px;font-weight:500;transition:transform .3s;z-index:999;white-space:nowrap;}
+/* MONTH SELECTOR */
+.month-filter-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--text-1);color:var(--surface);padding:10px 18px;border-radius:20px;font-size:12px;font-weight:500;transition:transform .3s;z-index:999;white-space:nowrap;}
 .toast.show{transform:translateX(-50%) translateY(0);}
-.toast.ok{background:#16a34a;}
-.toast.err{background:#dc2626;}
+.toast.ok{background:var(--green);}
+.toast.err{background:var(--red);}
 
-/* ── LOADING ── */
+/* LOADING */
 .loading{display:flex;align-items:center;justify-content:center;padding:40px;flex-direction:column;gap:10px;}
-.spin{width:24px;height:24px;border:2px solid var(--border);border-top-color:var(--brand);border-radius:50%;animation:spin .7s linear infinite;}
+.spin{width:22px;height:22px;border:2px solid var(--border);border-top-color:var(--navy);border-radius:50%;animation:spin .7s linear infinite;}
 @keyframes spin{to{transform:rotate(360deg);}}
-.load-txt{font-size:13px;color:var(--text-3);}
+.load-txt{font-size:11px;color:var(--text-3);}
 
-/* ── EMPTY ── */
+/* EMPTY */
 .empty{padding:40px;text-align:center;color:var(--text-3);font-size:12px;}
 .empty-icon{font-size:36px;display:block;margin-bottom:10px;}
 
-/* ── MODAL ── */
-.modal-overlay{display:none;position:fixed;inset:0;background:var(--overlay);z-index:200;align-items:center;justify-content:center;}
+/* MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;align-items:center;justify-content:center;}
 .modal-overlay.show{display:flex;}
-.modal{background:var(--surface);border-radius:12px;padding:20px;max-width:480px;width:90%;max-height:80vh;overflow-y:auto;box-shadow:0 8px 32px rgba(0,0,0,.2);}
+.modal{background:var(--surface);border-radius:12px;padding:20px;max-width:520px;width:90%;max-height:80vh;overflow-y:auto;box-shadow:0 8px 32px rgba(0,0,0,.2);}
 .modal-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
 .modal-title{font-size:14px;font-weight:600;color:var(--text-1);}
 .modal-close{background:none;border:none;cursor:pointer;font-size:20px;color:var(--text-3);}
-.modal-item{padding:7px 0;border-bottom:1px solid var(--surface-2);font-size:12px;}
+.modal-item{padding:8px 0;border-bottom:1px solid var(--surface-2);font-size:12px;display:flex;align-items:flex-start;justify-content:space-between;gap:8px;}
 .modal-item:last-child{border-bottom:none;}
 .modal-item-name{font-weight:500;color:var(--text-1);text-transform:capitalize;}
-.modal-item-comps{color:var(--text-3);margin-top:2px;font-size:13px;}
-
-
-/* ════════════════════════════════════════════
-   DESKTOP LAYOUT (≥ 1024px) — enhanced sizing
-   Mobile remains unchanged
-   ════════════════════════════════════════════ */
-@media(min-width:1024px){
-  html{font-size:16px;}
-
-  /* Header */
-  .hdr-inner{padding:16px 48px;}
-  .page-title{font-size:24px;font-weight:800;}
-  .page-sub{font-size:14px;}
-  .co-name{font-size:15px;}
-  .hn-btn{font-size:14px;padding:8px 18px;}
-
-  /* Main content width */
-  .main{padding:28px 48px;max-width:1400px;margin:0 auto;}
-
-  /* Tabs */
-  .tab{font-size:14px;padding:10px 20px;}
-
-  /* Cards */
-  .card{padding:22px 24px;}
-  .card-title{font-size:17px;}
-  .card-sub{font-size:13px;}
-
-  /* Grid — more columns on desktop */
-  .g2{grid-template-columns:1fr 1fr;gap:20px;}
-  .g3{grid-template-columns:1fr 1fr 1fr;gap:20px;}
-  .analysis-grid{grid-template-columns:repeat(6,1fr);gap:16px;}
-  .score-suggestions-row{grid-template-columns:1fr 1fr;gap:20px;}
-
-  /* Stat cards */
-  .stat-card{padding:20px;}
-  .stat-val{font-size:32px;font-weight:800;}
-  .stat-lbl{font-size:12px;}
-  .stat-sub{font-size:13px;}
-
-  /* Week list */
-  .week-card{margin-bottom:20px;}
-  .week-hdr{padding:14px 20px;}
-  .week-hdr-title{font-size:16px;}
-  .week-hdr-range{font-size:13px;}
-  .week-body{padding:16px 20px;}
-  .day-row{grid-template-columns:120px 1fr 1fr;gap:20px;padding:12px 0;}
-  .day-label{font-size:15px;}
-  .menu-pill{font-size:14px;}
-  .menu-comps{font-size:13px;}
-
-  /* Calendar */
-  .cal-title{font-size:18px;font-weight:700;}
-  .cal-btn{font-size:14px;padding:8px 16px;}
-  .week-day-hdr{font-size:13px;padding:8px 0 6px;}
-  .cal-cell{min-height:90px;padding:8px 9px;border-radius:12px;}
-  .cal-date{font-size:14px;}
-  .cal-menu-item{font-size:11px;padding:3px 7px;}
-  .cal-more{font-size:11px;}
-  .cal-view-btn{font-size:14px;padding:8px 18px;}
-
-  /* Input / Form */
-  .form-label{font-size:13px;}
-  .inp{font-size:15px;padding:10px 14px;}
-  .type-btn{font-size:14px;padding:10px;}
-  .comp-inp{font-size:15px;padding:10px 14px;}
-  .comp-add-btn{font-size:14px;padding:9px 16px;}
-  .btn-primary{font-size:15px;padding:14px;}
-  .paste-area{font-size:14px;min-height:140px;}
-  .paste-hint{font-size:13px;}
-  .parse-btn{font-size:13px;padding:9px 18px;}
-  .parsed-preview h4{font-size:14px;}
-  .parsed-item{font-size:14px;}
-  .parsed-date{font-size:13px;min-width:100px;}
-  .parsed-comp{font-size:13px;}
-  .comp-tag{font-size:13px;padding:4px 12px;}
-
-  /* Analysis */
-  .repeat-name{font-size:15px;}
-  .repeat-weeks{font-size:13px;}
-  .top-name{font-size:15px;}
-  .top-rank{font-size:13px;}
-  .top-count{font-size:13px;}
-  .sug-title{font-size:15px;}
-  .sug-desc{font-size:14px;}
-  .sug-card{padding:14px 16px;}
-  .ring-svg{width:100px;height:100px;}
-  .ring-lbl{font-size:14px;}
-  .score-ring{gap:40px;padding:20px 0;}
-
-  /* Modal */
-  .modal{max-width:600px;padding:28px;}
-  .modal-title{font-size:18px;}
-  .modal-item{font-size:15px;padding:12px 0;}
-  .modal-item-comps{font-size:14px;}
-
-  /* Toast */
-  .toast{font-size:15px;padding:13px 24px;}
-}
-
-/* ── WIDE DESKTOP (≥ 1440px) — max content width */
-@media(min-width:1440px){
-  .main{padding:32px 64px;}
-}
+.modal-item-comps{color:var(--text-3);margin-top:2px;font-size:11px;}
 </style>
 </head>
 <body>
-
-<script>
-  var GAS_URL = "https://script.google.com/macros/s/AKfycbywIW79lgCQOvlqUX0XuIsKk8A4NPGMnHx0shd573HZ-VXzjnijSuzSQ4PnpYf4zHKE/exec";
-</script>
 
 <!-- HEADER -->
 <div class="hdr">
@@ -368,12 +253,13 @@ select.inp{cursor:pointer;}
     <div class="hdr-bottom">
       <div>
         <div class="page-title">🍽️ Menu Plan</div>
-        <div class="page-sub">Weekly & monthly menu management + analysis</div>
+        <div class="page-sub">Weekly &amp; monthly menu management + analysis</div>
       </div>
       <div class="hdr-nav">
         <a class="hn-btn" href="index.html">📋 Form</a>
         <a class="hn-btn" href="dashboard.html">📊 Dashboard</a>
-        <button class="hn-btn" onclick="toggleTheme()">🌓 Theme</button>
+        <!-- FIX #1: theme button sekarang tidak bergantung pada elemen #themeLbl -->
+        <button class="hn-btn" id="themeToggleBtn" onclick="toggleTheme()">🌓 Theme</button>
       </div>
     </div>
   </div>
@@ -399,54 +285,42 @@ select.inp{cursor:pointer;}
   <div class="tabs">
     <button class="tab active" id="tab-analysis" onclick="openTab('analysis')">📊 Analysis</button>
     <button class="tab" id="tab-calendar" onclick="openTab('calendar')">📅 Calendar</button>
-    <button class="tab" id="tab-weekly" onclick="openTab('weekly')">📋 Weekly List</button>
-    <button class="tab" id="tab-input" onclick="openTab('input')">✏️ Input Menu</button>
+    <button class="tab" id="tab-weekly"   onclick="openTab('weekly')">📋 Weekly List</button>
+    <button class="tab" id="tab-input"    onclick="openTab('input')">✏️ Input Menu</button>
   </div>
 
-  <!-- ════════════════════════════════════ -->
-  <!--  TAB: ANALYSIS                       -->
-  <!-- ════════════════════════════════════ -->
+  <!-- TAB: ANALYSIS -->
   <div id="pane-analysis">
-    <div class="loading" id="analysisLoader"><div class="spin"></div><span class="load-txt">Loading analysis…</span></div>
+    <div class="loading" id="analysisLoader">
+      <div class="spin"></div>
+      <span class="load-txt">Loading analysis…</span>
+      <span style="font-size:10px;color:var(--text-3);margin-top:4px">First load may take 10–20s</span>
+    </div>
     <div id="analysisContent" style="display:none">
-
-      <!-- Stats row -->
       <div class="analysis-grid" id="statsGrid"></div>
-
-      <!-- Rotation score -->
       <div class="card mb">
         <div class="card-title">🔄 Menu Rotation Score</div>
         <div class="card-sub">Higher score = more variety. Target: above 70%</div>
         <div class="score-ring" id="scoreRing"></div>
       </div>
-
-      <!-- Suggestions -->
       <div class="card mb">
         <div class="card-title">💡 Smart Suggestions</div>
         <div class="card-sub">Based on your menu history this period</div>
         <div class="suggestion-list" id="suggestionList"></div>
       </div>
-
       <div class="g2">
-        <!-- Repeated menus -->
-        <div>
-          <div class="card">
-            <div class="card-title">⚠️ Repeated Snack Menus</div>
-            <div class="card-sub">Same snack appearing in multiple weeks</div>
-            <div id="repeatedSnack"></div>
-          </div>
+        <div class="card">
+          <div class="card-title">⚠️ Repeated Snack Menus</div>
+          <div class="card-sub">Same snack appearing in multiple weeks</div>
+          <div id="repeatedSnack"></div>
         </div>
-        <div>
-          <div class="card">
-            <div class="card-title">⚠️ Repeated Meal Menus</div>
-            <div class="card-sub">Same meal appearing in multiple weeks</div>
-            <div id="repeatedMeal"></div>
-          </div>
+        <div class="card">
+          <div class="card-title">⚠️ Repeated Meal Menus</div>
+          <div class="card-sub">Same meal appearing in multiple weeks</div>
+          <div id="repeatedMeal"></div>
         </div>
       </div>
-
       <div class="g2">
-        <!-- Top menus -->
         <div class="card">
           <div class="card-title">🏆 Most Frequent Snack</div>
           <div class="card-sub">All-time ranking</div>
@@ -458,24 +332,19 @@ select.inp{cursor:pointer;}
           <div class="top-list" id="topMeal"></div>
         </div>
       </div>
-
     </div>
   </div>
 
-  <!-- ════════════════════════════════════ -->
-  <!--  TAB: CALENDAR                       -->
-  <!-- ════════════════════════════════════ -->
+  <!-- TAB: CALENDAR -->
   <div id="pane-calendar" style="display:none">
-
-    <!-- Filter bar -->
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap;">
       <div class="filter-group-cal">
         <button class="cal-view-btn active" id="cvMonth" onclick="setCalView('month')">Monthly</button>
-        <button class="cal-view-btn" id="cvWeek" onclick="setCalView('week')">Weekly</button>
+        <button class="cal-view-btn" id="cvWeek"  onclick="setCalView('week')">Weekly</button>
       </div>
       <div style="display:flex;align-items:center;gap:6px;">
         <button class="cal-btn" onclick="calPrev()">← Prev</button>
-        <span class="cal-title" id="calMonthLabel" style="min-width:180px;text-align:center;">—</span>
+        <span class="cal-title" id="calMonthLabel" style="min-width:200px;text-align:center;">—</span>
         <button class="cal-btn" onclick="calNext()">Next →</button>
       </div>
       <select id="calWeekSel" class="inp" onchange="jumpToWeek(this.value)"
@@ -483,52 +352,38 @@ select.inp{cursor:pointer;}
         <option value="">Jump to week…</option>
       </select>
     </div>
-
-    <div class="card" id="calCard" style="padding:14px 16px;">
-      <!-- Month view -->
+    <div class="card" style="padding:14px 16px;">
       <div id="calMonthView">
         <div class="week-grid" style="margin-bottom:4px;">
-          <div class="week-day-hdr">Mon</div>
-          <div class="week-day-hdr">Tue</div>
-          <div class="week-day-hdr">Wed</div>
-          <div class="week-day-hdr">Thu</div>
-          <div class="week-day-hdr">Fri</div>
-          <div class="week-day-hdr">Sat</div>
+          <div class="week-day-hdr">Mon</div><div class="week-day-hdr">Tue</div>
+          <div class="week-day-hdr">Wed</div><div class="week-day-hdr">Thu</div>
+          <div class="week-day-hdr">Fri</div><div class="week-day-hdr">Sat</div>
           <div class="week-day-hdr">Sun</div>
         </div>
         <div id="calGrid" class="week-grid"></div>
       </div>
-
-      <!-- Week view -->
       <div id="calWeekView" style="display:none">
         <div id="calWeekGrid"></div>
       </div>
     </div>
   </div>
 
-  <!-- ════════════════════════════════════ -->
-  <!--  TAB: WEEKLY LIST                    -->
-  <!-- ════════════════════════════════════ -->
+  <!-- TAB: WEEKLY LIST -->
   <div id="pane-weekly" style="display:none">
     <div id="weeklyList"></div>
   </div>
 
-  <!-- ════════════════════════════════════ -->
-  <!--  TAB: INPUT                          -->
-  <!-- ════════════════════════════════════ -->
+  <!-- TAB: INPUT -->
   <div id="pane-input" style="display:none">
     <div class="g2">
-
       <!-- Manual input -->
       <div class="card">
         <div class="card-title">✏️ Manual Input</div>
         <div class="card-sub">Add one menu entry at a time</div>
-
         <div class="form-section">
           <label class="form-label">Date</label>
           <input type="date" class="inp" id="menuDate">
         </div>
-
         <div class="form-section">
           <label class="form-label">Type</label>
           <div class="type-toggle">
@@ -536,21 +391,19 @@ select.inp{cursor:pointer;}
             <button class="type-btn" id="typeMeal" onclick="setType('meal')">🍱 Meal</button>
           </div>
         </div>
-
         <div class="form-section">
           <label class="form-label">Menu Name <span style="color:var(--text-3)">(main dish)</span></label>
           <input type="text" class="inp" id="menuName" placeholder="e.g. Bubur Ayam / Chicken Yakiniku">
         </div>
-
         <div class="form-section">
           <label class="form-label">Components <span style="color:var(--text-3)">(sides, soup, etc.)</span></label>
           <div class="comp-wrap" id="compTags"></div>
           <div class="comp-inp-row">
-            <input type="text" class="comp-inp" id="compInput" placeholder="Add component…" onkeydown="if(event.key==='Enter'){addComp();event.preventDefault();}">
+            <input type="text" class="comp-inp" id="compInput" placeholder="Add component…"
+              onkeydown="if(event.key==='Enter'){addComp();event.preventDefault();}">
             <button class="comp-add-btn" onclick="addComp()">+ Add</button>
           </div>
         </div>
-
         <button class="btn-primary" onclick="submitManual()">Save Menu Entry</button>
       </div>
 
@@ -558,16 +411,13 @@ select.inp{cursor:pointer;}
       <div class="card">
         <div class="card-title">📋 Bulk Paste</div>
         <div class="card-sub">Paste menu data in the format from your records</div>
-
         <div class="form-section">
           <label class="form-label">Category</label>
           <div class="type-toggle">
             <button class="type-btn active-snack" id="pasteTypeSnack" onclick="setPasteType('snack')">🥐 Snack</button>
-            <button class="type-btn" id="pasteTypeMeal" onclick="setPasteType('meal')">🍱 Meal</button>
+            <button class="type-btn" id="pasteTypeMeal"  onclick="setPasteType('meal')">🍱 Meal</button>
           </div>
         </div>
-
-        <!-- Parse mode toggle -->
         <div class="form-section">
           <label class="form-label">Parse Mode</label>
           <div style="display:flex;flex-direction:column;gap:6px;">
@@ -587,26 +437,24 @@ select.inp{cursor:pointer;}
             </label>
           </div>
         </div>
-
         <div class="form-section">
           <label class="form-label">Paste your menu data</label>
           <div class="paste-wrap">
             <textarea class="paste-area" id="pasteArea" placeholder="Loading…"></textarea>
           </div>
           <div id="pasteHint" class="paste-hint"></div>
-          <button class="parse-btn" onclick="parsePaste()">🔍 Preview & Parse</button>
+          <button class="parse-btn" onclick="parsePaste()">🔍 Preview &amp; Parse</button>
         </div>
-
         <div class="parsed-preview" id="parsedPreview">
           <h4>Parsed Result — review before saving</h4>
           <div id="parsedList"></div>
           <div style="margin-top:12px;display:flex;gap:8px;">
             <button class="btn-primary" style="flex:1" onclick="submitParsed()">✅ Save All</button>
-            <button onclick="document.getElementById('parsedPreview').style.display='none'" style="flex:1;padding:10px;border:1px solid var(--border);border-radius:8px;font-size:12px;font-family:var(--font);cursor:pointer;background:var(--surface-2);color:var(--text-2);">Cancel</button>
+            <button onclick="document.getElementById('parsedPreview').style.display='none'"
+              style="flex:1;padding:10px;border:1px solid var(--border);border-radius:8px;font-size:12px;font-family:var(--font);cursor:pointer;background:var(--surface-2);color:var(--text-2);">Cancel</button>
           </div>
         </div>
       </div>
-
     </div>
   </div>
 
@@ -627,7 +475,7 @@ select.inp{cursor:pointer;}
 
 <script>
 // ═══════════════════════════════════════════════════
-//  CONFIGURATION
+//  CONFIG
 // ═══════════════════════════════════════════════════
 var GAS_URL = "https://script.google.com/macros/s/AKfycbywIW79lgCQOvlqUX0XuIsKk8A4NPGMnHx0shd573HZ-VXzjnijSuzSQ4PnpYf4zHKE/exec";
 
@@ -635,51 +483,40 @@ var GAS_URL = "https://script.google.com/macros/s/AKfycbywIW79lgCQOvlqUX0XuIsKk8
 //  STATE
 // ═══════════════════════════════════════════════════
 var DATA          = null;
-var selWeek       = '';      // current ISO week key e.g. "W2026-17"
+var selWeek       = '';
 var activeType    = 'snack';
 var pasteType     = 'snack';
 var components    = [];
 var parsedEntries = [];
 var calYear       = new Date().getFullYear();
 var calMonth      = new Date().getMonth();
-var calView       = 'month';
+var CV            = 'month';
 var calWeekKey    = '';
 var parseMode     = 'auto';
 var isDark        = false;
-
-// Standard accompaniments (never main menu)
-var ACCOMPANIMENTS = [
-  'nasi putih','nasi','nasi merah','kerupuk','kerupuk udang','kerupuk ikan','emping',
-  'sambal','sambal terasi','sambal bawang','sambal ijo','sambal merah','kecap','saus',
-  'saus pedas','saus tomat','acar','air putih','air mineral','teh','teh manis','teh tawar',
-  'kuah','kuah kaldu','kuah bening','melon','semangka','pepaya','pisang','jeruk','apel',
-  'mangga','lalapan','sayuran','salad','krupuk','crackers'
-];
-function isAccompaniment(name) {
-  var l = name.trim().toLowerCase();
-  return ACCOMPANIMENTS.some(function(a){ return l===a||l.startsWith(a+' ')||l.endsWith(' '+a); });
-}
 
 // ═══════════════════════════════════════════════════
 //  INIT
 // ═══════════════════════════════════════════════════
 window.onload = function() {
+  // FIX #1: toggleTheme() tidak lagi baca #themeLbl — aman dipanggil kapan saja
   if (window.matchMedia('(prefers-color-scheme: dark)').matches) toggleTheme();
   var now = new Date();
   document.getElementById('menuDate').value = toYMD(now);
-  // Init to current ISO week
   calWeekKey = isoKey(now);
   setParseMode('auto');
-  loadData('');  // load all data first, then populate week selector
+  loadData();
 };
 
 // ═══════════════════════════════════════════════════
-//  THEME
+//  THEME — FIX #1: tidak bergantung pada elemen #themeLbl
 // ═══════════════════════════════════════════════════
 function toggleTheme() {
   isDark = !isDark;
   document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
-  document.getElementById('themeLbl').textContent = isDark ? 'Dark mode' : 'Light mode';
+  // Aman: themeToggleBtn ada, tapi tidak wajib ada
+  var btn = document.getElementById('themeToggleBtn');
+  if (btn) btn.textContent = isDark ? '☀️ Theme' : '🌓 Theme';
 }
 
 // ═══════════════════════════════════════════════════
@@ -687,30 +524,25 @@ function toggleTheme() {
 // ═══════════════════════════════════════════════════
 function openTab(name) {
   ['analysis','calendar','weekly','input'].forEach(function(t) {
-    document.getElementById('pane-'+t).style.display = t===name ? '' : 'none';
+    document.getElementById('pane-'+t).style.display = t === name ? '' : 'none';
     var btn = document.getElementById('tab-'+t);
-    if (btn) btn.classList.toggle('active', t===name);
+    if (btn) btn.classList.toggle('active', t === name);
   });
-  if (name==='calendar' && DATA) renderCalendar();
-  if (name==='weekly'   && DATA) renderWeekly();
+  // FIX #5: sync calWeekKey dari selWeek sebelum render calendar
+  if (name === 'calendar') {
+    if (selWeek) {
+      calWeekKey = selWeek;
+      var m = isoWeekToMonday(selWeek);
+      calYear  = m.getFullYear();
+      calMonth = m.getMonth();
+    }
+    if (DATA) renderCalendar();
+  }
+  if (name === 'weekly' && DATA) renderWeekly();
 }
 
 // ═══════════════════════════════════════════════════
-//  SIDEBAR / NAV
-// ═══════════════════════════════════════════════════
-function openSb()  { document.getElementById('sidebar').classList.add('open');    document.getElementById('overlay').classList.add('show'); }
-function closeSb() { document.getElementById('sidebar').classList.remove('open'); document.getElementById('overlay').classList.remove('show'); }
-function navTo(id, btn) {
-  var el = document.getElementById(id); if (!el) return;
-  document.querySelectorAll('.nav-item').forEach(function(b){ b.classList.remove('active'); });
-  if (btn) btn.classList.add('active');
-  var th = document.querySelector('.topbar') ? document.querySelector('.topbar').offsetHeight : 0;
-  window.scrollTo({ top: el.getBoundingClientRect().top + window.pageYOffset - th - 6, behavior:'smooth' });
-  closeSb();
-}
-
-// ═══════════════════════════════════════════════════
-//  WEEK FILTER (main period control)
+//  WEEK FILTER
 // ═══════════════════════════════════════════════════
 function onWeekChange(val) {
   selWeek = val;
@@ -722,12 +554,11 @@ function fillWeekSelector(availableWeeks) {
   if (!sel) return;
   var prev = sel.value;
   sel.innerHTML = '<option value="">All data</option>';
-  // Filter out invalid week keys (WNaN-NaN etc)
-  (availableWeeks || []).filter(function(w){
+  (availableWeeks || []).filter(function(w) {
     return w.value && !w.value.includes('NaN') && /^W\d{4}-\d{2}$/.test(w.value);
   }).forEach(function(w) {
     var o = document.createElement('option');
-    o.value       = w.value;
+    o.value = w.value;
     o.textContent = w.label || weekLabel(w.value);
     if (w.value === selWeek || w.value === prev) { o.selected = true; selWeek = w.value; }
     sel.appendChild(o);
@@ -739,7 +570,7 @@ function updateWeekRangeLabel() {
   var lbl = document.getElementById('weekRangeLbl');
   if (!lbl) return;
   if (!selWeek || !DATA || !DATA.byWeek || !DATA.byWeek[selWeek]) {
-    lbl.textContent = DATA ? '(' + (DATA.entries||[]).length + ' entries total)' : '';
+    lbl.textContent = DATA ? '(' + (DATA.allEntries || []).length + ' entries total)' : '';
     return;
   }
   var w = DATA.byWeek[selWeek];
@@ -750,7 +581,6 @@ function applyWeekFilter() {
   if (!DATA) return;
   var rows, label;
   if (!selWeek) {
-    // All data
     rows  = DATA.allEntries || [];
     label = 'All data';
   } else {
@@ -759,47 +589,42 @@ function applyWeekFilter() {
       rows  = (wk.snack || []).concat(wk.meal || []);
       label = wk.label || weekLabel(selWeek);
     } else {
-      rows  = [];
-      label = selWeek;
+      rows = []; label = selWeek;
     }
   }
   updateWeekRangeLabel();
   renderAnalysisFromRows(rows, label);
-  // Sync calendar to this week
+  // FIX #5: sync calendar pointer
   if (selWeek) {
     calWeekKey = selWeek;
     var mon = isoWeekToMonday(selWeek);
     calYear  = mon.getFullYear();
     calMonth = mon.getMonth();
   }
-  if (document.getElementById('pane-calendar').style.display !== 'none') renderCalendar();
-  if (document.getElementById('pane-weekly').style.display   !== 'none') renderWeekly();
+  var calPane = document.getElementById('pane-calendar');
+  if (calPane && calPane.style.display !== 'none') renderCalendar();
+  var wkPane = document.getElementById('pane-weekly');
+  if (wkPane && wkPane.style.display !== 'none') renderWeekly();
 }
 
 // ═══════════════════════════════════════════════════
-//  LOAD FROM GAS
+//  LOAD DATA
 // ═══════════════════════════════════════════════════
-function loadData(monthStr) {
-  document.getElementById('analysisLoader').innerHTML =
-    '<div class="spin"></div>' +
-    '<span class="load-txt">Loading menu data…</span>' +
+function loadData() {
+  var loader = document.getElementById('analysisLoader');
+  loader.innerHTML = '<div class="spin"></div><span class="load-txt">Loading menu data…</span>' +
     '<span style="font-size:10px;color:var(--text-3);margin-top:4px">First load may take 10–20s</span>';
-  document.getElementById('analysisLoader').style.display = 'flex';
+  loader.style.display = 'flex';
   document.getElementById('analysisContent').style.display = 'none';
 
-  // Always load all months (no month filter — week filter handles period)
   var url = GAS_URL + '?action=menu&month=';
-
-  // Simple timeout using Promise.race — no AbortController (mobile compatible)
   var timeoutPromise = new Promise(function(_, reject) {
     setTimeout(function() { reject(new Error('timeout')); }, 25000);
   });
-  var fetchPromise = fetch(url, { redirect:'follow' });
-
-  Promise.race([fetchPromise, timeoutPromise])
+  Promise.race([fetch(url, { redirect: 'follow' }), timeoutPromise])
     .then(function(r) {
       var ct = r.headers.get('content-type') || '';
-      if (!ct.includes('json')) return r.text().then(function(t){ throw new Error('Non-JSON response. Try reloading.'); });
+      if (!ct.includes('json')) return r.text().then(function() { throw new Error('Non-JSON response. Try reloading.'); });
       return r.json();
     })
     .then(function(data) {
@@ -807,22 +632,17 @@ function loadData(monthStr) {
       DATA = data;
       DATA.allEntries = data.entries || [];
       fillWeekSelector(data.availableWeeks || []);
-      document.getElementById('analysisLoader').style.display = 'none';
+      loader.style.display = 'none';
       document.getElementById('analysisContent').style.display = '';
       applyWeekFilter();
     })
     .catch(function(e) {
-      var isTimeout = e.message === 'timeout';
-      var msg = isTimeout
-        ? 'Request took too long (>25s).<br>GAS may be slow. Try again.'
-        : e.message;
-      document.getElementById('analysisLoader').innerHTML =
+      var msg = e.message === 'timeout' ? 'Request took too long (>25s). Try again.' : e.message;
+      loader.innerHTML =
         '<div style="color:var(--red);font-size:12px;text-align:center;padding:24px;line-height:1.8">' +
-        '⚠️ Cannot load menu data.<br>' +
-        '<small style="color:var(--text-3)">'+msg+'</small><br><br>' +
-        '<button onclick="loadData(String())" style="padding:8px 16px;background:var(--navy);color:#fff;' +
-        'border:none;border-radius:7px;font-size:12px;font-family:var(--font);cursor:pointer;">' +
-        '↺ Retry</button></div>';
+        '⚠️ Cannot load menu data.<br><small style="color:var(--text-3)">' + msg + '</small><br><br>' +
+        '<button onclick="loadData()" style="padding:8px 16px;background:var(--navy);color:#fff;' +
+        'border:none;border-radius:7px;font-size:12px;font-family:var(--font);cursor:pointer;">↺ Retry</button></div>';
     });
 }
 
@@ -831,25 +651,22 @@ function loadData(monthStr) {
 // ═══════════════════════════════════════════════════
 function renderAnalysisFromRows(rows, label) {
   var a = buildAnalysis(rows, DATA ? DATA.allEntries : rows);
-
-  // Stats
   var uniqueDates = {};
-  rows.forEach(function(e){ uniqueDates[e.date||e.rawDate] = true; });
+  rows.forEach(function(e) { uniqueDates[e.rawDate || e.date] = true; });
   document.getElementById('statsGrid').innerHTML = [
-    { icon:'🥐', val:a.uniqueSnack||0,              lbl:'Unique Snacks',   sub:'Different menus',   col:'var(--amber)' },
-    { icon:'🍱', val:a.uniqueMeal||0,               lbl:'Unique Meals',    sub:'Different dishes',  col:'var(--navy)'  },
-    { icon:'📅', val:Object.keys(uniqueDates).length,lbl:'Days Recorded',  sub:'With menu data',    col:'var(--green)' },
-    { icon:'⚠️', val:(a.repeatedSnack||[]).length,  lbl:'Repeated Snacks', sub:'Multi-week',        col:'var(--amber)' },
-    { icon:'⚠️', val:(a.repeatedMeal||[]).length,   lbl:'Repeated Meals',  sub:'Multi-week',        col:'var(--red)'   },
+    { icon:'🥐', val:a.uniqueSnack||0,  lbl:'Unique Snacks',   sub:'Different menus',  col:'var(--amber)' },
+    { icon:'🍱', val:a.uniqueMeal||0,   lbl:'Unique Meals',    sub:'Different dishes', col:'var(--navy)'  },
+    { icon:'📅', val:Object.keys(uniqueDates).length, lbl:'Days Recorded', sub:'With menu data', col:'var(--green)' },
+    { icon:'⚠️', val:(a.repeatedSnack||[]).length, lbl:'Repeated Snacks', sub:'Multi-week', col:'var(--amber)' },
+    { icon:'⚠️', val:(a.repeatedMeal||[]).length,  lbl:'Repeated Meals',  sub:'Multi-week', col:'var(--red)'   },
     { icon:'✅', val:Math.round(((a.rotationScore||{}).snack||0)+((a.rotationScore||{}).meal||0))/2+'%',
       lbl:'Avg Rotation', sub:'Variety score', col:'var(--green)' }
-  ].map(function(s){
-    return '<div class="stat-card"><div style="font-size:22px;margin-bottom:4px">'+s.icon+'</div>'+
-      '<div class="stat-val" style="color:'+s.col+'">'+s.val+'</div>'+
+  ].map(function(s) {
+    return '<div class="stat-card"><div style="font-size:22px;margin-bottom:4px">'+s.icon+'</div>' +
+      '<div class="stat-val" style="color:'+s.col+'">'+s.val+'</div>' +
       '<div class="stat-lbl">'+s.lbl+'</div><div class="stat-sub">'+s.sub+'</div></div>';
   }).join('');
-
-  renderScoreRings(a.rotationScore || {snack:0,meal:0});
+  renderScoreRings(a.rotationScore || { snack:0, meal:0 });
   renderSuggestions(a);
   renderRepeated('repeatedSnack', a.repeatedSnack||[], 'var(--amber)');
   renderRepeated('repeatedMeal',  a.repeatedMeal||[],  'var(--navy)');
@@ -858,47 +675,40 @@ function renderAnalysisFromRows(rows, label) {
 }
 
 function buildAnalysis(filtered, all) {
-  // Frequency across ALL data
   var snackFreq={}, mealFreq={};
-  (all||[]).forEach(function(e){
-    var nm=e.menuName.trim().toLowerCase(), t=e.type.toLowerCase();
-    if(t==='snack') snackFreq[nm]=(snackFreq[nm]||0)+1;
-    else             mealFreq[nm] =(mealFreq[nm] ||0)+1;
+  (all||[]).forEach(function(e) {
+    var nm = e.menuName.trim().toLowerCase(), t = e.type.toLowerCase();
+    if (t==='snack') snackFreq[nm]=(snackFreq[nm]||0)+1;
+    else              mealFreq[nm] =(mealFreq[nm] ||0)+1;
   });
-
-  // Repetition within filtered period by week
   var wkSnack={}, wkMeal={};
-  filtered.forEach(function(e){
+  filtered.forEach(function(e) {
     var k=e.menuName.trim().toLowerCase(), w=e.week||0;
-    if(e.type.toLowerCase()==='snack'){
-      if(!wkSnack[k]) wkSnack[k]=[];
-      if(wkSnack[k].indexOf(w)<0) wkSnack[k].push(w);
+    if (e.type.toLowerCase()==='snack') {
+      if (!wkSnack[k]) wkSnack[k]=[];
+      if (wkSnack[k].indexOf(w)<0) wkSnack[k].push(w);
     } else {
-      if(!wkMeal[k]) wkMeal[k]=[];
-      if(wkMeal[k].indexOf(w)<0) wkMeal[k].push(w);
+      if (!wkMeal[k]) wkMeal[k]=[];
+      if (wkMeal[k].indexOf(w)<0) wkMeal[k].push(w);
     }
   });
-
   var repSnack=[], repMeal=[];
   Object.keys(wkSnack).forEach(function(k){ if(wkSnack[k].length>=2) repSnack.push({name:k,weeks:wkSnack[k],count:wkSnack[k].length}); });
   Object.keys(wkMeal).forEach(function(k){  if(wkMeal[k].length>=2)  repMeal.push({name:k,weeks:wkMeal[k], count:wkMeal[k].length}); });
   repSnack.sort(function(a,b){return b.count-a.count;});
   repMeal.sort(function(a,b){return b.count-a.count;});
-
   function topN(freq,n){ return Object.keys(freq).map(function(k){return{name:k,count:freq[k]};}).sort(function(a,b){return b.count-a.count;}).slice(0,n); }
-
   var uSnack=Object.keys(wkSnack).length, uMeal=Object.keys(wkMeal).length;
   var tSnack=filtered.filter(function(e){return e.type.toLowerCase()==='snack';}).length;
   var tMeal =filtered.filter(function(e){return e.type.toLowerCase()!=='snack';}).length;
-
   return {
     repeatedSnack:repSnack, repeatedMeal:repMeal,
     topSnack:topN(snackFreq,5), topMeal:topN(mealFreq,8),
     uniqueSnack:uSnack, uniqueMeal:uMeal,
-    totalSnack:tSnack, totalMeal:tMeal,
+    totalSnack:tSnack,  totalMeal:tMeal,
     rotationScore:{
       snack: tSnack>0 ? Math.round(uSnack/tSnack*100) : 0,
-      meal:  tMeal>0  ? Math.round(uMeal/tMeal*100)  : 0
+      meal:  tMeal>0  ? Math.round(uMeal/tMeal*100)   : 0
     }
   };
 }
@@ -908,27 +718,28 @@ function renderScoreRings(score) {
     var r=30,cx=40,cy=40,circ=2*Math.PI*r;
     var dash=circ*(pct/100);
     var grade=pct>=80?'🟢 Excellent':pct>=60?'🟡 Good':'🔴 Needs variety';
-    return '<div class="ring-wrap">'+
-      '<svg class="ring-svg" viewBox="0 0 80 80">'+
-        '<circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="none" stroke="var(--border)" stroke-width="7"/>'+
-        '<circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="none" stroke="'+col+'" stroke-width="7"'+
-          ' stroke-dasharray="'+dash+' '+(circ-dash)+'" stroke-dashoffset="'+(circ/4)+'" stroke-linecap="round"/>'+
-        '<text x="'+cx+'" y="'+cy+'" text-anchor="middle" dominant-baseline="middle"'+
-          ' font-size="14" font-weight="700" fill="var(--text-1)" font-family="Inter,sans-serif">'+pct+'%</text>'+
-      '</svg>'+
-      '<div class="ring-lbl" style="font-weight:600">'+lbl+'</div>'+
-      '<div style="font-size:10px;color:var(--text-3);margin-top:2px">'+grade+'</div>'+
+    return '<div class="ring-wrap">' +
+      '<svg class="ring-svg" viewBox="0 0 80 80">' +
+        '<circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="none" stroke="var(--border)" stroke-width="7"/>' +
+        '<circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="none" stroke="'+col+'" stroke-width="7"' +
+          ' stroke-dasharray="'+dash.toFixed(2)+' '+(circ-dash).toFixed(2)+'"' +
+          ' stroke-dashoffset="'+(circ/4).toFixed(2)+'" stroke-linecap="round"/>' +
+        '<text x="'+cx+'" y="'+cy+'" text-anchor="middle" dominant-baseline="middle"' +
+          ' font-size="14" font-weight="700" fill="var(--text-1)" font-family="Inter,sans-serif">'+pct+'%</text>' +
+      '</svg>' +
+      '<div class="ring-lbl" style="font-weight:600">'+lbl+'</div>' +
+      '<div style="font-size:10px;color:var(--text-3);margin-top:2px">'+grade+'</div>' +
       '</div>';
   }
   document.getElementById('scoreRing').innerHTML =
-    ring(score.snack,'var(--amber)','🥐 Snack Rotation')+
-    '<div style="width:1px;height:80px;background:var(--border);flex-shrink:0"></div>'+
+    ring(score.snack,'var(--amber)','🥐 Snack Rotation') +
+    '<div style="width:1px;height:80px;background:var(--border);flex-shrink:0"></div>' +
     ring(score.meal,'var(--navy)','🍱 Meal Rotation');
 }
 
 function renderSuggestions(a) {
   var sugs=[], ss=(a.rotationScore||{}).snack||0, ms=(a.rotationScore||{}).meal||0;
-  if(ss<60) sugs.push({icon:'🔄',title:'Increase snack variety',desc:'Snack rotation at '+ss+'%. Try 3-4 different snack themes each month.'});
+  if(ss<60) sugs.push({icon:'🔄',title:'Increase snack variety',desc:'Snack rotation at '+ss+'%. Try 3–4 different snack themes each month.'});
   else if(ss>=80) sugs.push({icon:'🌟',title:'Excellent snack variety!',desc:'Rotation '+ss+'% — great diversity. Document successful menus.'});
   if(ms<60) sugs.push({icon:'🍽️',title:'Diversify meal menu',desc:'Meal rotation at '+ms+'%. Rotate proteins: Chicken → Fish → Beef → Tofu/Tempe weekly.'});
   if((a.repeatedSnack||[]).length>2){
@@ -936,10 +747,10 @@ function renderSuggestions(a) {
     sugs.push({icon:'⚡',title:'Snack repetition detected',desc:(a.repeatedSnack||[]).length+' snack(s) repeated across weeks ('+names+'…). Space same menu 3+ weeks apart.'});
   }
   if((a.repeatedMeal||[]).length>3) sugs.push({icon:'📋',title:'Create a meal rotation calendar',desc:'With '+(a.repeatedMeal||[]).length+' repeated meals, a 4-week rotation plan ensures variety.'});
-  if(!sugs.length){ sugs.push({icon:'✅',title:'Menu planning looks great!',desc:'No major issues. Consider collecting worker feedback on favourite menus.'}); }
+  if(!sugs.length) sugs.push({icon:'✅',title:'Menu planning looks great!',desc:'No major issues. Consider collecting worker feedback on favourite menus.'});
   sugs.push({icon:'🥗',title:'Nutritional balance tip',desc:'Each meal: protein + vegetables + carb + fruit/soup. This reduces leftover from monotony.'});
   document.getElementById('suggestionList').innerHTML=sugs.map(function(s){
-    return '<div class="sug-card"><span class="sug-icon">'+s.icon+'</span>'+
+    return '<div class="sug-card"><span class="sug-icon">'+s.icon+'</span>' +
       '<div><div class="sug-title">'+s.title+'</div><div class="sug-desc">'+s.desc+'</div></div></div>';
   }).join('');
 }
@@ -952,9 +763,9 @@ function renderRepeated(elId,items,col) {
     var pct=Math.round(item.count/max*100);
     var cls=item.count>=3?'danger':'warn';
     var wkLbl=item.weeks.map(function(w){return 'W'+w;}).join(', ');
-    return '<div class="repeat-card '+cls+'">'+
-      '<div class="repeat-hdr"><span class="repeat-name">'+item.name+'</span>'+
-      '<span class="repeat-weeks">'+item.count+'× ('+wkLbl+')</span></div>'+
+    return '<div class="repeat-card '+cls+'">' +
+      '<div class="repeat-hdr"><span class="repeat-name">'+item.name+'</span>' +
+      '<span class="repeat-weeks">'+item.count+'× ('+wkLbl+')</span></div>' +
       '<div class="repeat-bar-bg"><div class="repeat-bar-fill" style="width:'+pct+'%;background:'+col+'"></div></div></div>';
   }).join('');
 }
@@ -965,10 +776,10 @@ function renderTopMenu(elId,items,col) {
   var max=items[0]?items[0].count:1;
   el.innerHTML=items.map(function(item,i){
     var pct=Math.round(item.count/max*100);
-    return '<div class="top-item">'+
-      '<span class="top-rank">'+(i+1)+'</span>'+
-      '<span class="top-name">'+item.name+'</span>'+
-      '<div class="top-bar-bg"><div class="top-bar-fill" style="width:'+pct+'%;background:'+col+'"></div></div>'+
+    return '<div class="top-item">' +
+      '<span class="top-rank">'+(i+1)+'</span>' +
+      '<span class="top-name">'+item.name+'</span>' +
+      '<div class="top-bar-bg"><div class="top-bar-fill" style="width:'+pct+'%;background:'+col+'"></div></div>' +
       '<span class="top-count">'+item.count+'×</span></div>';
   }).join('');
 }
@@ -1000,9 +811,10 @@ function isoKey(d) {
   return 'W'+getISOWeekYear(d)+'-'+String(getISOWeekNum(d)).padStart(2,'0');
 }
 function isoWeekToMonday(key) {
-  if(!key){ return getMondayOf(new Date()); }
+  if(!key) return getMondayOf(new Date());
   var parts=key.replace('W','').split('-');
   var y=parseInt(parts[0]),w=parseInt(parts[1]);
+  if(isNaN(y)||isNaN(w)) return getMondayOf(new Date());
   var jan4=new Date(y,0,4);
   var mon=getMondayOf(jan4);
   mon.setDate(mon.getDate()+(w-1)*7);
@@ -1018,7 +830,6 @@ function weekLabel(key) {
 // ═══════════════════════════════════════════════════
 //  CALENDAR
 // ═══════════════════════════════════════════════════
-var CV='month';
 function setCalView(v) {
   CV=v;
   document.getElementById('cvMonth').className='cal-view-btn'+(v==='month'?' active':'');
@@ -1026,9 +837,9 @@ function setCalView(v) {
   document.getElementById('calMonthView').style.display=v==='month'?'':'none';
   document.getElementById('calWeekView').style.display =v==='week' ?'':'none';
   document.getElementById('calWeekSel').style.display  =v==='week' ?'':'none';
-  if(v==='month') renderCalMonth();
-  else renderCalWeek();
+  if(v==='month') renderCalMonth(); else renderCalWeek();
 }
+
 function calPrev() {
   if(CV==='month'){
     calMonth--; if(calMonth<0){calMonth=11;calYear--;} renderCalMonth();
@@ -1046,13 +857,17 @@ function calNext() {
   }
 }
 function renderCalendar() {
-  if(selWeek){ calWeekKey=selWeek; var m=isoWeekToMonday(selWeek); calYear=m.getFullYear(); calMonth=m.getMonth(); }
+  // FIX #5: sudah di-sync di openTab dan applyWeekFilter — langsung render
   if(CV==='month') renderCalMonth(); else renderCalWeek();
 }
+
 function buildWeekSelector() {
-  var sel=document.getElementById('calWeekSel'); if(!sel||!DATA||!DATA.byWeek) return;
+  var sel=document.getElementById('calWeekSel');
+  if(!sel||!DATA||!DATA.byWeek) return;
   sel.innerHTML='<option value="">Jump to week…</option>';
-  Object.keys(DATA.byWeek).sort().forEach(function(k){
+  Object.keys(DATA.byWeek).filter(function(k){
+    return k && !k.includes('NaN') && /^W\d{4}-\d{2}$/.test(k);
+  }).sort().forEach(function(k){
     var w=DATA.byWeek[k];
     var o=document.createElement('option');
     o.value=k; o.textContent=w.label||k;
@@ -1063,34 +878,28 @@ function buildWeekSelector() {
 function jumpToWeek(key) { if(key){calWeekKey=key; renderCalWeek();} }
 
 function renderCalMonth() {
-  var MN=['January','February','March','April','May','June',
-          'July','August','September','October','November','December'];
-  document.getElementById('calMonthLabel').textContent = MN[calMonth] + ' ' + calYear;
-
-  var first  = (new Date(calYear,calMonth,1).getDay()+6)%7;
-  var last   = new Date(calYear,calMonth+1,0).getDate();
-  var today  = new Date();
-  var byDate = (DATA&&DATA.byDate)||{};
-
+  var MN=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  document.getElementById('calMonthLabel').textContent = MN[calMonth]+' '+calYear;
+  var first=(new Date(calYear,calMonth,1).getDay()+6)%7;
+  var last=new Date(calYear,calMonth+1,0).getDate();
+  var today=new Date();
+  var byDate=(DATA&&DATA.byDate)||{};
   function trunc(s,n){ if(!s)return''; s=s.charAt(0).toUpperCase()+s.slice(1).toLowerCase(); return s.length>n?s.substring(0,n)+'…':s; }
-
   var cells='';
   for(var i=0;i<first;i++) cells+='<div class="cal-cell empty"></div>';
-
   for(var d=1;d<=last;d++){
-    var dt  = new Date(calYear,calMonth,d);
-    var rk  = dt.getFullYear()+'-'+String(dt.getMonth()+1).padStart(2,'0')+'-'+String(dt.getDate()).padStart(2,'0');
-    var isT = dt.toDateString()===today.toDateString();
-    var day = byDate[rk]||null;
-    var cls = 'cal-cell'+(day?' has-data':'')+(isT?' today':'');
-    var dateSt = isT
+    var dt=new Date(calYear,calMonth,d);
+    var rk=dt.getFullYear()+'-'+String(dt.getMonth()+1).padStart(2,'0')+'-'+String(dt.getDate()).padStart(2,'0');
+    var isT=dt.toDateString()===today.toDateString();
+    var day=byDate[rk]||null;
+    var cls='cal-cell'+(day?' has-data':'')+(isT?' today':'');
+    var dateSt=isT
       ? 'display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;background:var(--navy);color:#fff;border-radius:50%;font-size:10px;font-weight:700;'
       : 'font-size:11px;font-weight:700;color:var(--text-2);';
-    var inner = '<div class="cal-date"><span style="'+dateSt+'">'+d+'</span></div>';
-
+    var inner='<div class="cal-date"><span style="'+dateSt+'">'+d+'</span></div>';
     if(day){
       if(day.snack&&day.snack.length){
-        inner+='<div class="cal-menu-item cal-snack" title="'+day.snack[0].menuName+'">'+
+        inner+='<div class="cal-menu-item cal-snack" title="'+esc(day.snack[0].menuName)+'">'+
           '<span style="display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--amber);margin-right:3px;vertical-align:middle"></span>'+
           trunc(day.snack[0].menuName,20)+'</div>';
       }
@@ -1098,18 +907,18 @@ function renderCalMonth() {
         var shown=0;
         day.meal.forEach(function(ml){
           if(shown>=2)return;
-          inner+='<div class="cal-menu-item cal-meal" title="'+ml.menuName+'">'+
+          inner+='<div class="cal-menu-item cal-meal" title="'+esc(ml.menuName)+'">'+
             '<span style="display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--navy);margin-right:3px;vertical-align:middle"></span>'+
             trunc(ml.menuName,20)+'</div>';
           shown++;
         });
-        if(day.meal.length>2) inner+='<div class="cal-more">+'+(day.meal.length-2)+' more dish</div>';
+        if(day.meal.length>2) inner+='<div class="cal-more">+'+(day.meal.length-2)+' more</div>';
       }
     }
-    var oc=day?' onclick="openDayModal("'+rk+'")"':'';
+    // FIX #2: onclick pakai single-quote di dalam attribute untuk rawKey yang mengandung '-'
+    var oc=day?' onclick="openDayModal(\''+rk+'\')"':'';
     cells+='<div class="'+cls+'"'+oc+'>'+inner+'</div>';
   }
-
   var rem=(first+last)%7;
   if(rem>0) for(var j=0;j<7-rem;j++) cells+='<div class="cal-cell empty"></div>';
   document.getElementById('calGrid').innerHTML=cells;
@@ -1124,11 +933,10 @@ function renderCalWeek() {
   buildWeekSelector();
   var byDate=(DATA&&DATA.byDate)||{};
   var DAYS=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
-  var hdrs='<div style="display:grid;grid-template-columns:64px 1fr 1fr;gap:8px;padding-bottom:8px;border-bottom:2px solid var(--border);margin-bottom:4px;">'+
-    '<div style="font-size:12px;font-weight:700;color:var(--text-3);text-transform:uppercase">Day</div>'+
-    '<div style="font-size:13px;font-weight:700;color:var(--amber);text-transform:uppercase">🥐 Snack</div>'+
-    '<div style="font-size:13px;font-weight:700;color:var(--navy);text-transform:uppercase">🍱 Meal</div>'+
-    '</div>';
+  var hdrs='<div style="display:grid;grid-template-columns:80px 1fr 1fr;gap:8px;padding-bottom:8px;border-bottom:2px solid var(--border);margin-bottom:4px;">' +
+    '<div style="font-size:10px;font-weight:700;color:var(--text-3);text-transform:uppercase">Day</div>' +
+    '<div style="font-size:10px;font-weight:700;color:var(--amber);text-transform:uppercase">🥐 Snack</div>' +
+    '<div style="font-size:10px;font-weight:700;color:var(--navy);text-transform:uppercase">🍱 Meal</div></div>';
   var rows='';
   for(var i=0;i<7;i++){
     var dt=new Date(mon); dt.setDate(mon.getDate()+i);
@@ -1136,26 +944,29 @@ function renderCalWeek() {
     var day=byDate[rk]||null;
     var isT=dt.toDateString()===new Date().toDateString();
     var dayLbl=DAYS[i]+' '+dt.getDate()+' '+dt.toLocaleDateString('en-GB',{month:'short'});
-    rows+='<div style="display:grid;grid-template-columns:64px 1fr 1fr;gap:8px;padding:10px 0;border-bottom:1px solid var(--surface-2);">';
-    rows+='<div style="font-size:14px;font-weight:600;color:'+(isT?'var(--navy)':'var(--text-3)')+';padding-top:3px">'+dayLbl+(isT?' ✦':'')+'</div>';
-    // Snack
+    rows+='<div style="display:grid;grid-template-columns:80px 1fr 1fr;gap:8px;padding:10px 0;border-bottom:1px solid var(--surface-2);">';
+    rows+='<div style="font-size:11px;font-weight:600;color:'+(isT?'var(--navy)':'var(--text-3)')+';padding-top:3px">'+dayLbl+(isT?' ✦':'')+'</div>';
+    // Snack col
     rows+='<div>';
     if(day&&day.snack&&day.snack.length){
       day.snack.forEach(function(e){
-        rows+='<div style="font-size:14px;font-weight:500;color:var(--amber);margin-bottom:3px">🥐 '+cap(e.menuName)+'</div>';
-        if(e.components&&e.components.length) rows+='<div style="font-size:13px;color:var(--text-3);margin-bottom:4px">'+e.components.slice(0,4).join(' · ')+'</div>';
+        rows+='<div style="font-size:12px;font-weight:500;color:var(--amber);margin-bottom:2px">🥐 '+cap(e.menuName)+'</div>';
+        if(e.components&&e.components.length) rows+='<div style="font-size:10px;color:var(--text-3);margin-bottom:3px">'+e.components.slice(0,4).join(' · ')+'</div>';
+        // FIX #3: tombol hapus di week view
+        rows+='<button class="btn-del" onclick="confirmDelete(\''+esc(e.date)+'\',\''+e.type+'\',\''+esc(e.menuName)+'\')">🗑 Delete</button>';
       });
-    } else rows+='<span style="font-size:13px;color:var(--text-3);font-style:italic">—</span>';
+    } else rows+='<span style="font-size:11px;color:var(--text-3);font-style:italic">—</span>';
     rows+='</div>';
-    // Meal
+    // Meal col
     rows+='<div>';
     if(day&&day.meal&&day.meal.length){
       day.meal.forEach(function(e){
-        rows+='<div style="font-size:14px;font-weight:500;color:var(--navy);margin-bottom:3px">🍱 '+cap(e.menuName)+'</div>';
+        rows+='<div style="font-size:12px;font-weight:500;color:var(--navy);margin-bottom:2px">🍱 '+cap(e.menuName)+'</div>';
+        rows+='<button class="btn-del" onclick="confirmDelete(\''+esc(e.date)+'\',\''+e.type+'\',\''+esc(e.menuName)+'\')">🗑 Delete</button>';
       });
       if(day.meal[0]&&day.meal[0].components&&day.meal[0].components.length)
         rows+='<div style="font-size:10px;color:var(--text-3)">'+day.meal[0].components.slice(0,4).join(' · ')+'</div>';
-    } else rows+='<span style="font-size:13px;color:var(--text-3);font-style:italic">—</span>';
+    } else rows+='<span style="font-size:11px;color:var(--text-3);font-style:italic">—</span>';
     rows+='</div>';
     rows+='</div>';
   }
@@ -1163,30 +974,38 @@ function renderCalWeek() {
 }
 
 // ═══════════════════════════════════════════════════
-//  DAY MODAL
+//  DAY MODAL — FIX #2 + FIX #3
 // ═══════════════════════════════════════════════════
 function openDayModal(rawKey) {
   if(!DATA||!DATA.byDate) return;
   var day=DATA.byDate[rawKey]; if(!day) return;
-  var d=new Date(rawKey+'T00:00:00');
+  // FIX #7: parse date dengan explicit timezone offset agar tidak off-by-one
+  var d=new Date(rawKey+'T12:00:00');
   var display=isNaN(d.getTime())?rawKey:d.toLocaleDateString('en-GB',{weekday:'long',day:'2-digit',month:'long',year:'numeric'});
   document.getElementById('modalDate').textContent='📅 '+display;
   var html='';
   if(day.snack&&day.snack.length){
     html+='<div style="margin-bottom:12px"><div style="font-size:10px;font-weight:700;color:var(--amber);text-transform:uppercase;margin-bottom:8px">🥐 Snack</div>';
     day.snack.forEach(function(e){
-      html+='<div class="modal-item"><div class="modal-item-name">'+cap(e.menuName)+'</div>';
-      if(e.components&&e.components.length) html+='<div class="modal-item-comps">'+e.components.join(', ')+'</div>';
-      html+='</div>';
+      html+='<div class="modal-item">' +
+        '<div><div class="modal-item-name">'+cap(e.menuName)+'</div>' +
+        (e.components&&e.components.length?'<div class="modal-item-comps">'+e.components.join(', ')+'</div>':'') +
+        '</div>' +
+        // FIX #3: delete button di modal
+        '<button class="btn-del" onclick="confirmDelete(\''+esc(e.date)+'\',\''+e.type+'\',\''+esc(e.menuName)+'\');closeDayModal()">🗑 Delete</button>' +
+        '</div>';
     });
     html+='</div>';
   }
   if(day.meal&&day.meal.length){
     html+='<div><div style="font-size:10px;font-weight:700;color:var(--navy);text-transform:uppercase;margin-bottom:8px">🍱 Meal</div>';
     day.meal.forEach(function(e){
-      html+='<div class="modal-item"><div class="modal-item-name">'+cap(e.menuName)+'</div>';
-      if(e.components&&e.components.length) html+='<div class="modal-item-comps">'+e.components.join(', ')+'</div>';
-      html+='</div>';
+      html+='<div class="modal-item">' +
+        '<div><div class="modal-item-name">'+cap(e.menuName)+'</div>' +
+        (e.components&&e.components.length?'<div class="modal-item-comps">'+e.components.join(', ')+'</div>':'') +
+        '</div>' +
+        '<button class="btn-del" onclick="confirmDelete(\''+esc(e.date)+'\',\''+e.type+'\',\''+esc(e.menuName)+'\');closeDayModal()">🗑 Delete</button>' +
+        '</div>';
     });
     html+='</div>';
   }
@@ -1197,19 +1016,44 @@ function openDayModal(rawKey) {
 function closeDayModal() { document.getElementById('dayModal').classList.remove('show'); }
 
 // ═══════════════════════════════════════════════════
-//  WEEKLY LIST
+//  DELETE — FIX #3
+// ═══════════════════════════════════════════════════
+function confirmDelete(date, type, menuName) {
+  if (!confirm('Delete "' + cap(menuName) + '" (' + type + ') on ' + date + '?')) return;
+  deleteEntry(date, type, menuName);
+}
+
+function deleteEntry(date, type, menuName) {
+  var params = new URLSearchParams({
+    action:   'deletemenu',
+    date:     date,
+    type:     type,
+    menuname: menuName
+  });
+  fetch(GAS_URL + '?' + params.toString(), { redirect: 'follow' })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      if (data.success) {
+        toast('Entry deleted.', 'ok');
+        loadData(); // FIX #3: reload fresh dari sheet setelah delete
+      } else {
+        toast('Delete failed: ' + (data.message || 'Unknown error'), 'err');
+      }
+    })
+    .catch(function(e) { toast('Network error: ' + e.message, 'err'); });
+}
+
+// ═══════════════════════════════════════════════════
+//  WEEKLY LIST — FIX #3: tambah tombol hapus per entry
 // ═══════════════════════════════════════════════════
 function renderWeekly() {
   var container=document.getElementById('weeklyList');
-  if(!DATA||!DATA.byWeek){ container.innerHTML='<div class="empty"><span class="empty-icon">📋</span>No menu data available.</div>'; return; }
-
-  // Filter to selected week or show all — skip invalid NaN keys
+  if(!DATA||!DATA.byWeek){container.innerHTML='<div class="empty"><span class="empty-icon">📋</span>No menu data available.</div>';return;}
   var keys=Object.keys(DATA.byWeek).filter(function(k){
     return k && !k.includes('NaN') && /^W\d{4}-\d{2}$/.test(k);
   }).sort();
   if(selWeek) keys=keys.filter(function(k){return k===selWeek;});
-  if(!keys.length){ container.innerHTML='<div class="empty"><span class="empty-icon">📋</span>No data for this week.</div>'; return; }
-
+  if(!keys.length){container.innerHTML='<div class="empty"><span class="empty-icon">📋</span>No data for this week.</div>';return;}
   container.innerHTML=keys.map(function(wk){
     var w=DATA.byWeek[wk];
     var dayMap={};
@@ -1222,27 +1066,45 @@ function renderWeekly() {
     var dayKeys=Object.keys(dayMap).sort();
     var rows=dayKeys.map(function(dk){
       var day=dayMap[dk];
+      // Snack column
       var snH=day.snack.length
-        ?'<div style="font-size:12px;font-weight:500;color:var(--amber)">🥐 '+cap(day.snack[0].menuName)+'</div>'+
-          (day.snack[0].components&&day.snack[0].components.length?'<div style="font-size:10px;color:var(--text-3)">'+day.snack[0].components.slice(0,4).join(' · ')+'</div>':'')
-        :'<span style="font-size:13px;color:var(--text-3);font-style:italic">No snack</span>';
+        ? day.snack.map(function(e){
+            return '<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:6px;margin-bottom:4px">' +
+              '<div>' +
+                '<div style="font-size:12px;font-weight:500;color:var(--amber)">🥐 '+cap(e.menuName)+'</div>' +
+                (e.components&&e.components.length?'<div style="font-size:10px;color:var(--text-3)">'+e.components.slice(0,4).join(' · ')+'</div>':'') +
+              '</div>' +
+              '<button class="btn-del" onclick="confirmDelete(\''+esc(e.date)+'\',\''+e.type+'\',\''+esc(e.menuName)+'\')">🗑</button>' +
+              '</div>';
+          }).join('')
+        : '<span style="font-size:11px;color:var(--text-3);font-style:italic">No snack</span>';
+      // Meal column
       var mlH=day.meal.length
-        ?day.meal.map(function(m){return'<div style="font-size:12px;font-weight:500;color:var(--navy)">🍱 '+cap(m.menuName)+'</div>';}).join('')+
-          (day.meal[0].components&&day.meal[0].components.length?'<div style="font-size:10px;color:var(--text-3)">'+day.meal[0].components.slice(0,3).join(' · ')+'</div>':'')
-        :'<span style="font-size:13px;color:var(--text-3);font-style:italic">No meal</span>';
-      return '<div class="day-row"><div><div class="day-label">'+day.dateStr+'</div></div>'+
-        '<div class="menu-pill-wrap">'+snH+'</div>'+
-        '<div class="menu-pill-wrap">'+mlH+'</div></div>';
+        ? day.meal.map(function(e){
+            return '<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:6px;margin-bottom:4px">' +
+              '<div>' +
+                '<div style="font-size:12px;font-weight:500;color:var(--navy)">🍱 '+cap(e.menuName)+'</div>' +
+                (e.components&&e.components.length?'<div style="font-size:10px;color:var(--text-3)">'+e.components.slice(0,3).join(' · ')+'</div>':'') +
+              '</div>' +
+              '<button class="btn-del" onclick="confirmDelete(\''+esc(e.date)+'\',\''+e.type+'\',\''+esc(e.menuName)+'\')">🗑</button>' +
+              '</div>';
+          }).join('')
+        : '<span style="font-size:11px;color:var(--text-3);font-style:italic">No meal</span>';
+      return '<div class="day-row">' +
+        '<div><div class="day-label">'+day.dateStr+'</div></div>' +
+        '<div class="menu-pill-wrap">'+snH+'</div>' +
+        '<div class="menu-pill-wrap">'+mlH+'</div>' +
+        '</div>';
     }).join('');
-    return '<div class="week-card">'+
-      '<div class="week-hdr">'+
-        '<span class="week-hdr-title">'+wk+'</span>'+
-        '<span class="week-hdr-range">'+(w.label||weekLabel(wk))+'</span>'+
-      '</div>'+
-      '<div class="week-body">'+
-        '<div class="day-row" style="font-size:13px;font-weight:700;color:var(--text-3);text-transform:uppercase;padding-bottom:8px">'+
-          '<div>Date</div><div>🥐 Snack</div><div>🍱 Meal</div></div>'+
-        rows+
+    return '<div class="week-card">' +
+      '<div class="week-hdr">' +
+        '<span class="week-hdr-title">'+wk+'</span>' +
+        '<span class="week-hdr-range">'+(w.label||weekLabel(wk))+'</span>' +
+      '</div>' +
+      '<div class="week-body">' +
+        '<div class="day-row" style="font-size:10px;font-weight:700;color:var(--text-3);text-transform:uppercase;padding-bottom:6px">' +
+          '<div>Date</div><div>🥐 Snack</div><div>🍱 Meal</div></div>' +
+        rows +
       '</div></div>';
   }).join('');
 }
@@ -1267,7 +1129,7 @@ function addComp() {
 function removeComp(i) { components.splice(i,1); renderCompTags(); }
 function renderCompTags() {
   document.getElementById('compTags').innerHTML=components.map(function(c,i){
-    return '<span class="comp-tag">'+c+'<button onclick="removeComp('+i+')">×</button></span>';
+    return '<span class="comp-tag">'+esc(c)+'<button onclick="removeComp('+i+')">×</button></span>';
   }).join('');
 }
 function submitManual() {
@@ -1275,7 +1137,7 @@ function submitManual() {
   var name=document.getElementById('menuName').value.trim();
   if(!date||!name){toast('Please fill date and menu name.','err');return;}
   saveEntries([{date:date,type:activeType,menuName:name,components:components.slice()}],function(){
-    document.getElementById('menuName').value=''; components=[]; renderCompTags(); loadData('');
+    document.getElementById('menuName').value=''; components=[]; renderCompTags(); loadData();
   });
 }
 
@@ -1293,11 +1155,11 @@ function updatePlaceholderAndHint() {
   var ta=document.getElementById('pasteArea'), hint=document.getElementById('pasteHint');
   if(!ta||!hint) return;
   if(parseMode==='auto'){
-    ta.placeholder=['Contoh Snack (Auto mode):','','20-Apr-26   Bubur ayam','20-Apr-26   Kuah kaldu','20-Apr-26   Sambal','20-Apr-26   Kerupuk','','Baris pertama per tanggal = menu utama.','Baris berikutnya = komponen otomatis.'].join('\n');
-    hint.innerHTML='<strong>Auto mode:</strong> Baris <em>pertama</em> setiap tanggal = menu utama. Semua baris berikutnya = komponen. Cocok untuk copy-paste langsung.';
+    ta.placeholder='Contoh Snack (Auto mode):\n\n20-Apr-26\tBubur ayam\n20-Apr-26\tKuah kaldu\n20-Apr-26\tSambal\n20-Apr-26\tKerupuk\n\nBaris pertama per tanggal = menu utama.\nBaris berikutnya = komponen otomatis.';
+    hint.innerHTML='<strong>Auto mode:</strong> Baris <em>pertama</em> setiap tanggal = menu utama. Semua baris berikutnya = komponen.';
   } else {
-    ta.placeholder=['Contoh Remark mode:','','20-Apr-26   Bubur ayam [s]','20-Apr-26   Kuah kaldu [c]','20-Apr-26   Sambal [c]','20-Apr-26   Kerupuk [c]','','14-Apr-26   Chicken yakiniku [s]','14-Apr-26   Fu yung hai [s]','14-Apr-26   Nasi putih [c]','14-Apr-26   Melon [c]'].join('\n');
-    hint.innerHTML='<strong>Remark mode:</strong> Tag <code>[s]</code> = menu utama, <code>[c]</code> = komponen. Admin yang menentukan sendiri.';
+    ta.placeholder='Contoh Remark mode:\n\n20-Apr-26\tBubur ayam [s]\n20-Apr-26\tKuah kaldu [c]\n20-Apr-26\tSambal [c]\n\n14-Apr-26\tChicken yakiniku [s]\n14-Apr-26\tNasi putih [c]';
+    hint.innerHTML='<strong>Remark mode:</strong> Tag <code>[s]</code> = menu utama, <code>[c]</code> = komponen.';
   }
 }
 function parsePaste() {
@@ -1348,18 +1210,18 @@ function parseRemark(raw) {
     } else {
       var target=lastByDate[date]||(result.length?result[result.length-1]:null);
       if(target) target.components.push(name);
-      else { var e={date:date,type:pasteType,menuName:name,components:[]}; result.push(e); lastByDate[date]=e; }
+      else { var e2={date:date,type:pasteType,menuName:name,components:[]}; result.push(e2); lastByDate[date]=e2; }
     }
   });
   return result;
 }
 function showParsedPreview() {
-  var note='<div style="background:var(--navy-lt);border:1px solid var(--border);border-radius:7px;padding:8px 12px;margin-bottom:10px;font-size:11px;color:var(--text-2);">'+
-    (parseMode==='remark'?'🏷️ Remark':'🤖 Auto')+' mode · <strong>'+parsedEntries.length+' main menu(s)</strong> · '+
+  var note='<div style="background:var(--navy-lt);border:1px solid var(--border);border-radius:7px;padding:8px 12px;margin-bottom:10px;font-size:11px;color:var(--text-2);">' +
+    (parseMode==='remark'?'🏷️ Remark':'🤖 Auto')+' mode · <strong>'+parsedEntries.length+' main menu(s)</strong> · ' +
     parsedEntries.reduce(function(a,e){return a+e.components.length;},0)+' component(s)</div>';
   document.getElementById('parsedList').innerHTML=note+parsedEntries.map(function(e){
     var comp=e.components.length?'<div class="parsed-comp">📎 '+e.components.join(' · ')+'</div>':'';
-    return '<div class="parsed-item"><span class="parsed-date">'+e.date+'</span>'+
+    return '<div class="parsed-item"><span class="parsed-date">'+e.date+'</span>' +
       '<div><div class="parsed-menu"><span class="badge '+(e.type==='snack'?'b-snack':'b-meal')+'">'+e.type+'</span> <strong>'+cap(e.menuName)+'</strong></div>'+comp+'</div></div>';
   }).join('');
   document.getElementById('parsedPreview').style.display='block';
@@ -1369,7 +1231,7 @@ function submitParsed() {
   saveEntries(parsedEntries,function(){
     document.getElementById('pasteArea').value='';
     document.getElementById('parsedPreview').style.display='none';
-    parsedEntries=[]; loadData(''); openTab('analysis');
+    parsedEntries=[]; loadData(); openTab('analysis');
   });
 }
 
@@ -1416,15 +1278,17 @@ function tryParseDate(str) {
   m=str.match(/^(\d{1,2})[-\/]([A-Za-z]{3})[-\/](\d{2,4})$/);
   if(m){ var mo=months3[m[2].toLowerCase()]; if(mo===undefined)return null; var yr=parseInt(m[3]);if(yr<100)yr+=2000; var dt=new Date(yr,mo,parseInt(m[1]));return isNaN(dt.getTime())?null:toYMD(dt); }
   m=str.match(/^(\d{4})[-\/](\d{1,2})[-\/](\d{1,2})$/);
-  if(m){ var dt=new Date(parseInt(m[1]),parseInt(m[2])-1,parseInt(m[3]));return isNaN(dt.getTime())?null:toYMD(dt); }
+  if(m){ var dt2=new Date(parseInt(m[1]),parseInt(m[2])-1,parseInt(m[3]));return isNaN(dt2.getTime())?null:toYMD(dt2); }
   m=str.match(/^(\d{1,2})[-\/](\d{1,2})[-\/](\d{2,4})$/);
-  if(m){ var yr=parseInt(m[3]);if(yr<100)yr+=2000; var dt=new Date(yr,parseInt(m[2])-1,parseInt(m[1]));return isNaN(dt.getTime())?null:toYMD(dt); }
+  if(m){ var yr2=parseInt(m[3]);if(yr2<100)yr2+=2000; var dt3=new Date(yr2,parseInt(m[2])-1,parseInt(m[1]));return isNaN(dt3.getTime())?null:toYMD(dt3); }
   return null;
 }
 function toYMD(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
 function cap(s){ if(!s)return''; return s.charAt(0).toUpperCase()+s.slice(1).toLowerCase(); }
-function monthToNum(ms){ if(!ms)return 0; var mn=['January','February','March','April','May','June','July','August','September','October','November','December']; var p=ms.split(' '); var i=mn.indexOf(p[0]); return(parseInt(p[1]||0)*12)+(i>=0?i:0); }
+// FIX #4: esc() helper untuk HTML attribute escaping — menghindari XSS dan quote-breaking di onclick
+function esc(s){ return String(s||'').replace(/'/g,'&apos;').replace(/"/g,'&quot;'); }
 function toast(msg,type){ var t=document.getElementById('toast'); t.textContent=msg; t.className='toast '+(type||''); t.classList.add('show'); setTimeout(function(){t.classList.remove('show');},3200); }
+// FIX #6: monthToNum dihapus karena tidak dipakai — bersihkan dead code
 </script>
 </body>
 </html>
