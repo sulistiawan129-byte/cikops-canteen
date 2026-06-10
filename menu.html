@@ -416,25 +416,40 @@ select.inp{cursor:pointer;}
         <div class="card-sub">Paste menu data in the format from your records</div>
 
         <div class="form-section">
-          <label class="form-label">Type</label>
+          <label class="form-label">Category</label>
           <div class="type-toggle">
             <button class="type-btn active-snack" id="pasteTypeSnack" onclick="setPasteType('snack')">🥐 Snack</button>
             <button class="type-btn" id="pasteTypeMeal" onclick="setPasteType('meal')">🍱 Meal</button>
           </div>
         </div>
 
+        <!-- Parse mode toggle -->
+        <div class="form-section">
+          <label class="form-label">Parse Mode</label>
+          <div style="display:flex;flex-direction:column;gap:6px;">
+            <label style="display:flex;align-items:flex-start;gap:8px;cursor:pointer;padding:9px 12px;border:2px solid var(--border);border-radius:8px;transition:border-color .12s;" id="modeAutoLabel">
+              <input type="radio" name="parseMode" value="auto" id="modeAuto" checked onchange="setParseMode('auto')" style="margin-top:2px;flex-shrink:0;">
+              <div>
+                <div style="font-size:12px;font-weight:600;color:var(--text-1);">🤖 Auto — First line = main, rest = components</div>
+                <div style="font-size:10px;color:var(--text-3);margin-top:1px;">Baris pertama per tanggal = menu utama. Semua baris berikutnya = komponen.</div>
+              </div>
+            </label>
+            <label style="display:flex;align-items:flex-start;gap:8px;cursor:pointer;padding:9px 12px;border:2px solid var(--border);border-radius:8px;transition:border-color .12s;" id="modeRemarkLabel">
+              <input type="radio" name="parseMode" value="remark" id="modeRemark" onchange="setParseMode('remark')" style="margin-top:2px;flex-shrink:0;">
+              <div>
+                <div style="font-size:12px;font-weight:600;color:var(--text-1);">🏷️ Remark — Tag each line manually</div>
+                <div style="font-size:10px;color:var(--text-3);margin-top:1px;">Tambah tag <code style="background:var(--surface-2);padding:1px 4px;border-radius:3px;">[s]</code> untuk snack utama atau <code style="background:var(--surface-2);padding:1px 4px;border-radius:3px;">[c]</code> untuk komponen di tiap baris.</div>
+              </div>
+            </label>
+          </div>
+        </div>
+
         <div class="form-section">
           <label class="form-label">Paste your menu data</label>
           <div class="paste-wrap">
-            <textarea class="paste-area" id="pasteArea" placeholder="Format contoh:&#10;&#10;20-Apr-26&#9;Bubur ayam&#10;20-Apr-26&#9;Kuah kaldu&#10;20-Apr-26&#9;Sambal&#10;20-Apr-26&#9;Kerupuk&#10;&#10;atau&#10;&#10;14-Apr-26&#9;Chicken yakiniku&#10;&#9;Egg drop soup&#10;&#9;Nasi putih&#10;&#9;Melon"></textarea>
+            <textarea class="paste-area" id="pasteArea" placeholder="Loading…"></textarea>
           </div>
-          <p class="paste-hint">
-            Baris pertama dengan tanggal = menu utama.<br>
-            Baris berikutnya tanpa tanggal = komponen/pendukung.<br>
-            Pisah tanggal &amp; nama dengan Tab atau spasi.<br>
-            <span style="color:var(--green);font-weight:500">✓ Auto-detect:</span>
-            Kerupuk, sambal, nasi, melon, dll otomatis jadi komponen — bukan menu utama.
-          </p>
+          <div id="pasteHint" class="paste-hint"></div>
           <button class="parse-btn" onclick="parsePaste()">🔍 Preview & Parse</button>
         </div>
 
@@ -945,12 +960,104 @@ function submitManual() {
 // ══════════════════════════════════════════════
 //  INPUT — BULK PASTE
 // ══════════════════════════════════════════════
+var parseMode = 'auto'; // 'auto' | 'remark'
+
+function setParseMode(m) {
+  parseMode = m;
+
+  // Update radio label border highlight
+  var autoLbl   = document.getElementById('modeAutoLabel');
+  var remarkLbl = document.getElementById('modeRemarkLabel');
+  if (autoLbl)   autoLbl.style.borderColor   = (m === 'auto')   ? 'var(--navy)' : 'var(--border)';
+  if (remarkLbl) remarkLbl.style.borderColor  = (m === 'remark') ? 'var(--navy)' : 'var(--border)';
+
+  updatePlaceholderAndHint();
+}
+
+function updatePlaceholderAndHint() {
+  var ta   = document.getElementById('pasteArea');
+  var hint = document.getElementById('pasteHint');
+  if (!ta || !hint) return;
+
+  if (parseMode === 'auto') {
+    ta.placeholder =
+      'Contoh Snack (Auto mode):
+
+' +
+      '20-Apr-26	Bubur ayam
+' +
+      '20-Apr-26	Kuah kaldu
+' +
+      '20-Apr-26	Sambal
+' +
+      '20-Apr-26	Kerupuk
+
+' +
+      'Baris pertama per tanggal = menu utama.
+' +
+      'Baris berikutnya = komponen otomatis.';
+    hint.innerHTML =
+      '📌 <strong>Auto mode:</strong> Baris <em>pertama</em> setiap tanggal = menu utama. ' +
+      'Semua baris berikutnya dengan tanggal yang sama = komponen. ' +
+      'Cocok untuk format copy-paste langsung dari catatan harian.';
+  } else {
+    ta.placeholder =
+      'Contoh Remark mode:
+
+' +
+      '20-Apr-26	Bubur ayam [s]
+' +
+      '20-Apr-26	Kuah kaldu [c]
+' +
+      '20-Apr-26	Sambal [c]
+' +
+      '20-Apr-26	Kerupuk [c]
+
+' +
+      '14-Apr-26	Chicken yakiniku [s]
+' +
+      '14-Apr-26	Fu yung hai [s]
+' +
+      '14-Apr-26	Nasi putih [c]
+' +
+      '14-Apr-26	Melon [c]';
+    hint.innerHTML =
+      '🏷️ <strong>Remark mode:</strong> Tambah tag di akhir setiap baris — ' +
+      '<code style="background:var(--surface-2);padding:1px 5px;border-radius:3px;font-size:10px">[s]</code> = menu utama, ' +
+      '<code style="background:var(--surface-2);padding:1px 5px;border-radius:3px;font-size:10px">[c]</code> = komponen. ' +
+      'Lebih presisi, admin yang menentukan sendiri.';
+  }
+}
+
+// Init placeholder on page load
+window.addEventListener('DOMContentLoaded', function() {
+  setParseMode('auto');
+});
+
 function parsePaste() {
-  var raw   = document.getElementById('pasteArea').value.trim();
+  var raw = document.getElementById('pasteArea').value.trim();
   if (!raw) { toast('Paste some menu data first.', 'err'); return; }
-  var lines = raw.split('\n');
+
   parsedEntries = [];
-  var currentDate = '', currentMenu = null;
+
+  if (parseMode === 'remark') {
+    parsedEntries = parseRemark(raw);
+  } else {
+    parsedEntries = parseAuto(raw);
+  }
+
+  if (!parsedEntries.length) {
+    toast('Could not parse any entries. Check format.', 'err');
+    return;
+  }
+  showParsedPreview();
+}
+
+// ── AUTO MODE: first line per date = main, rest = components
+function parseAuto(raw) {
+  var lines   = raw.split('\n');
+  var result  = [];
+  var dateMap = {}; // track first menu per date
 
   lines.forEach(function(line) {
     if (!line.trim()) return;
@@ -958,88 +1065,85 @@ function parsePaste() {
     var tabIdx = line.indexOf('\t');
     var part1  = tabIdx > -1 ? line.substring(0, tabIdx).trim() : '';
     var part2  = tabIdx > -1 ? line.substring(tabIdx+1).trim() : line.trim();
+    var text   = part2 || part1;
+    if (!text) return;
 
-    var tryDate = tryParseDate(part1);
+    var tryDate = tryParseDate(part1) || (tabIdx === -1 ? null : null);
+
+    // Also try parsing date from beginning of line without tab
+    if (!tryDate && !tabIdx && part1) tryDate = tryParseDate(part1);
+
+    // Lines that start with a date
     if (tryDate) {
-      currentDate = tryDate;
-      if (part2) {
-        if (isAccompaniment(part2)) {
-          // It's a standard side — attach to current menu as component
-          if (currentMenu) currentMenu.components.push(part2);
-        } else {
-          // It's a real menu — save previous and start new
-          if (currentMenu) parsedEntries.push(currentMenu);
-          currentMenu = { date:currentDate, type:pasteType, menuName:part2, components:[] };
-        }
+      if (!dateMap[tryDate]) {
+        // First item this date = main menu
+        var entry = { date:tryDate, type:pasteType, menuName:text, components:[] };
+        result.push(entry);
+        dateMap[tryDate] = entry;
+      } else {
+        // Subsequent items same date = component of first menu
+        dateMap[tryDate].components.push(text);
       }
     } else {
-      var text = line.trim();
-      if (!text) return;
-
-      var isIndented = line.startsWith('\t') || line.startsWith('  ');
-
-      if (isIndented) {
-        // Indented = always a component, regardless of whether it's an accompaniment
-        if (currentMenu) currentMenu.components.push(text);
-        else if (currentDate) {
-          if (currentMenu) parsedEntries.push(currentMenu);
-          currentMenu = { date:currentDate, type:pasteType, menuName:text, components:[] };
-        }
-      } else {
-        // Non-indented, no date
-        if (isAccompaniment(text)) {
-          // Standard side — add as component to current menu
-          if (currentMenu) currentMenu.components.push(text);
-        } else {
-          // Real menu item — new entry on same date
-          if (currentDate) {
-            if (currentMenu) parsedEntries.push(currentMenu);
-            currentMenu = { date:currentDate, type:pasteType, menuName:text, components:[] };
-          }
-        }
+      // No date — component of last entry
+      if (result.length) {
+        result[result.length - 1].components.push(line.trim());
       }
     }
   });
-  if (currentMenu) parsedEntries.push(currentMenu);
+  return result;
+}
+
+// ── REMARK MODE: use [s] / [c] tags
+function parseRemark(raw) {
+  var lines  = raw.split('\n');
+  var result = [];
+  var lastMainByDate = {}; // date → last [s] entry
+
+  lines.forEach(function(line) {
+    var trimmed = line.trim();
+    if (!trimmed) return;
+
+    // Detect remark tag — [s] or [c] at end (case-insensitive)
+    var tagMatch = trimmed.match(/\[(s|c)\]\s*$/i);
+    var tag      = tagMatch ? tagMatch[1].toLowerCase() : null;
+    var nameRaw  = tag ? trimmed.replace(/\[(s|c)\]\s*$/i, '').trim() : trimmed;
+
+    // Extract date + name
+    var tabIdx  = nameRaw.indexOf('\t');
+    var part1   = tabIdx > -1 ? nameRaw.substring(0, tabIdx).trim() : '';
+    var part2   = tabIdx > -1 ? nameRaw.substring(tabIdx+1).trim() : nameRaw;
+    var tryDate = tryParseDate(part1);
+    var name    = tryDate ? part2 : nameRaw;
+    var date    = tryDate || (result.length ? result[result.length-1].date : '');
+
+    if (!name || !date) return;
+
+    if (tag === 's' || (!tag && !lastMainByDate[date])) {
+      // Main menu
+      var entry = { date:date, type:pasteType, menuName:name, components:[] };
+      result.push(entry);
+      lastMainByDate[date] = entry;
+    } else {
+      // Component — attach to last main of this date
+      var target = lastMainByDate[date] || (result.length ? result[result.length-1] : null);
+      if (target) target.components.push(name);
+      else {
+        // No main yet — create one
+        var entry = { date:date, type:pasteType, menuName:name, components:[] };
+        result.push(entry);
+        lastMainByDate[date] = entry;
+      }
+    }
+  });
+  return result;
+}
 
   if (!parsedEntries.length) { toast('Could not parse any entries. Check format.', 'err'); return; }
 
   // Show preview
   var preview = document.getElementById('parsedPreview');
-  // Count auto-classified accompaniments
-  var accompCount = 0;
-  parsedEntries.forEach(function(e) {
-    e.components.forEach(function(c) {
-      if (isAccompaniment(c)) accompCount++;
-    });
-  });
-
-  var accompNote = accompCount > 0
-    ? '<div style="background:var(--green-lt);border:1px solid #86efac;border-radius:7px;padding:8px 12px;margin-bottom:10px;font-size:11px;color:var(--green);">' +
-      '✓ <strong>' + accompCount + ' standard accompaniment(s)</strong> (kerupuk, sambal, nasi, dll) ' +
-      'auto-classified as components — not counted as main menu.</div>'
-    : '';
-
-  document.getElementById('parsedList').innerHTML = accompNote + parsedEntries.map(function(e) {
-    var compHtml = '';
-    if (e.components.length) {
-      var compItems = e.components.map(function(c) {
-        var isAcc = isAccompaniment(c);
-        return '<span style="' + (isAcc ? 'color:var(--text-3);font-style:italic' : '') + '">' +
-          (isAcc ? '🍽 ' : '') + c + '</span>';
-      }).join(', ');
-      compHtml = '<div class="parsed-comp">+ ' + compItems + '</div>';
-    }
-    return '<div class="parsed-item">' +
-      '<span class="parsed-date">' + e.date + '</span>' +
-      '<div><div class="parsed-menu">' +
-        '<span class="badge ' + (e.type==='snack'?'b-snack':'b-meal') + '">' + e.type + '</span> ' +
-        '<strong>' + cap(e.menuName) + '</strong></div>' +
-        compHtml +
-      '</div>' +
-      '</div>';
-  }).join('');
-  preview.style.display = 'block';
+  showParsedPreview();
 }
 
 function tryParseDate(str) {
@@ -1078,6 +1182,31 @@ function tryParseDate(str) {
     return isNaN(dt.getTime()) ? null : toYMD(dt);
   }
   return null;
+}
+
+function showParsedPreview() {
+  var modeLabel = parseMode === 'remark' ? '🏷️ Remark mode' : '🤖 Auto mode';
+  var modeNote  = '<div style="background:var(--navy-lt);border:1px solid var(--border);border-radius:7px;' +
+    'padding:8px 12px;margin-bottom:10px;font-size:11px;color:var(--text-2);">' +
+    modeLabel + ' · <strong>' + parsedEntries.length + ' main menu(s)</strong> detected — ' +
+    parsedEntries.reduce(function(a,e){return a+e.components.length;},0) + ' component(s)</div>';
+
+  document.getElementById('parsedList').innerHTML = modeNote + parsedEntries.map(function(e) {
+    var compHtml = e.components.length
+      ? '<div class="parsed-comp">📎 ' + e.components.join(' · ') + '</div>'
+      : '';
+    return '<div class="parsed-item">' +
+      '<span class="parsed-date">' + e.date + '</span>' +
+      '<div>' +
+        '<div class="parsed-menu">' +
+          '<span class="badge ' + (e.type==='snack'?'b-snack':'b-meal') + '">' + e.type + '</span> ' +
+          '<strong>' + cap(e.menuName) + '</strong>' +
+        '</div>' +
+        compHtml +
+      '</div>' +
+      '</div>';
+  }).join('');
+  document.getElementById('parsedPreview').style.display = 'block';
 }
 
 function submitParsed() {
