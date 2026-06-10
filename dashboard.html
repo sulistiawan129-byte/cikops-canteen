@@ -110,6 +110,8 @@ select.month-sel option{background:var(--surface);}
 /* CHART */
 .chart-box{position:relative;width:100%;}
 .chart-box canvas{display:block;width:100%!important;height:auto!important;}
+/* Size classes control visual expectation via aspectRatio in JS, not CSS crop */
+.chart-box.ch-sm canvas,.chart-box.ch-md canvas,.chart-box.ch-lg canvas,.chart-box.ch-donut canvas{display:block;}
 
 /* LEGEND */
 .legend{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:8px;}
@@ -319,7 +321,7 @@ var GAS_URL="https://script.google.com/macros/s/AKfycbywIW79lgCQOvlqUX0XuIsKk8A4
               <button class="ct-btn" id="snackLine" onclick="switchChart('snack','line')">Line</button>
             </div>
           </div>
-          <div class="chart-box"><canvas id="trendSnack"></canvas></div>
+          <div class="chart-box ch-lg"><canvas id="trendSnack"></canvas></div>
         </div>
         <div class="card">
           <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;">
@@ -329,7 +331,7 @@ var GAS_URL="https://script.google.com/macros/s/AKfycbywIW79lgCQOvlqUX0XuIsKk8A4
               <button class="ct-btn" id="mealLine" onclick="switchChart('meal','line')">Line</button>
             </div>
           </div>
-          <div class="chart-box"><canvas id="trendMeal"></canvas></div>
+          <div class="chart-box ch-lg"><canvas id="trendMeal"></canvas></div>
         </div>
       </div>
       <div class="g2 mb">
@@ -360,12 +362,12 @@ var GAS_URL="https://script.google.com/macros/s/AKfycbywIW79lgCQOvlqUX0XuIsKk8A4
         <div class="card">
           <div class="c-title">🥐 Snack Efficiency</div>
           <div class="c-sub">Consumed vs leftover rate</div>
-          <div class="chart-box"><canvas id="donutSnack"></canvas></div>
+          <div class="chart-box ch-donut"><canvas id="donutSnack"></canvas></div>
         </div>
         <div class="card">
           <div class="c-title">🍱 Meal Efficiency</div>
           <div class="c-sub">Consumed vs leftover rate</div>
-          <div class="chart-box"><canvas id="donutMeal"></canvas></div>
+          <div class="chart-box ch-donut"><canvas id="donutMeal"></canvas></div>
         </div>
         <div class="card">
           <div class="c-title">Monthly Efficiency Trend</div>
@@ -374,7 +376,7 @@ var GAS_URL="https://script.google.com/macros/s/AKfycbywIW79lgCQOvlqUX0XuIsKk8A4
             <span class="leg"><span class="leg-dot" style="background:#86efac"></span>Snack</span>
             <span class="leg"><span class="leg-dot" style="background:#93c5fd"></span>Meal</span>
           </div>
-          <div class="chart-box"><canvas id="monthlyChart"></canvas></div>
+          <div class="chart-box ch-sm"><canvas id="monthlyChart"></canvas></div>
         </div>
       </div>
       <div class="g2 mb">
@@ -759,10 +761,9 @@ function makeTrendChart(canvasId,rows,ordKey,conKey,lftKey,ordColor,conColor,cha
   var c=gc(), ctx=document.getElementById(canvasId).getContext('2d');
   var isBar=chartType==='bar';
   var datasets = isBar ? [
-    // Grouped bar: Ordered (dark) + Consumed (mid) side by side, Leftover stacked
-    {label:'Ordered', data:rows.map(function(r){return n(r[ordKey]);}),backgroundColor:ordColor+'cc',borderRadius:3,borderSkipped:false},
-    {label:'Consumed',data:rows.map(function(r){return n(r[conKey]);}),backgroundColor:conColor+'cc',borderRadius:3,borderSkipped:false},
-    {label:'Leftover',data:rows.map(function(r){return n(r[lftKey]);}),backgroundColor:'#fca5a599',borderRadius:3,borderSkipped:false}
+    {label:'Ordered', data:rows.map(function(r){return n(r[ordKey]);}),backgroundColor:ordColor+'bb',borderRadius:3,borderSkipped:false,maxBarThickness:18},
+    {label:'Consumed',data:rows.map(function(r){return n(r[conKey]);}),backgroundColor:conColor+'bb',borderRadius:3,borderSkipped:false,maxBarThickness:18},
+    {label:'Leftover',data:rows.map(function(r){return n(r[lftKey]);}),backgroundColor:'rgba(252,165,165,.55)',borderRadius:3,borderSkipped:false,maxBarThickness:18}
   ] : [
     {label:'Ordered', data:rows.map(function(r){return n(r[ordKey]);}),borderColor:ordColor,backgroundColor:ordColor+'18',borderWidth:2,pointRadius:2,tension:.3,fill:false},
     {label:'Consumed',data:rows.map(function(r){return n(r[conKey]);}),borderColor:conColor,backgroundColor:conColor+'18',borderWidth:1.5,borderDash:[4,3],pointRadius:0,tension:.3,fill:false},
@@ -772,7 +773,9 @@ function makeTrendChart(canvasId,rows,ordKey,conKey,lftKey,ordColor,conColor,cha
     type:isBar?'bar':'line',
     data:{labels:rows.map(function(r){return r.date;}),datasets:datasets},
     options:{
-      responsive:true,maintainAspectRatio:true,aspectRatio:2.2,animation:{duration:300},
+      responsive:true,maintainAspectRatio:true,aspectRatio:2.8,
+      layout:{padding:{top:2,bottom:2,left:0,right:0}},
+      animation:{duration:300},
       plugins:{
         legend:{display:true,position:'top',labels:{font:{size:10,family:"'Inter',sans-serif"},boxWidth:10,padding:8}},
         tooltip:{callbacks:{label:function(ctx){return ctx.dataset.label+': '+n(ctx.raw).toLocaleString();}}}
@@ -797,7 +800,8 @@ function makeDonut(canvasId,eff,colFill,colEmpty,old){
     type:'doughnut',
     data:{labels:['Consumed','Leftover'],datasets:[{data:[Math.max(0,eff),Math.max(0,100-eff)],backgroundColor:[colFill,colEmpty],borderWidth:0,cutout:'70%'}]},
     options:{
-      responsive:true,maintainAspectRatio:true,aspectRatio:1.4,animation:{duration:300},
+      responsive:true,maintainAspectRatio:true,aspectRatio:1.6,
+      layout:{padding:{top:4,bottom:4}},animation:{duration:300},
       plugins:{
         legend:{position:'bottom',labels:{font:{size:11,family:"'Inter',sans-serif"},boxWidth:10,padding:10}},
         tooltip:{callbacks:{label:function(ctx){return ctx.label+': '+parseFloat(ctx.raw).toFixed(1)+'%';}}}
@@ -822,13 +826,14 @@ function renderMonthly(mrows){
     data:{
       labels:mrows.map(function(r){return r.month;}),
       datasets:[
-        {label:'Snack',data:mrows.map(function(r){return n(r.snackEff);}),backgroundColor:'#1a6b3f99',borderRadius:4},
-        {label:'Meal', data:mrows.map(function(r){return n(r.mealEff);}), backgroundColor:'#00236699',borderRadius:4}
+        {label:'Snack',data:mrows.map(function(r){return n(r.snackEff);}),backgroundColor:'#1a6b3fbb',borderRadius:4,maxBarThickness:24},
+        {label:'Meal', data:mrows.map(function(r){return n(r.mealEff);}), backgroundColor:'#002366bb',borderRadius:4,maxBarThickness:24}
       ]
     },
     options:{
-      responsive:true,maintainAspectRatio:true,aspectRatio:2,animation:{duration:300},
-      plugins:{legend:{labels:{font:{size:10,family:"'Inter',sans-serif"},boxWidth:9,padding:8}}},
+      responsive:true,maintainAspectRatio:true,aspectRatio:2.4,
+      layout:{padding:{top:2,bottom:2}},animation:{duration:300},
+      plugins:{legend:{labels:{font:{size:10,family:"'Inter',sans-serif"},boxWidth:9,padding:8,color:isDark?'#8b949e':'#475569'}}},
       scales:{
         x:{grid:{display:false},ticks:{color:c.txt,font:{size:9,family:"'Inter',sans-serif"}}},
         y:{min:yMin,max:100,grid:{color:c.grid},ticks:{color:c.txt,font:{size:9,family:"'Inter',sans-serif"},callback:function(v){return v+'%';}}}
