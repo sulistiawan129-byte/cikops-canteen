@@ -431,7 +431,9 @@ select.inp{cursor:pointer;}
           <p class="paste-hint">
             Baris pertama dengan tanggal = menu utama.<br>
             Baris berikutnya tanpa tanggal = komponen/pendukung.<br>
-            Pisah tanggal & nama dengan Tab atau spasi.
+            Pisah tanggal &amp; nama dengan Tab atau spasi.<br>
+            <span style="color:var(--green);font-weight:500">✓ Auto-detect:</span>
+            Kerupuk, sambal, nasi, melon, dll otomatis jadi komponen — bukan menu utama.
           </p>
           <button class="parse-btn" onclick="parsePaste()">🔍 Preview & Parse</button>
         </div>
@@ -478,6 +480,37 @@ var calYear    = new Date().getFullYear();
 var calMonth   = new Date().getMonth(); // 0-based
 var isDark     = false;
 
+// ── STANDARD ACCOMPANIMENTS ──────────────────
+// Items in this list are NEVER treated as a main menu name.
+// They are always classified as components/sides automatically.
+var ACCOMPANIMENTS = [
+  // Staples
+  'nasi putih','nasi','nasi merah','nasi goreng',
+  // Condiments & sides
+  'kerupuk','kerupuk udang','kerupuk ikan','emping',
+  'sambal','sambal terasi','sambal bawang','sambal ijo','sambal merah',
+  'kecap','saus','saus pedas','saus tomat','acar',
+  // Beverages
+  'air putih','air mineral','teh','teh manis','teh tawar',
+  'jus','juice','susu',
+  // Common soup bases listed as sides
+  'kuah','kuah kaldu','kuah bening',
+  // Fruits often served as sides
+  'melon','semangka','pepaya','pisang','jeruk','apel','mangga',
+  // Other common fillers
+  'tempe goreng','tahu goreng','tempe','tahu',
+  'telur dadar','telur rebus','telur ceplok',
+  'lalapan','sayuran','salad',
+  'krupuk','crackers'
+];
+
+function isAccompaniment(name) {
+  var lower = name.trim().toLowerCase();
+  return ACCOMPANIMENTS.some(function(a) {
+    return lower === a || lower.startsWith(a + ' ') || lower.endsWith(' ' + a);
+  });
+}
+
 // ── INIT
 window.onload = function() {
   if (window.matchMedia('(prefers-color-scheme: dark)').matches) toggleTheme();
@@ -517,7 +550,15 @@ function loadData(month) {
 
   var url = GAS_URL + '?action=menu&month=' + encodeURIComponent(month);
   fetch(url, { redirect: 'follow' })
-    .then(function(r) { return r.json(); })
+    .then(function(r) {
+      var ct = r.headers.get('content-type') || '';
+      if (!ct.includes('json')) {
+        return r.text().then(function(t) {
+          throw new Error('GAS returned non-JSON. Redeploy may be needed. Preview: ' + t.substring(0,80));
+        });
+      }
+      return r.json();
+    })
     .then(function(data) {
       if (!data.success) throw new Error(data.message);
       DATA = data;
@@ -913,39 +954,48 @@ function parsePaste() {
 
   lines.forEach(function(line) {
     if (!line.trim()) return;
-    // Try to detect date at start of line
+
     var tabIdx = line.indexOf('\t');
     var part1  = tabIdx > -1 ? line.substring(0, tabIdx).trim() : '';
     var part2  = tabIdx > -1 ? line.substring(tabIdx+1).trim() : line.trim();
 
-    // Try parse date from part1
     var tryDate = tryParseDate(part1);
     if (tryDate) {
       currentDate = tryDate;
       if (part2) {
-        // This is the main menu line
-        if (currentMenu) parsedEntries.push(currentMenu);
-        currentMenu = { date:currentDate, type:pasteType, menuName:part2, components:[] };
+        if (isAccompaniment(part2)) {
+          // It's a standard side — attach to current menu as component
+          if (currentMenu) currentMenu.components.push(part2);
+        } else {
+          // It's a real menu — save previous and start new
+          if (currentMenu) parsedEntries.push(currentMenu);
+          currentMenu = { date:currentDate, type:pasteType, menuName:part2, components:[] };
+        }
       }
     } else {
-      // No date — might be a component or continuation
       var text = line.trim();
       if (!text) return;
-      // If starts with tab, it's a component
-      if (line.startsWith('\t') || line.startsWith('  ')) {
+
+      var isIndented = line.startsWith('\t') || line.startsWith('  ');
+
+      if (isIndented) {
+        // Indented = always a component, regardless of whether it's an accompaniment
         if (currentMenu) currentMenu.components.push(text);
-        else {
-          // First non-date line — treat as new menu on currentDate
+        else if (currentDate) {
+          if (currentMenu) parsedEntries.push(currentMenu);
+          currentMenu = { date:currentDate, type:pasteType, menuName:text, components:[] };
+        }
+      } else {
+        // Non-indented, no date
+        if (isAccompaniment(text)) {
+          // Standard side — add as component to current menu
+          if (currentMenu) currentMenu.components.push(text);
+        } else {
+          // Real menu item — new entry on same date
           if (currentDate) {
             if (currentMenu) parsedEntries.push(currentMenu);
             currentMenu = { date:currentDate, type:pasteType, menuName:text, components:[] };
           }
-        }
-      } else {
-        // Non-indented, no date — new menu same date
-        if (currentDate) {
-          if (currentMenu) parsedEntries.push(currentMenu);
-          currentMenu = { date:currentDate, type:pasteType, menuName:text, components:[] };
         }
       }
     }
@@ -956,13 +1006,36 @@ function parsePaste() {
 
   // Show preview
   var preview = document.getElementById('parsedPreview');
-  document.getElementById('parsedList').innerHTML = parsedEntries.map(function(e) {
+  // Count auto-classified accompaniments
+  var accompCount = 0;
+  parsedEntries.forEach(function(e) {
+    e.components.forEach(function(c) {
+      if (isAccompaniment(c)) accompCount++;
+    });
+  });
+
+  var accompNote = accompCount > 0
+    ? '<div style="background:var(--green-lt);border:1px solid #86efac;border-radius:7px;padding:8px 12px;margin-bottom:10px;font-size:11px;color:var(--green);">' +
+      '✓ <strong>' + accompCount + ' standard accompaniment(s)</strong> (kerupuk, sambal, nasi, dll) ' +
+      'auto-classified as components — not counted as main menu.</div>'
+    : '';
+
+  document.getElementById('parsedList').innerHTML = accompNote + parsedEntries.map(function(e) {
+    var compHtml = '';
+    if (e.components.length) {
+      var compItems = e.components.map(function(c) {
+        var isAcc = isAccompaniment(c);
+        return '<span style="' + (isAcc ? 'color:var(--text-3);font-style:italic' : '') + '">' +
+          (isAcc ? '🍽 ' : '') + c + '</span>';
+      }).join(', ');
+      compHtml = '<div class="parsed-comp">+ ' + compItems + '</div>';
+    }
     return '<div class="parsed-item">' +
       '<span class="parsed-date">' + e.date + '</span>' +
       '<div><div class="parsed-menu">' +
         '<span class="badge ' + (e.type==='snack'?'b-snack':'b-meal') + '">' + e.type + '</span> ' +
-        cap(e.menuName) + '</div>' +
-        (e.components.length ? '<div class="parsed-comp">+ ' + e.components.join(', ') + '</div>' : '') +
+        '<strong>' + cap(e.menuName) + '</strong></div>' +
+        compHtml +
       '</div>' +
       '</div>';
   }).join('');
@@ -1019,22 +1092,66 @@ function submitParsed() {
 }
 
 // ══════════════════════════════════════════════
-//  SAVE TO GAS
+//  SAVE TO GAS — chunked to avoid URL length limit
 // ══════════════════════════════════════════════
 function saveEntries(entries, cb) {
-  var payload = { entries: entries };
-  var url = GAS_URL + '?action=savemenu&payload=' + encodeURIComponent(JSON.stringify(payload));
-  fetch(url, { redirect: 'follow' })
-    .then(function(r) { return r.json(); })
-    .then(function(res) {
-      if (res.success) {
-        toast(res.message || 'Saved!', 'ok');
-        if (typeof cb === 'function') cb();
+  var CHUNK = 8; // max entries per request
+  var chunks = [];
+  for (var i = 0; i < entries.length; i += CHUNK) {
+    chunks.push(entries.slice(i, i + CHUNK));
+  }
+
+  var total   = chunks.length;
+  var done    = 0;
+  var errors  = [];
+
+  function sendChunk(idx) {
+    if (idx >= total) {
+      // All chunks done
+      if (errors.length) {
+        toast('Partial save — ' + errors.length + ' chunk(s) failed.', 'err');
       } else {
-        toast('Error: ' + res.message, 'err');
+        toast(entries.length + ' menu entries saved!', 'ok');
+        if (typeof cb === 'function') cb();
       }
-    })
-    .catch(function(e) { toast('Network error: ' + e.message, 'err'); });
+      return;
+    }
+
+    var payload = { entries: chunks[idx] };
+    var encoded = encodeURIComponent(JSON.stringify(payload));
+
+    // Safety: if encoded > 6000 chars, split further
+    if (encoded.length > 6000) {
+      // Split this chunk in half and re-queue
+      var half = Math.ceil(chunks[idx].length / 2);
+      var a    = chunks[idx].slice(0, half);
+      var b    = chunks[idx].slice(half);
+      chunks.splice(idx, 1, a, b);
+      total = chunks.length;
+      sendChunk(idx);
+      return;
+    }
+
+    var url = GAS_URL + '?action=savemenu&payload=' + encoded;
+    fetch(url, { redirect: 'follow' })
+      .then(function(r) {
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        return r.json();
+      })
+      .then(function(res) {
+        if (!res.success) errors.push(res.message);
+        done++;
+        if (total > 1) toast('Saving… ' + done + '/' + total, '');
+        sendChunk(idx + 1);
+      })
+      .catch(function(e) {
+        errors.push(e.message);
+        done++;
+        sendChunk(idx + 1);
+      });
+  }
+
+  sendChunk(0);
 }
 
 // ══════════════════════════════════════════════
