@@ -825,10 +825,8 @@ function renderWeekly() {
     document.getElementById('weeklyList').innerHTML = '<div class="empty"><span class="empty-icon">📋</span>No menu data available.</div>';
     return;
   }
-  var weeks = Object.keys(DATA.byWeek).sort(function(a,b) {
-    var wa = DATA.byWeek[a], wb = DATA.byWeek[b];
-    return (wa.year * 100 + wa.weekNum) - (wb.year * 100 + wb.weekNum);
-  });
+  // ISO week keys "W2026-17" sort correctly as strings (zero-padded)
+  var weeks = Object.keys(DATA.byWeek).sort();
 
   if (!weeks.length) {
     document.getElementById('weeklyList').innerHTML = '<div class="empty"><span class="empty-icon">📋</span>No weekly data for this period.</div>';
@@ -865,10 +863,18 @@ function renderWeekly() {
         '</div>';
     }).join('');
 
+    // Compute Mon-Sun range from first day in this week
+    var firstDateStr = dayKeys[0] ? dayKeys[0] : '';
+    var weekRange    = firstDateStr ? weekRangeLabel(firstDateStr.replace(/(\d+)\s(\w+)\s(\d+)/,
+      function(m, d, mon, y) {
+        var months = {Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11};
+        return new Date(parseInt(y), months[mon]||0, parseInt(d)).toISOString().split('T')[0];
+      })) : '';
+    var weekTitle = (w.label || ('Week ' + w.weekNum));
     return '<div class="week-card">' +
       '<div class="week-hdr">' +
-        '<span class="week-hdr-title">Week ' + w.weekNum + ' · ' + w.year + '</span>' +
-        '<span class="week-hdr-range">' + (dayKeys[0]||'') + ' – ' + (dayKeys[dayKeys.length-1]||'') + '</span>' +
+        '<span class="week-hdr-title">' + weekTitle + '</span>' +
+        '<span class="week-hdr-range">' + (w.label || weekRange || (dayKeys[0]+' – '+dayKeys[dayKeys.length-1])) + '</span>' +
       '</div>' +
       '<div class="week-body">' +
         '<div class="day-row" style="font-size:10px;font-weight:700;color:var(--text-3);text-transform:uppercase;padding-bottom:6px;">' +
@@ -1036,27 +1042,23 @@ function parsePaste() {
   showParsedPreview();
 }
 
-// ── AUTO MODE: first line per date = main, rest = components
+// ── AUTO MODE: first line per date = main menu, rest = components
 function parseAuto(raw) {
   var lines   = raw.split('\n');
   var result  = [];
-  var dateMap = {}; // track first menu per date
+  var dateMap = {}; // date string -> first entry (main menu)
 
   lines.forEach(function(line) {
     if (!line.trim()) return;
 
     var tabIdx = line.indexOf('\t');
-    var part1  = tabIdx > -1 ? line.substring(0, tabIdx).trim() : '';
-    var part2  = tabIdx > -1 ? line.substring(tabIdx+1).trim() : line.trim();
+    var part1  = tabIdx > -1 ? line.substring(0, tabIdx).trim() : line.trim();
+    var part2  = tabIdx > -1 ? line.substring(tabIdx+1).trim() : '';
     var text   = part2 || part1;
     if (!text) return;
 
-    var tryDate = tryParseDate(part1) || (tabIdx === -1 ? null : null);
+    var tryDate = tryParseDate(part1);
 
-    // Also try parsing date from beginning of line without tab
-    if (!tryDate && !tabIdx && part1) tryDate = tryParseDate(part1);
-
-    // Lines that start with a date
     if (tryDate) {
       if (!dateMap[tryDate]) {
         // First item this date = main menu
@@ -1064,17 +1066,60 @@ function parseAuto(raw) {
         result.push(entry);
         dateMap[tryDate] = entry;
       } else {
-        // Subsequent items same date = component of first menu
+        // Same date again = component of that date's main menu
         dateMap[tryDate].components.push(text);
       }
     } else {
-      // No date — component of last entry
-      if (result.length) {
-        result[result.length - 1].components.push(line.trim());
+      // No date = component of last entry
+      var txt = line.trim();
+      if (txt && result.length) {
+        result[result.length - 1].components.push(txt);
       }
     }
   });
   return result;
+}
+
+// ── ISO WEEK HELPERS (Mon-Sun rolling, mirrors Code.gs) ─────
+function getISOWeekNum(d) {
+  var date   = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+  var dayNum = date.getUTCDay() || 7;
+  date.setUTCDate(date.getUTCDate() + 4 - dayNum);
+  var yearStart = new Date(Date.UTC(date.getUTCFullYear(), 0, 1));
+  return Math.ceil((((date - yearStart) / 86400000) + 1) / 7);
+}
+function getISOWeekYear(d) {
+  var date   = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+  var dayNum = date.getUTCDay() || 7;
+  date.setUTCDate(date.getUTCDate() + 4 - dayNum);
+  return date.getUTCFullYear();
+}
+function getMondayOf(d) {
+  var day = d.getDay() || 7;
+  var mon = new Date(d);
+  mon.setDate(d.getDate() + (1 - day));
+  return mon;
+}
+function getSundayOf(d) {
+  var mon = getMondayOf(d);
+  var sun = new Date(mon);
+  sun.setDate(mon.getDate() + 6);
+  return sun;
+}
+function isoWeekKey(dateStr) {
+  var d = new Date(dateStr + 'T00:00:00');
+  if (isNaN(d.getTime())) return 'W0000-00';
+  var wn = getISOWeekNum(d), wy = getISOWeekYear(d);
+  return 'W' + wy + '-' + String(wn).padStart(2,'0');
+}
+function weekRangeLabel(dateStr) {
+  var d   = new Date(dateStr + 'T00:00:00');
+  if (isNaN(d.getTime())) return '';
+  var mon = getMondayOf(d), sun = getSundayOf(d);
+  var fmt = function(dt) {
+    return dt.toLocaleDateString('en-GB', { day:'2-digit', month:'short' });
+  };
+  return 'Mon ' + fmt(mon) + ' – Sun ' + fmt(sun);
 }
 
 // ── REMARK MODE: use [s] / [c] tags
@@ -1262,6 +1307,15 @@ function saveEntries(entries, cb) {
 // ══════════════════════════════════════════════
 //  UTILS
 // ══════════════════════════════════════════════
+function monthToNum(monthStr) {
+  if (!monthStr) return 0;
+  var months = ['January','February','March','April','May','June',
+                'July','August','September','October','November','December'];
+  var parts  = monthStr.split(' ');
+  var idx    = months.indexOf(parts[0]);
+  return (parseInt(parts[1]||0) * 12) + (idx >= 0 ? idx : 0);
+}
+
 function toYMD(d) {
   return d.getFullYear() + '-' +
     String(d.getMonth()+1).padStart(2,'0') + '-' +
