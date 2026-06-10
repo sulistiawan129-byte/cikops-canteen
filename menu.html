@@ -666,15 +666,26 @@ function applyWeekFilter() {
 //  LOAD FROM GAS
 // ═══════════════════════════════════════════════════
 function loadData(monthStr) {
+  document.getElementById('analysisLoader').innerHTML =
+    '<div class="spin"></div>' +
+    '<span class="load-txt">Loading menu data…</span>' +
+    '<span style="font-size:10px;color:var(--text-3);margin-top:4px">First load may take 10–20s</span>';
   document.getElementById('analysisLoader').style.display = 'flex';
   document.getElementById('analysisContent').style.display = 'none';
 
   // Always load all months (no month filter — week filter handles period)
   var url = GAS_URL + '?action=menu&month=';
-  fetch(url, { redirect:'follow' })
+
+  // Simple timeout using Promise.race — no AbortController (mobile compatible)
+  var timeoutPromise = new Promise(function(_, reject) {
+    setTimeout(function() { reject(new Error('timeout')); }, 25000);
+  });
+  var fetchPromise = fetch(url, { redirect:'follow' });
+
+  Promise.race([fetchPromise, timeoutPromise])
     .then(function(r) {
       var ct = r.headers.get('content-type') || '';
-      if (!ct.includes('json')) return r.text().then(function(t){ throw new Error('Non-JSON: '+t.substring(0,60)); });
+      if (!ct.includes('json')) return r.text().then(function(t){ throw new Error('Non-JSON response. Try reloading.'); });
       return r.json();
     })
     .then(function(data) {
@@ -684,12 +695,20 @@ function loadData(monthStr) {
       fillWeekSelector(data.availableWeeks || []);
       document.getElementById('analysisLoader').style.display = 'none';
       document.getElementById('analysisContent').style.display = '';
-      // Apply current week filter (or show all)
       applyWeekFilter();
     })
     .catch(function(e) {
+      var isTimeout = e.message === 'timeout';
+      var msg = isTimeout
+        ? 'Request took too long (>25s).<br>GAS may be slow. Try again.'
+        : e.message;
       document.getElementById('analysisLoader').innerHTML =
-        '<div style="color:var(--red);font-size:12px;text-align:center;padding:24px">Cannot load menu data.<br><small>'+e.message+'</small></div>';
+        '<div style="color:var(--red);font-size:12px;text-align:center;padding:24px;line-height:1.8">' +
+        '⚠️ Cannot load menu data.<br>' +
+        '<small style="color:var(--text-3)">'+msg+'</small><br><br>' +
+        '<button onclick="loadData(String())" style="padding:8px 16px;background:var(--navy);color:#fff;' +
+        'border:none;border-radius:7px;font-size:12px;font-family:var(--font);cursor:pointer;">' +
+        '↺ Retry</button></div>';
     });
 }
 
