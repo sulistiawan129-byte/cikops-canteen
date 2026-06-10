@@ -529,9 +529,9 @@ function isAccompaniment(name) {
 // ── INIT
 window.onload = function() {
   if (window.matchMedia('(prefers-color-scheme: dark)').matches) toggleTheme();
-  // Set default date to today
   var now = new Date();
   document.getElementById('menuDate').value = toYMD(now);
+  setParseMode('auto');
   loadData('');
 };
 
@@ -980,59 +980,42 @@ function updatePlaceholderAndHint() {
   if (!ta || !hint) return;
 
   if (parseMode === 'auto') {
-    ta.placeholder =
-      'Contoh Snack (Auto mode):
-
-' +
-      '20-Apr-26	Bubur ayam
-' +
-      '20-Apr-26	Kuah kaldu
-' +
-      '20-Apr-26	Sambal
-' +
-      '20-Apr-26	Kerupuk
-
-' +
-      'Baris pertama per tanggal = menu utama.
-' +
-      'Baris berikutnya = komponen otomatis.';
+    ta.placeholder = [
+      'Contoh Snack (Auto mode):',
+      '',
+      '20-Apr-26   Bubur ayam',
+      '20-Apr-26   Kuah kaldu',
+      '20-Apr-26   Sambal',
+      '20-Apr-26   Kerupuk',
+      '',
+      'Baris pertama per tanggal = menu utama.',
+      'Baris berikutnya = komponen otomatis.'
+    ].join('\n');
     hint.innerHTML =
-      '📌 <strong>Auto mode:</strong> Baris <em>pertama</em> setiap tanggal = menu utama. ' +
-      'Semua baris berikutnya dengan tanggal yang sama = komponen. ' +
-      'Cocok untuk format copy-paste langsung dari catatan harian.';
+      '<strong>Auto mode:</strong> Baris <em>pertama</em> setiap tanggal = menu utama. ' +
+      'Semua baris berikutnya = komponen otomatis. ' +
+      'Cocok untuk copy-paste langsung dari catatan harian.';
   } else {
-    ta.placeholder =
-      'Contoh Remark mode:
-
-' +
-      '20-Apr-26	Bubur ayam [s]
-' +
-      '20-Apr-26	Kuah kaldu [c]
-' +
-      '20-Apr-26	Sambal [c]
-' +
-      '20-Apr-26	Kerupuk [c]
-
-' +
-      '14-Apr-26	Chicken yakiniku [s]
-' +
-      '14-Apr-26	Fu yung hai [s]
-' +
-      '14-Apr-26	Nasi putih [c]
-' +
-      '14-Apr-26	Melon [c]';
+    ta.placeholder = [
+      'Contoh Remark mode:',
+      '',
+      '20-Apr-26   Bubur ayam [s]',
+      '20-Apr-26   Kuah kaldu [c]',
+      '20-Apr-26   Sambal [c]',
+      '20-Apr-26   Kerupuk [c]',
+      '',
+      '14-Apr-26   Chicken yakiniku [s]',
+      '14-Apr-26   Fu yung hai [s]',
+      '14-Apr-26   Nasi putih [c]',
+      '14-Apr-26   Melon [c]'
+    ].join('\n');
     hint.innerHTML =
-      '🏷️ <strong>Remark mode:</strong> Tambah tag di akhir setiap baris — ' +
-      '<code style="background:var(--surface-2);padding:1px 5px;border-radius:3px;font-size:10px">[s]</code> = menu utama, ' +
-      '<code style="background:var(--surface-2);padding:1px 5px;border-radius:3px;font-size:10px">[c]</code> = komponen. ' +
-      'Lebih presisi, admin yang menentukan sendiri.';
+      '<strong>Remark mode:</strong> Tambah tag di akhir baris &mdash; ' +
+      '<code style="background:var(--surface-2);padding:1px 5px;border-radius:3px">[s]</code> = menu utama, ' +
+      '<code style="background:var(--surface-2);padding:1px 5px;border-radius:3px">[c]</code> = komponen. ' +
+      'Admin yang menentukan sendiri.';
   }
 }
-
-// Init placeholder on page load
-window.addEventListener('DOMContentLoaded', function() {
-  setParseMode('auto');
-});
 
 function parsePaste() {
   var raw = document.getElementById('pasteArea').value.trim();
@@ -1137,13 +1120,6 @@ function parseRemark(raw) {
     }
   });
   return result;
-}
-
-  if (!parsedEntries.length) { toast('Could not parse any entries. Check format.', 'err'); return; }
-
-  // Show preview
-  var preview = document.getElementById('parsedPreview');
-  showParsedPreview();
 }
 
 function tryParseDate(str) {
