@@ -18,6 +18,8 @@ html{font-size:14px;}
   --border:#e2e5eb;--text-1:#0f172a;--text-2:#475569;--text-3:#94a3b8;
   --font:'Inter','Segoe UI',system-ui,sans-serif;
   --r:10px;--shadow:0 1px 3px rgba(0,0,0,.05),0 3px 10px rgba(0,0,0,.04);
+  /* LAYOUT: fluid dengan padding responsif */
+  --page-px: clamp(16px, 3vw, 48px);
 }
 [data-theme="dark"]{
   --bg:#0d1117;--surface:#161b22;--surface-2:#1c2128;--border:#30363d;
@@ -26,9 +28,12 @@ html{font-size:14px;}
 }
 body{font-family:var(--font);background:var(--bg);color:var(--text-1);min-height:100vh;-webkit-font-smoothing:antialiased;}
 
-/* HEADER */
+/* ── HEADER ── */
 .hdr{background:var(--navy);padding:0;}
-.hdr-inner{max-width:1100px;margin:0 auto;padding:14px 20px;}
+.hdr-inner{
+  width:100%;
+  padding:14px var(--page-px);
+}
 .hdr-top{display:flex;align-items:center;justify-content:space-between;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,.1);margin-bottom:12px;}
 .brand{display:flex;align-items:center;gap:10px;}
 .logo-sq{width:34px;height:34px;border-radius:8px;background:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
@@ -44,26 +49,63 @@ body{font-family:var(--font);background:var(--bg);color:var(--text-1);min-height
 .hn-btn:hover{background:rgba(255,255,255,.15);color:#fff;}
 .hn-btn.active{background:#fff;color:var(--navy);}
 
-/* MAIN */
-.main{max-width:1100px;margin:0 auto;padding:20px;}
+/* ── MAIN ── */
+.main{
+  width:100%;
+  padding:20px var(--page-px);
+}
 
-/* TABS */
+/* ── TABS ── */
 .tabs{display:flex;gap:4px;background:var(--surface-2);border:1px solid var(--border);border-radius:9px;padding:4px;margin-bottom:20px;}
 .tab{flex:1;padding:8px 12px;border-radius:6px;border:none;background:none;font-size:12px;font-weight:500;font-family:var(--font);color:var(--text-3);cursor:pointer;transition:all .12s;text-align:center;}
 .tab.active{background:var(--surface);color:var(--text-1);box-shadow:0 1px 3px rgba(0,0,0,.08);}
 
-/* CARDS */
+/* ── CARDS ── */
 .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:16px 18px;box-shadow:var(--shadow);}
 .card-title{font-size:13px;font-weight:600;color:var(--text-1);margin-bottom:2px;}
 .card-sub{font-size:11px;color:var(--text-3);margin-bottom:14px;}
 
-/* GRID */
+/* ── GRIDS — fluid & responsive ── */
+/* 2-col: side-by-side ab 600px */
 .g2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px;}
+/* 3-col: ab 700px */
 .g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:16px;}
 .mb{margin-bottom:16px;}
-@media(max-width:700px){.g2,.g3{grid-template-columns:1fr;}}
 
-/* BADGE */
+/* stat grid: 3 col mobile→6 col desktop */
+.analysis-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:12px;
+  margin-bottom:16px;
+}
+
+/* score + suggestions side-by-side ab 900px */
+.score-suggestions-row{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:14px;
+  margin-bottom:16px;
+}
+
+/* repeated + top: each pair stays 2-col */
+/* already handled by .g2 */
+
+@media(min-width:1200px){
+  .analysis-grid{grid-template-columns:repeat(6,1fr);}
+}
+@media(max-width:900px){
+  .score-suggestions-row{grid-template-columns:1fr;}
+}
+@media(max-width:700px){
+  .g2,.g3{grid-template-columns:1fr;}
+  .analysis-grid{grid-template-columns:repeat(2,1fr);}
+}
+@media(max-width:420px){
+  .analysis-grid{grid-template-columns:1fr 1fr;}
+}
+
+/* ── BADGE ── */
 .badge{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:600;padding:2px 8px;border-radius:20px;}
 .b-snack{background:var(--amber-lt);color:var(--amber);}
 .b-meal{background:var(--navy-lt);color:var(--navy);}
@@ -72,7 +114,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text-1);min-height
 .b-red{background:var(--red-lt);color:var(--red);}
 .b-purple{background:var(--purple-lt);color:var(--purple);}
 
-/* FORM */
+/* ── FORM ── */
 .form-section{margin-bottom:20px;}
 .form-label{font-size:11px;font-weight:600;color:var(--text-2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;display:block;}
 .form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;}
@@ -87,7 +129,7 @@ select.inp{cursor:pointer;}
 .type-btn.active-meal{border-color:var(--navy);background:var(--navy-lt);color:var(--navy);}
 [data-theme="dark"] .type-btn.active-meal{color:#7fa8ff;}
 
-/* PASTE AREA */
+/* ── PASTE AREA ── */
 .paste-wrap{position:relative;}
 .paste-area{width:100%;border:2px dashed var(--border);border-radius:9px;padding:14px;font-size:12px;font-family:var(--font);background:var(--surface-2);color:var(--text-1);resize:vertical;min-height:110px;line-height:1.7;}
 .paste-area:focus{outline:none;border-color:var(--navy);}
@@ -95,7 +137,7 @@ select.inp{cursor:pointer;}
 .parse-btn{margin-top:8px;padding:7px 14px;background:var(--navy);color:#fff;border:none;border-radius:7px;font-size:11px;font-weight:500;font-family:var(--font);cursor:pointer;}
 .parse-btn:hover{opacity:.9;}
 
-/* PREVIEW PARSED */
+/* ── PREVIEW PARSED ── */
 .parsed-preview{background:var(--surface-2);border:1px solid var(--border);border-radius:8px;padding:12px 14px;margin-top:10px;display:none;}
 .parsed-preview h4{font-size:11px;font-weight:600;color:var(--text-2);margin-bottom:8px;text-transform:uppercase;letter-spacing:.06em;}
 .parsed-item{display:flex;align-items:flex-start;gap:8px;padding:6px 0;border-bottom:1px solid var(--border);font-size:12px;}
@@ -104,7 +146,7 @@ select.inp{cursor:pointer;}
 .parsed-menu{color:var(--text-1);font-weight:500;}
 .parsed-comp{font-size:11px;color:var(--text-3);margin-top:2px;}
 
-/* COMPONENT TAGS */
+/* ── COMPONENT TAGS ── */
 .comp-wrap{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px;}
 .comp-tag{display:inline-flex;align-items:center;gap:4px;background:var(--surface-2);border:1px solid var(--border);border-radius:20px;padding:2px 8px;font-size:11px;color:var(--text-2);}
 .comp-tag button{background:none;border:none;cursor:pointer;color:var(--text-3);font-size:13px;line-height:1;padding:0;}
@@ -114,12 +156,12 @@ select.inp{cursor:pointer;}
 .comp-add-btn{padding:6px 12px;background:var(--surface-2);border:1px solid var(--border);border-radius:7px;font-size:11px;font-family:var(--font);cursor:pointer;color:var(--text-2);white-space:nowrap;}
 .comp-add-btn:hover{background:var(--border);}
 
-/* SUBMIT BTN */
+/* ── SUBMIT BTN ── */
 .btn-primary{width:100%;padding:12px;background:var(--navy);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:600;font-family:var(--font);cursor:pointer;transition:opacity .12s;}
 .btn-primary:hover{opacity:.9;}
 .btn-primary:disabled{background:var(--text-3);cursor:not-allowed;}
 
-/* CALENDAR */
+/* ── CALENDAR ── */
 .filter-group-cal{display:flex;border:1px solid var(--border);border-radius:7px;overflow:hidden;background:var(--surface-2);}
 .cal-view-btn{padding:6px 14px;font-size:11px;font-weight:500;font-family:var(--font);background:none;border:none;cursor:pointer;color:var(--text-3);transition:background .12s,color .12s;}
 .cal-view-btn.active{background:var(--navy);color:#fff;}
@@ -129,11 +171,11 @@ select.inp{cursor:pointer;}
 .cal-btn:hover{background:var(--border);}
 .week-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:3px;}
 .week-day-hdr{font-size:10px;font-weight:600;color:var(--text-3);text-align:center;padding:6px 0 4px;text-transform:uppercase;letter-spacing:.06em;}
-.cal-cell{background:var(--surface-2);border:1px solid var(--border);border-radius:6px;padding:5px 6px;min-height:64px;position:relative;cursor:pointer;transition:border-color .12s;overflow:hidden;}
+.cal-cell{background:var(--surface-2);border:1px solid var(--border);border-radius:6px;padding:5px 6px;min-height:80px;position:relative;cursor:pointer;transition:border-color .12s;overflow:hidden;}
 .cal-cell:hover{border-color:var(--navy);background:var(--surface);}
 .cal-cell.has-data{background:var(--surface);box-shadow:var(--shadow);}
 .cal-cell.today{border-color:var(--navy);border-width:2px;}
-.cal-cell.empty{background:transparent;border:1px dashed var(--border);cursor:default;min-height:64px;}
+.cal-cell.empty{background:transparent;border:1px dashed var(--border);cursor:default;min-height:80px;}
 .cal-cell.empty:hover{border-color:var(--border);background:transparent;}
 .cal-date{font-size:11px;font-weight:700;color:var(--text-2);margin-bottom:3px;line-height:1;}
 .cal-menu-item{font-size:9px;font-weight:500;padding:2px 5px;border-radius:3px;margin-bottom:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%;display:block;line-height:1.3;}
@@ -142,7 +184,7 @@ select.inp{cursor:pointer;}
 [data-theme="dark"] .cal-meal{color:#7fa8ff;}
 .cal-more{font-size:9px;color:var(--text-3);padding:0 2px;}
 
-/* WEEK LIST VIEW */
+/* ── WEEK LIST VIEW ── */
 .week-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);margin-bottom:12px;overflow:hidden;box-shadow:var(--shadow);}
 .week-hdr{background:var(--navy);color:#fff;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;}
 .week-hdr-title{font-size:12px;font-weight:600;}
@@ -157,20 +199,17 @@ select.inp{cursor:pointer;}
 .menu-comps{font-size:10px;color:var(--text-3);line-height:1.4;}
 .no-menu{font-size:11px;color:var(--text-3);font-style:italic;}
 
-/* DELETE BUTTON */
+/* ── DELETE BUTTON ── */
 .btn-del{background:none;border:1px solid var(--border);border-radius:5px;padding:2px 7px;font-size:10px;color:var(--red);cursor:pointer;font-family:var(--font);transition:all .12s;white-space:nowrap;}
 .btn-del:hover{background:var(--red-lt);border-color:var(--red);}
 
-/* ANALYSIS */
-.analysis-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px;}
-@media(max-width:800px){.analysis-grid{grid-template-columns:1fr 1fr;}}
-@media(max-width:500px){.analysis-grid{grid-template-columns:1fr;}}
+/* ── STAT CARDS ── */
 .stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px;text-align:center;box-shadow:var(--shadow);}
 .stat-val{font-size:28px;font-weight:700;color:var(--text-1);line-height:1;margin-bottom:3px;}
 .stat-lbl{font-size:10px;font-weight:500;color:var(--text-3);text-transform:uppercase;letter-spacing:.06em;}
 .stat-sub{font-size:11px;color:var(--text-3);margin-top:3px;}
 
-/* REPEAT ALERT */
+/* ── REPEAT ALERT ── */
 .repeat-card{border-left:3px solid;border-radius:var(--r);padding:12px 14px;margin-bottom:8px;background:var(--surface);}
 .repeat-card.warn{border-color:var(--amber);}
 .repeat-card.danger{border-color:var(--red);}
@@ -181,20 +220,20 @@ select.inp{cursor:pointer;}
 .repeat-bar-bg{height:4px;background:var(--surface-2);border-radius:4px;overflow:hidden;margin-top:6px;}
 .repeat-bar-fill{height:100%;border-radius:4px;}
 
-/* ROTATION SCORE */
+/* ── ROTATION SCORE ── */
 .score-ring{display:flex;align-items:center;justify-content:center;gap:20px;padding:16px 0;}
 .ring-wrap{text-align:center;}
 .ring-svg{width:80px;height:80px;}
 .ring-lbl{font-size:11px;color:var(--text-2);margin-top:5px;}
 
-/* SUGGESTION CARDS */
+/* ── SUGGESTION CARDS ── */
 .suggestion-list{display:flex;flex-direction:column;gap:8px;}
 .sug-card{background:var(--surface-2);border:1px solid var(--border);border-radius:8px;padding:11px 13px;display:flex;gap:10px;align-items:flex-start;}
 .sug-icon{font-size:20px;flex-shrink:0;}
 .sug-title{font-size:12px;font-weight:600;color:var(--text-1);margin-bottom:2px;}
 .sug-desc{font-size:11px;color:var(--text-2);line-height:1.5;}
 
-/* TOP MENU LIST */
+/* ── TOP MENU LIST ── */
 .top-list{display:flex;flex-direction:column;gap:5px;}
 .top-item{display:flex;align-items:center;gap:8px;}
 .top-rank{font-size:10px;font-weight:700;color:var(--text-3);min-width:16px;}
@@ -203,26 +242,23 @@ select.inp{cursor:pointer;}
 .top-bar-fill{height:100%;border-radius:5px;}
 .top-count{font-size:10px;color:var(--text-3);min-width:30px;text-align:right;}
 
-/* MONTH SELECTOR */
-.month-filter-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;}
-
-/* TOAST */
+/* ── TOAST ── */
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--text-1);color:var(--surface);padding:10px 18px;border-radius:20px;font-size:12px;font-weight:500;transition:transform .3s;z-index:999;white-space:nowrap;}
 .toast.show{transform:translateX(-50%) translateY(0);}
 .toast.ok{background:var(--green);}
 .toast.err{background:var(--red);}
 
-/* LOADING */
+/* ── LOADING ── */
 .loading{display:flex;align-items:center;justify-content:center;padding:40px;flex-direction:column;gap:10px;}
 .spin{width:22px;height:22px;border:2px solid var(--border);border-top-color:var(--navy);border-radius:50%;animation:spin .7s linear infinite;}
 @keyframes spin{to{transform:rotate(360deg);}}
 .load-txt{font-size:11px;color:var(--text-3);}
 
-/* EMPTY */
+/* ── EMPTY ── */
 .empty{padding:40px;text-align:center;color:var(--text-3);font-size:12px;}
 .empty-icon{font-size:36px;display:block;margin-bottom:10px;}
 
-/* MODAL */
+/* ── MODAL ── */
 .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;align-items:center;justify-content:center;}
 .modal-overlay.show{display:flex;}
 .modal{background:var(--surface);border-radius:12px;padding:20px;max-width:520px;width:90%;max-height:80vh;overflow-y:auto;box-shadow:0 8px 32px rgba(0,0,0,.2);}
@@ -233,6 +269,12 @@ select.inp{cursor:pointer;}
 .modal-item:last-child{border-bottom:none;}
 .modal-item-name{font-weight:500;color:var(--text-1);text-transform:capitalize;}
 .modal-item-comps{color:var(--text-3);margin-top:2px;font-size:11px;}
+
+/* ── RESPONSIVE TWEAKS ── */
+@media(max-width:600px){
+  .day-row{grid-template-columns:70px 1fr 1fr;gap:8px;}
+  .top-bar-bg{width:50px;}
+}
 </style>
 </head>
 <body>
@@ -258,7 +300,6 @@ select.inp{cursor:pointer;}
       <div class="hdr-nav">
         <a class="hn-btn" href="index.html">📋 Form</a>
         <a class="hn-btn" href="dashboard.html">📊 Dashboard</a>
-        <!-- FIX #1: theme button sekarang tidak bergantung pada elemen #themeLbl -->
         <button class="hn-btn" id="themeToggleBtn" onclick="toggleTheme()">🌓 Theme</button>
       </div>
     </div>
@@ -297,17 +338,24 @@ select.inp{cursor:pointer;}
       <span style="font-size:10px;color:var(--text-3);margin-top:4px">First load may take 10–20s</span>
     </div>
     <div id="analysisContent" style="display:none">
+      <!-- Stats: 3 col mobile, 6 col desktop -->
       <div class="analysis-grid" id="statsGrid"></div>
-      <div class="card mb">
-        <div class="card-title">🔄 Menu Rotation Score</div>
-        <div class="card-sub">Higher score = more variety. Target: above 70%</div>
-        <div class="score-ring" id="scoreRing"></div>
+
+      <!-- Score + Suggestions side-by-side on wide screens -->
+      <div class="score-suggestions-row">
+        <div class="card">
+          <div class="card-title">🔄 Menu Rotation Score</div>
+          <div class="card-sub">Higher score = more variety. Target: above 70%</div>
+          <div class="score-ring" id="scoreRing"></div>
+        </div>
+        <div class="card">
+          <div class="card-title">💡 Smart Suggestions</div>
+          <div class="card-sub">Based on your menu history this period</div>
+          <div class="suggestion-list" id="suggestionList"></div>
+        </div>
       </div>
-      <div class="card mb">
-        <div class="card-title">💡 Smart Suggestions</div>
-        <div class="card-sub">Based on your menu history this period</div>
-        <div class="suggestion-list" id="suggestionList"></div>
-      </div>
+
+      <!-- Repeated menus -->
       <div class="g2">
         <div class="card">
           <div class="card-title">⚠️ Repeated Snack Menus</div>
@@ -320,6 +368,8 @@ select.inp{cursor:pointer;}
           <div id="repeatedMeal"></div>
         </div>
       </div>
+
+      <!-- Top menus -->
       <div class="g2">
         <div class="card">
           <div class="card-title">🏆 Most Frequent Snack</div>
@@ -499,7 +549,6 @@ var isDark        = false;
 //  INIT
 // ═══════════════════════════════════════════════════
 window.onload = function() {
-  // FIX #1: toggleTheme() tidak lagi baca #themeLbl — aman dipanggil kapan saja
   if (window.matchMedia('(prefers-color-scheme: dark)').matches) toggleTheme();
   var now = new Date();
   document.getElementById('menuDate').value = toYMD(now);
@@ -509,12 +558,11 @@ window.onload = function() {
 };
 
 // ═══════════════════════════════════════════════════
-//  THEME — FIX #1: tidak bergantung pada elemen #themeLbl
+//  THEME
 // ═══════════════════════════════════════════════════
 function toggleTheme() {
   isDark = !isDark;
   document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
-  // Aman: themeToggleBtn ada, tapi tidak wajib ada
   var btn = document.getElementById('themeToggleBtn');
   if (btn) btn.textContent = isDark ? '☀️ Theme' : '🌓 Theme';
 }
@@ -528,7 +576,6 @@ function openTab(name) {
     var btn = document.getElementById('tab-'+t);
     if (btn) btn.classList.toggle('active', t === name);
   });
-  // FIX #5: sync calWeekKey dari selWeek sebelum render calendar
   if (name === 'calendar') {
     if (selWeek) {
       calWeekKey = selWeek;
@@ -594,7 +641,6 @@ function applyWeekFilter() {
   }
   updateWeekRangeLabel();
   renderAnalysisFromRows(rows, label);
-  // FIX #5: sync calendar pointer
   if (selWeek) {
     calWeekKey = selWeek;
     var mon = isoWeekToMonday(selWeek);
@@ -857,7 +903,6 @@ function calNext() {
   }
 }
 function renderCalendar() {
-  // FIX #5: sudah di-sync di openTab dan applyWeekFilter — langsung render
   if(CV==='month') renderCalMonth(); else renderCalWeek();
 }
 
@@ -915,7 +960,6 @@ function renderCalMonth() {
         if(day.meal.length>2) inner+='<div class="cal-more">+'+(day.meal.length-2)+' more</div>';
       }
     }
-    // FIX #2: onclick pakai single-quote di dalam attribute untuk rawKey yang mengandung '-'
     var oc=day?' onclick="openDayModal(\''+rk+'\')"':'';
     cells+='<div class="'+cls+'"'+oc+'>'+inner+'</div>';
   }
@@ -946,18 +990,15 @@ function renderCalWeek() {
     var dayLbl=DAYS[i]+' '+dt.getDate()+' '+dt.toLocaleDateString('en-GB',{month:'short'});
     rows+='<div style="display:grid;grid-template-columns:80px 1fr 1fr;gap:8px;padding:10px 0;border-bottom:1px solid var(--surface-2);">';
     rows+='<div style="font-size:11px;font-weight:600;color:'+(isT?'var(--navy)':'var(--text-3)')+';padding-top:3px">'+dayLbl+(isT?' ✦':'')+'</div>';
-    // Snack col
     rows+='<div>';
     if(day&&day.snack&&day.snack.length){
       day.snack.forEach(function(e){
         rows+='<div style="font-size:12px;font-weight:500;color:var(--amber);margin-bottom:2px">🥐 '+cap(e.menuName)+'</div>';
         if(e.components&&e.components.length) rows+='<div style="font-size:10px;color:var(--text-3);margin-bottom:3px">'+e.components.slice(0,4).join(' · ')+'</div>';
-        // FIX #3: tombol hapus di week view
         rows+='<button class="btn-del" onclick="confirmDelete(\''+esc(e.date)+'\',\''+e.type+'\',\''+esc(e.menuName)+'\')">🗑 Delete</button>';
       });
     } else rows+='<span style="font-size:11px;color:var(--text-3);font-style:italic">—</span>';
     rows+='</div>';
-    // Meal col
     rows+='<div>';
     if(day&&day.meal&&day.meal.length){
       day.meal.forEach(function(e){
@@ -974,12 +1015,11 @@ function renderCalWeek() {
 }
 
 // ═══════════════════════════════════════════════════
-//  DAY MODAL — FIX #2 + FIX #3
+//  DAY MODAL
 // ═══════════════════════════════════════════════════
 function openDayModal(rawKey) {
   if(!DATA||!DATA.byDate) return;
   var day=DATA.byDate[rawKey]; if(!day) return;
-  // FIX #7: parse date dengan explicit timezone offset agar tidak off-by-one
   var d=new Date(rawKey+'T12:00:00');
   var display=isNaN(d.getTime())?rawKey:d.toLocaleDateString('en-GB',{weekday:'long',day:'2-digit',month:'long',year:'numeric'});
   document.getElementById('modalDate').textContent='📅 '+display;
@@ -991,7 +1031,6 @@ function openDayModal(rawKey) {
         '<div><div class="modal-item-name">'+cap(e.menuName)+'</div>' +
         (e.components&&e.components.length?'<div class="modal-item-comps">'+e.components.join(', ')+'</div>':'') +
         '</div>' +
-        // FIX #3: delete button di modal
         '<button class="btn-del" onclick="confirmDelete(\''+esc(e.date)+'\',\''+e.type+'\',\''+esc(e.menuName)+'\');closeDayModal()">🗑 Delete</button>' +
         '</div>';
     });
@@ -1016,7 +1055,7 @@ function openDayModal(rawKey) {
 function closeDayModal() { document.getElementById('dayModal').classList.remove('show'); }
 
 // ═══════════════════════════════════════════════════
-//  DELETE — FIX #3
+//  DELETE
 // ═══════════════════════════════════════════════════
 function confirmDelete(date, type, menuName) {
   if (!confirm('Delete "' + cap(menuName) + '" (' + type + ') on ' + date + '?')) return;
@@ -1035,7 +1074,7 @@ function deleteEntry(date, type, menuName) {
     .then(function(data) {
       if (data.success) {
         toast('Entry deleted.', 'ok');
-        loadData(); // FIX #3: reload fresh dari sheet setelah delete
+        loadData();
       } else {
         toast('Delete failed: ' + (data.message || 'Unknown error'), 'err');
       }
@@ -1044,7 +1083,7 @@ function deleteEntry(date, type, menuName) {
 }
 
 // ═══════════════════════════════════════════════════
-//  WEEKLY LIST — FIX #3: tambah tombol hapus per entry
+//  WEEKLY LIST
 // ═══════════════════════════════════════════════════
 function renderWeekly() {
   var container=document.getElementById('weeklyList');
@@ -1066,7 +1105,6 @@ function renderWeekly() {
     var dayKeys=Object.keys(dayMap).sort();
     var rows=dayKeys.map(function(dk){
       var day=dayMap[dk];
-      // Snack column
       var snH=day.snack.length
         ? day.snack.map(function(e){
             return '<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:6px;margin-bottom:4px">' +
@@ -1078,7 +1116,6 @@ function renderWeekly() {
               '</div>';
           }).join('')
         : '<span style="font-size:11px;color:var(--text-3);font-style:italic">No snack</span>';
-      // Meal column
       var mlH=day.meal.length
         ? day.meal.map(function(e){
             return '<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:6px;margin-bottom:4px">' +
@@ -1285,10 +1322,8 @@ function tryParseDate(str) {
 }
 function toYMD(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
 function cap(s){ if(!s)return''; return s.charAt(0).toUpperCase()+s.slice(1).toLowerCase(); }
-// FIX #4: esc() helper untuk HTML attribute escaping — menghindari XSS dan quote-breaking di onclick
 function esc(s){ return String(s||'').replace(/'/g,'&apos;').replace(/"/g,'&quot;'); }
 function toast(msg,type){ var t=document.getElementById('toast'); t.textContent=msg; t.className='toast '+(type||''); t.classList.add('show'); setTimeout(function(){t.classList.remove('show');},3200); }
-// FIX #6: monthToNum dihapus karena tidak dipakai — bersihkan dead code
 </script>
 </body>
 </html>
