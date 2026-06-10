@@ -606,10 +606,13 @@ function fillWeekSelector(availableWeeks) {
   if (!sel) return;
   var prev = sel.value;
   sel.innerHTML = '<option value="">All data</option>';
-  (availableWeeks || []).forEach(function(w) {
+  // Filter out invalid week keys (WNaN-NaN etc)
+  (availableWeeks || []).filter(function(w){
+    return w.value && !w.value.includes('NaN') && /^W\d{4}-\d{2}$/.test(w.value);
+  }).forEach(function(w) {
     var o = document.createElement('option');
     o.value       = w.value;
-    o.textContent = w.label;
+    o.textContent = w.label || weekLabel(w.value);
     if (w.value === selWeek || w.value === prev) { o.selected = true; selWeek = w.value; }
     sel.appendChild(o);
   });
@@ -638,7 +641,7 @@ function applyWeekFilter() {
     var wk = DATA.byWeek && DATA.byWeek[selWeek];
     if (wk) {
       rows  = (wk.snack || []).concat(wk.meal || []);
-      label = wk.label || selWeek;
+      label = wk.label || weekLabel(selWeek);
     } else {
       rows  = [];
       label = selWeek;
@@ -1043,8 +1046,10 @@ function renderWeekly() {
   var container=document.getElementById('weeklyList');
   if(!DATA||!DATA.byWeek){ container.innerHTML='<div class="empty"><span class="empty-icon">📋</span>No menu data available.</div>'; return; }
 
-  // Filter to selected week or show all
-  var keys=Object.keys(DATA.byWeek).sort();
+  // Filter to selected week or show all — skip invalid NaN keys
+  var keys=Object.keys(DATA.byWeek).filter(function(k){
+    return k && !k.includes('NaN') && /^W\d{4}-\d{2}$/.test(k);
+  }).sort();
   if(selWeek) keys=keys.filter(function(k){return k===selWeek;});
   if(!keys.length){ container.innerHTML='<div class="empty"><span class="empty-icon">📋</span>No data for this week.</div>'; return; }
 
