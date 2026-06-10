@@ -644,7 +644,9 @@ function loadMonth(m,cb){
     .then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.json();})
     .then(function(data){
       if(!data.success) throw new Error(data.message||'API error');
-      D=data; D.allRows=data.chartData||[];
+      D=data;
+      D.allRows       = cleanRows(data.chartData||[]);
+      D.monthlyRows   = cleanMonthlyRows(data.monthlyRows||[]);
       fillMonthSel(data.availableMonths);
       document.getElementById('loader').style.display='none';
       document.getElementById('dash').style.display='';
@@ -695,6 +697,48 @@ function f(v){return Number(v||0).toLocaleString();}
 function set(id,v){var el=document.getElementById(id);if(el)el.textContent=v;}
 function toYMD(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
 function eb(v){var val=parseFloat(v)||0;var c=val>=98?'eg':val>=95?'eo':'er';return '<span class="eb '+c+'">'+val.toFixed(1)+'%</span>';}
+
+// Clean any ISO date string (e.g. "2026-05-31T17:00:00.000Z") into readable format
+function cleanDate(v){
+  if(!v||v==='—') return v||'—';
+  var s=String(v);
+  // If it looks like an ISO date, parse and reformat
+  if(s.length>10&&s.indexOf('T')>-1){
+    try{
+      var d=new Date(s);
+      if(!isNaN(d.getTime())){
+        return d.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
+      }
+    }catch(e){}
+  }
+  // If yyyy-MM-dd format
+  if(/^\d{4}-\d{2}-\d{2}$/.test(s)){
+    try{
+      var d=new Date(s+'T00:00:00');
+      return d.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
+    }catch(e){}
+  }
+  return s;
+}
+
+// Clean all date fields in API response rows
+function cleanRows(rows){
+  return (rows||[]).map(function(r){
+    return Object.assign({},r,{
+      date:    cleanDate(r.date),
+      rawDate: r.rawDate||''
+    });
+  });
+}
+function cleanMonthlyRows(rows){
+  return (rows||[]).map(function(r){
+    return Object.assign({},r,{
+      month:    cleanDate(r.month),
+      peakDate: cleanDate(r.peakDate),
+      bestDate: cleanDate(r.bestDate)
+    });
+  });
+}
 
 function buildKPI(rows){
   var a=rows.reduce(function(acc,r){
