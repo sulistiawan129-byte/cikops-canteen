@@ -266,13 +266,15 @@ select.inp{cursor:pointer;}
 <!-- MAIN -->
 <div class="main">
 
-  <!-- MONTH FILTER -->
+  <!-- WEEK FILTER -->
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px;">
-    <div style="display:flex;align-items:center;gap:8px;">
-      <span style="font-size:12px;color:var(--text-2);font-weight:500;">Period:</span>
-      <select class="inp" id="monthFilter" onchange="onMonthChange(this.value)" style="width:auto;padding:5px 10px;font-size:12px;">
-        <option value="">Loading…</option>
+    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+      <span style="font-size:12px;color:var(--text-2);font-weight:500;">Week:</span>
+      <select class="inp" id="weekFilter" onchange="onWeekChange(this.value)"
+        style="width:auto;padding:5px 10px;font-size:12px;min-width:200px;">
+        <option value="">All data</option>
       </select>
+      <span style="font-size:11px;color:var(--text-3);" id="weekRangeLbl"></span>
     </div>
     <button onclick="openTab('input')" style="padding:7px 16px;background:var(--navy);color:#fff;border:none;border-radius:7px;font-size:12px;font-weight:600;font-family:var(--font);cursor:pointer;">+ Add Menu</button>
   </div>
@@ -508,1003 +510,759 @@ select.inp{cursor:pointer;}
 <div class="toast" id="toast"></div>
 
 <script>
-// ══════════════════════════════════════════════
+// ═══════════════════════════════════════════════════
+//  CONFIGURATION
+// ═══════════════════════════════════════════════════
+var GAS_URL = "https://script.google.com/macros/s/AKfycbywIW79lgCQOvlqUX0XuIsKk8A4NPGMnHx0shd573HZ-VXzjnijSuzSQ4PnpYf4zHKE/exec";
+
+// ═══════════════════════════════════════════════════
 //  STATE
-// ══════════════════════════════════════════════
-var DATA       = null;
-var selMonth   = '';
-var activeType = 'snack';
-var pasteType  = 'snack';
-var components = [];
+// ═══════════════════════════════════════════════════
+var DATA          = null;
+var selWeek       = '';      // current ISO week key e.g. "W2026-17"
+var activeType    = 'snack';
+var pasteType     = 'snack';
+var components    = [];
 var parsedEntries = [];
-var calYear    = new Date().getFullYear();
-var calMonth   = new Date().getMonth(); // 0-based
-var isDark     = false;
+var calYear       = new Date().getFullYear();
+var calMonth      = new Date().getMonth();
+var calView       = 'month';
+var calWeekKey    = '';
+var parseMode     = 'auto';
+var isDark        = false;
 
-// ── STANDARD ACCOMPANIMENTS ──────────────────
-// Items in this list are NEVER treated as a main menu name.
-// They are always classified as components/sides automatically.
+// Standard accompaniments (never main menu)
 var ACCOMPANIMENTS = [
-  // Staples
-  'nasi putih','nasi','nasi merah','nasi goreng',
-  // Condiments & sides
-  'kerupuk','kerupuk udang','kerupuk ikan','emping',
-  'sambal','sambal terasi','sambal bawang','sambal ijo','sambal merah',
-  'kecap','saus','saus pedas','saus tomat','acar',
-  // Beverages
-  'air putih','air mineral','teh','teh manis','teh tawar',
-  'jus','juice','susu',
-  // Common soup bases listed as sides
-  'kuah','kuah kaldu','kuah bening',
-  // Fruits often served as sides
-  'melon','semangka','pepaya','pisang','jeruk','apel','mangga',
-  // Other common fillers
-  'tempe goreng','tahu goreng','tempe','tahu',
-  'telur dadar','telur rebus','telur ceplok',
-  'lalapan','sayuran','salad',
-  'krupuk','crackers'
+  'nasi putih','nasi','nasi merah','kerupuk','kerupuk udang','kerupuk ikan','emping',
+  'sambal','sambal terasi','sambal bawang','sambal ijo','sambal merah','kecap','saus',
+  'saus pedas','saus tomat','acar','air putih','air mineral','teh','teh manis','teh tawar',
+  'kuah','kuah kaldu','kuah bening','melon','semangka','pepaya','pisang','jeruk','apel',
+  'mangga','lalapan','sayuran','salad','krupuk','crackers'
 ];
-
 function isAccompaniment(name) {
-  var lower = name.trim().toLowerCase();
-  return ACCOMPANIMENTS.some(function(a) {
-    return lower === a || lower.startsWith(a + ' ') || lower.endsWith(' ' + a);
-  });
+  var l = name.trim().toLowerCase();
+  return ACCOMPANIMENTS.some(function(a){ return l===a||l.startsWith(a+' ')||l.endsWith(' '+a); });
 }
 
-// ── INIT
+// ═══════════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════════
 window.onload = function() {
   if (window.matchMedia('(prefers-color-scheme: dark)').matches) toggleTheme();
   var now = new Date();
   document.getElementById('menuDate').value = toYMD(now);
-  // Init calendar week to current ISO week
-  calWeekKey = 'W' + getISOWeekYear(now) + '-' + String(getISOWeekNum(now)).padStart(2,'0');
+  // Init to current ISO week
+  calWeekKey = isoKey(now);
   setParseMode('auto');
-  loadData('');
+  loadData('');  // load all data first, then populate week selector
 };
 
-// ── THEME
+// ═══════════════════════════════════════════════════
+//  THEME
+// ═══════════════════════════════════════════════════
 function toggleTheme() {
   isDark = !isDark;
   document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+  document.getElementById('themeLbl').textContent = isDark ? 'Dark mode' : 'Light mode';
 }
 
-// ── TABS
+// ═══════════════════════════════════════════════════
+//  TABS
+// ═══════════════════════════════════════════════════
 function openTab(name) {
   ['analysis','calendar','weekly','input'].forEach(function(t) {
-    document.getElementById('pane-' + t).style.display = t === name ? '' : 'none';
-    var btn = document.getElementById('tab-' + t);
-    if (btn) btn.classList.toggle('active', t === name);
+    document.getElementById('pane-'+t).style.display = t===name ? '' : 'none';
+    var btn = document.getElementById('tab-'+t);
+    if (btn) btn.classList.toggle('active', t===name);
   });
-  if (name === 'calendar' && DATA) renderCalendar();
-  if (name === 'weekly'   && DATA) renderWeekly();
+  if (name==='calendar' && DATA) renderCalendar();
+  if (name==='weekly'   && DATA) renderWeekly();
 }
 
-// ── MONTH CHANGE
-function onMonthChange(val) {
-  selMonth = val;
-  loadData(val);
+// ═══════════════════════════════════════════════════
+//  SIDEBAR / NAV
+// ═══════════════════════════════════════════════════
+function openSb()  { document.getElementById('sidebar').classList.add('open');    document.getElementById('overlay').classList.add('show'); }
+function closeSb() { document.getElementById('sidebar').classList.remove('open'); document.getElementById('overlay').classList.remove('show'); }
+function navTo(id, btn) {
+  var el = document.getElementById(id); if (!el) return;
+  document.querySelectorAll('.nav-item').forEach(function(b){ b.classList.remove('active'); });
+  if (btn) btn.classList.add('active');
+  var th = document.querySelector('.topbar') ? document.querySelector('.topbar').offsetHeight : 0;
+  window.scrollTo({ top: el.getBoundingClientRect().top + window.pageYOffset - th - 6, behavior:'smooth' });
+  closeSb();
 }
 
-// ── LOAD DATA
-function loadData(month) {
+// ═══════════════════════════════════════════════════
+//  WEEK FILTER (main period control)
+// ═══════════════════════════════════════════════════
+function onWeekChange(val) {
+  selWeek = val;
+  applyWeekFilter();
+}
+
+function fillWeekSelector(availableWeeks) {
+  var sel = document.getElementById('weekFilter');
+  if (!sel) return;
+  var prev = sel.value;
+  sel.innerHTML = '<option value="">All data</option>';
+  (availableWeeks || []).forEach(function(w) {
+    var o = document.createElement('option');
+    o.value       = w.value;
+    o.textContent = w.label;
+    if (w.value === selWeek || w.value === prev) { o.selected = true; selWeek = w.value; }
+    sel.appendChild(o);
+  });
+  updateWeekRangeLabel();
+}
+
+function updateWeekRangeLabel() {
+  var lbl = document.getElementById('weekRangeLbl');
+  if (!lbl) return;
+  if (!selWeek || !DATA || !DATA.byWeek || !DATA.byWeek[selWeek]) {
+    lbl.textContent = DATA ? '(' + (DATA.entries||[]).length + ' entries total)' : '';
+    return;
+  }
+  var w = DATA.byWeek[selWeek];
+  lbl.textContent = w.label ? '(' + w.label + ')' : '';
+}
+
+function applyWeekFilter() {
+  if (!DATA) return;
+  var rows, label;
+  if (!selWeek) {
+    // All data
+    rows  = DATA.allEntries || [];
+    label = 'All data';
+  } else {
+    var wk = DATA.byWeek && DATA.byWeek[selWeek];
+    if (wk) {
+      rows  = (wk.snack || []).concat(wk.meal || []);
+      label = wk.label || selWeek;
+    } else {
+      rows  = [];
+      label = selWeek;
+    }
+  }
+  updateWeekRangeLabel();
+  renderAnalysisFromRows(rows, label);
+  // Sync calendar to this week
+  if (selWeek) {
+    calWeekKey = selWeek;
+    var mon = isoWeekToMonday(selWeek);
+    calYear  = mon.getFullYear();
+    calMonth = mon.getMonth();
+  }
+  if (document.getElementById('pane-calendar').style.display !== 'none') renderCalendar();
+  if (document.getElementById('pane-weekly').style.display   !== 'none') renderWeekly();
+}
+
+// ═══════════════════════════════════════════════════
+//  LOAD FROM GAS
+// ═══════════════════════════════════════════════════
+function loadData(monthStr) {
   document.getElementById('analysisLoader').style.display = 'flex';
   document.getElementById('analysisContent').style.display = 'none';
 
-  var url = GAS_URL + '?action=menu&month=' + encodeURIComponent(month);
-  fetch(url, { redirect: 'follow' })
+  // Always load all months (no month filter — week filter handles period)
+  var url = GAS_URL + '?action=menu&month=';
+  fetch(url, { redirect:'follow' })
     .then(function(r) {
       var ct = r.headers.get('content-type') || '';
-      if (!ct.includes('json')) {
-        return r.text().then(function(t) {
-          throw new Error('GAS returned non-JSON. Redeploy may be needed. Preview: ' + t.substring(0,80));
-        });
-      }
+      if (!ct.includes('json')) return r.text().then(function(t){ throw new Error('Non-JSON: '+t.substring(0,60)); });
       return r.json();
     })
     .then(function(data) {
-      if (!data.success) throw new Error(data.message);
+      if (!data.success) throw new Error(data.message || 'API error');
       DATA = data;
-      fillMonthFilter(data.availableMonths, data.selectedMonth);
-      calYear  = selMonth ? parseInt(selMonth.split(' ')[1]||new Date().getFullYear()) : new Date().getFullYear();
-      calMonth = selMonth ? getMonthIndex(selMonth) : new Date().getMonth();
-      renderAnalysis(data);
+      DATA.allEntries = data.entries || [];
+      fillWeekSelector(data.availableWeeks || []);
       document.getElementById('analysisLoader').style.display = 'none';
       document.getElementById('analysisContent').style.display = '';
+      // Apply current week filter (or show all)
+      applyWeekFilter();
     })
     .catch(function(e) {
       document.getElementById('analysisLoader').innerHTML =
-        '<div style="color:var(--red);font-size:12px;text-align:center;padding:24px">' +
-        'Cannot load menu data.<br><small>' + e.message + '</small></div>';
+        '<div style="color:var(--red);font-size:12px;text-align:center;padding:24px">Cannot load menu data.<br><small>'+e.message+'</small></div>';
     });
 }
 
-function getMonthIndex(monthStr) {
-  var months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-  var parts  = monthStr.split(' ');
-  var idx    = months.indexOf(parts[0]);
-  return idx >= 0 ? idx : new Date().getMonth();
-}
-
-function fillMonthFilter(months, selected) {
-  var sel = document.getElementById('monthFilter');
-  sel.innerHTML = '<option value="">All months</option>';
-  (months || []).slice().reverse().forEach(function(m) {
-    var o = document.createElement('option');
-    o.value       = m;
-    o.textContent = m;
-    if (m === selected || m === selMonth) o.selected = true;
-    sel.appendChild(o);
-  });
-}
-
-// ══════════════════════════════════════════════
+// ═══════════════════════════════════════════════════
 //  ANALYSIS
-// ══════════════════════════════════════════════
-function renderAnalysis(data) {
-  var a = data.analysis || {};
+// ═══════════════════════════════════════════════════
+function renderAnalysisFromRows(rows, label) {
+  var a = buildAnalysis(rows, DATA ? DATA.allEntries : rows);
 
   // Stats
+  var uniqueDates = {};
+  rows.forEach(function(e){ uniqueDates[e.date||e.rawDate] = true; });
   document.getElementById('statsGrid').innerHTML = [
-    { icon:'🥐', val: a.uniqueSnack || 0,  lbl:'Unique Snacks',  sub:'Different menus',      col:'var(--amber)' },
-    { icon:'🍱', val: a.uniqueMeal  || 0,  lbl:'Unique Meals',   sub:'Different main dishes', col:'var(--navy)'  },
-    { icon:'📅', val: data.entries ? [...new Set(data.entries.map(function(e){return e.date;}))].length : 0,
-      lbl:'Days Recorded', sub:'With menu data', col:'var(--green)' },
-    { icon:'⚠️', val: (a.repeatedSnack||[]).length, lbl:'Repeated Snacks', sub:'Appear 2+ weeks', col:'var(--amber)' },
-    { icon:'⚠️', val: (a.repeatedMeal||[]).length,  lbl:'Repeated Meals',  sub:'Appear 2+ weeks', col:'var(--red)'   },
-    { icon:'✅', val: Math.round(((a.rotationScore||{}).snack||0) + ((a.rotationScore||{}).meal||0)) / 2 + '%',
+    { icon:'🥐', val:a.uniqueSnack||0,              lbl:'Unique Snacks',   sub:'Different menus',   col:'var(--amber)' },
+    { icon:'🍱', val:a.uniqueMeal||0,               lbl:'Unique Meals',    sub:'Different dishes',  col:'var(--navy)'  },
+    { icon:'📅', val:Object.keys(uniqueDates).length,lbl:'Days Recorded',  sub:'With menu data',    col:'var(--green)' },
+    { icon:'⚠️', val:(a.repeatedSnack||[]).length,  lbl:'Repeated Snacks', sub:'Multi-week',        col:'var(--amber)' },
+    { icon:'⚠️', val:(a.repeatedMeal||[]).length,   lbl:'Repeated Meals',  sub:'Multi-week',        col:'var(--red)'   },
+    { icon:'✅', val:Math.round(((a.rotationScore||{}).snack||0)+((a.rotationScore||{}).meal||0))/2+'%',
       lbl:'Avg Rotation', sub:'Variety score', col:'var(--green)' }
-  ].map(function(s) {
-    return '<div class="stat-card">' +
-      '<div style="font-size:22px;margin-bottom:4px">' + s.icon + '</div>' +
-      '<div class="stat-val" style="color:' + s.col + '">' + s.val + '</div>' +
-      '<div class="stat-lbl">' + s.lbl + '</div>' +
-      '<div class="stat-sub">' + s.sub + '</div>' +
-      '</div>';
+  ].map(function(s){
+    return '<div class="stat-card"><div style="font-size:22px;margin-bottom:4px">'+s.icon+'</div>'+
+      '<div class="stat-val" style="color:'+s.col+'">'+s.val+'</div>'+
+      '<div class="stat-lbl">'+s.lbl+'</div><div class="stat-sub">'+s.sub+'</div></div>';
   }).join('');
 
-  // Rotation score rings
-  renderScoreRings(a.rotationScore || { snack:0, meal:0 });
-
-  // Suggestions
+  renderScoreRings(a.rotationScore || {snack:0,meal:0});
   renderSuggestions(a);
+  renderRepeated('repeatedSnack', a.repeatedSnack||[], 'var(--amber)');
+  renderRepeated('repeatedMeal',  a.repeatedMeal||[],  'var(--navy)');
+  renderTopMenu('topSnack', a.topSnack||[], 'var(--amber)');
+  renderTopMenu('topMeal',  a.topMeal||[],  'var(--navy)');
+}
 
-  // Repeated menus
-  renderRepeated('repeatedSnack', a.repeatedSnack || [], 'var(--amber)');
-  renderRepeated('repeatedMeal',  a.repeatedMeal  || [], 'var(--navy)');
+function buildAnalysis(filtered, all) {
+  // Frequency across ALL data
+  var snackFreq={}, mealFreq={};
+  (all||[]).forEach(function(e){
+    var nm=e.menuName.trim().toLowerCase(), t=e.type.toLowerCase();
+    if(t==='snack') snackFreq[nm]=(snackFreq[nm]||0)+1;
+    else             mealFreq[nm] =(mealFreq[nm] ||0)+1;
+  });
 
-  // Top menus
-  renderTopMenu('topSnack', a.topSnack || [], 'var(--amber)');
-  renderTopMenu('topMeal',  a.topMeal  || [], 'var(--navy)');
+  // Repetition within filtered period by week
+  var wkSnack={}, wkMeal={};
+  filtered.forEach(function(e){
+    var k=e.menuName.trim().toLowerCase(), w=e.week||0;
+    if(e.type.toLowerCase()==='snack'){
+      if(!wkSnack[k]) wkSnack[k]=[];
+      if(wkSnack[k].indexOf(w)<0) wkSnack[k].push(w);
+    } else {
+      if(!wkMeal[k]) wkMeal[k]=[];
+      if(wkMeal[k].indexOf(w)<0) wkMeal[k].push(w);
+    }
+  });
+
+  var repSnack=[], repMeal=[];
+  Object.keys(wkSnack).forEach(function(k){ if(wkSnack[k].length>=2) repSnack.push({name:k,weeks:wkSnack[k],count:wkSnack[k].length}); });
+  Object.keys(wkMeal).forEach(function(k){  if(wkMeal[k].length>=2)  repMeal.push({name:k,weeks:wkMeal[k], count:wkMeal[k].length}); });
+  repSnack.sort(function(a,b){return b.count-a.count;});
+  repMeal.sort(function(a,b){return b.count-a.count;});
+
+  function topN(freq,n){ return Object.keys(freq).map(function(k){return{name:k,count:freq[k]};}).sort(function(a,b){return b.count-a.count;}).slice(0,n); }
+
+  var uSnack=Object.keys(wkSnack).length, uMeal=Object.keys(wkMeal).length;
+  var tSnack=filtered.filter(function(e){return e.type.toLowerCase()==='snack';}).length;
+  var tMeal =filtered.filter(function(e){return e.type.toLowerCase()!=='snack';}).length;
+
+  return {
+    repeatedSnack:repSnack, repeatedMeal:repMeal,
+    topSnack:topN(snackFreq,5), topMeal:topN(mealFreq,8),
+    uniqueSnack:uSnack, uniqueMeal:uMeal,
+    totalSnack:tSnack, totalMeal:tMeal,
+    rotationScore:{
+      snack: tSnack>0 ? Math.round(uSnack/tSnack*100) : 0,
+      meal:  tMeal>0  ? Math.round(uMeal/tMeal*100)  : 0
+    }
+  };
 }
 
 function renderScoreRings(score) {
-  function ring(pct, col, lbl) {
-    var r = 30, cx = 40, cy = 40;
-    var circ = 2 * Math.PI * r;
-    var dash  = circ * (pct / 100);
-    var grade = pct >= 80 ? '🟢 Excellent' : pct >= 60 ? '🟡 Good' : '🔴 Needs variety';
-    return '<div class="ring-wrap">' +
-      '<svg class="ring-svg" viewBox="0 0 80 80">' +
-        '<circle cx="' + cx + '" cy="' + cy + '" r="' + r + '" fill="none" stroke="var(--border)" stroke-width="7"/>' +
-        '<circle cx="' + cx + '" cy="' + cy + '" r="' + r + '" fill="none" stroke="' + col + '" stroke-width="7"' +
-          ' stroke-dasharray="' + dash + ' ' + (circ-dash) + '"' +
-          ' stroke-dashoffset="' + (circ/4) + '" stroke-linecap="round"/>' +
-        '<text x="' + cx + '" y="' + cy + '" text-anchor="middle" dominant-baseline="middle"' +
-          ' font-size="14" font-weight="700" fill="var(--text-1)" font-family="Inter,sans-serif">' + pct + '%</text>' +
-      '</svg>' +
-      '<div class="ring-lbl" style="font-weight:600">' + lbl + '</div>' +
-      '<div style="font-size:10px;color:var(--text-3);margin-top:2px">' + grade + '</div>' +
+  function ring(pct,col,lbl) {
+    var r=30,cx=40,cy=40,circ=2*Math.PI*r;
+    var dash=circ*(pct/100);
+    var grade=pct>=80?'🟢 Excellent':pct>=60?'🟡 Good':'🔴 Needs variety';
+    return '<div class="ring-wrap">'+
+      '<svg class="ring-svg" viewBox="0 0 80 80">'+
+        '<circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="none" stroke="var(--border)" stroke-width="7"/>'+
+        '<circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="none" stroke="'+col+'" stroke-width="7"'+
+          ' stroke-dasharray="'+dash+' '+(circ-dash)+'" stroke-dashoffset="'+(circ/4)+'" stroke-linecap="round"/>'+
+        '<text x="'+cx+'" y="'+cy+'" text-anchor="middle" dominant-baseline="middle"'+
+          ' font-size="14" font-weight="700" fill="var(--text-1)" font-family="Inter,sans-serif">'+pct+'%</text>'+
+      '</svg>'+
+      '<div class="ring-lbl" style="font-weight:600">'+lbl+'</div>'+
+      '<div style="font-size:10px;color:var(--text-3);margin-top:2px">'+grade+'</div>'+
       '</div>';
   }
   document.getElementById('scoreRing').innerHTML =
-    ring(score.snack, 'var(--amber)', '🥐 Snack Rotation') +
-    '<div style="width:1px;height:80px;background:var(--border);flex-shrink:0"></div>' +
-    ring(score.meal,  'var(--navy)',  '🍱 Meal Rotation');
+    ring(score.snack,'var(--amber)','🥐 Snack Rotation')+
+    '<div style="width:1px;height:80px;background:var(--border);flex-shrink:0"></div>'+
+    ring(score.meal,'var(--navy)','🍱 Meal Rotation');
 }
 
 function renderSuggestions(a) {
-  var sugs = [];
-  var snackScore = (a.rotationScore || {}).snack || 0;
-  var mealScore  = (a.rotationScore || {}).meal  || 0;
-  var repSnack   = (a.repeatedSnack || []).length;
-  var repMeal    = (a.repeatedMeal  || []).length;
-
-  if (snackScore < 60) {
-    sugs.push({ icon:'🔄', title:'Increase snack variety', desc:'Your snack rotation score is ' + snackScore + '%. Try introducing at least 3-4 different snack themes each month (e.g. traditional, modern, western) to improve variety.' });
-  } else if (snackScore >= 80) {
-    sugs.push({ icon:'🌟', title:'Excellent snack variety!', desc:'Rotation score of ' + snackScore + '% shows great menu diversity. Keep it up and document successful menus for future reference.' });
+  var sugs=[], ss=(a.rotationScore||{}).snack||0, ms=(a.rotationScore||{}).meal||0;
+  if(ss<60) sugs.push({icon:'🔄',title:'Increase snack variety',desc:'Snack rotation at '+ss+'%. Try 3-4 different snack themes each month.'});
+  else if(ss>=80) sugs.push({icon:'🌟',title:'Excellent snack variety!',desc:'Rotation '+ss+'% — great diversity. Document successful menus.'});
+  if(ms<60) sugs.push({icon:'🍽️',title:'Diversify meal menu',desc:'Meal rotation at '+ms+'%. Rotate proteins: Chicken → Fish → Beef → Tofu/Tempe weekly.'});
+  if((a.repeatedSnack||[]).length>2){
+    var names=(a.repeatedSnack||[]).slice(0,2).map(function(r){return r.name;}).join(', ');
+    sugs.push({icon:'⚡',title:'Snack repetition detected',desc:(a.repeatedSnack||[]).length+' snack(s) repeated across weeks ('+names+'…). Space same menu 3+ weeks apart.'});
   }
-
-  if (mealScore < 60) {
-    sugs.push({ icon:'🍽️', title:'Diversify meal menu', desc:'Meal rotation at ' + mealScore + '%. Consider rotating protein sources weekly: Chicken week → Fish week → Beef week → Tofu/Tempe week. This ensures nutritional balance too.' });
-  }
-
-  if (repSnack > 2) {
-    var names = (a.repeatedSnack || []).slice(0,2).map(function(r){return r.name;}).join(', ');
-    sugs.push({ icon:'⚡', title:'Snack repetition detected', desc:repSnack + ' snack menu(s) repeated across weeks (' + names + '…). Aim to space the same menu at least 3 weeks apart to maintain freshness.' });
-  }
-
-  if (repMeal > 3) {
-    sugs.push({ icon:'📋', title:'Create a meal rotation calendar', desc:'With ' + repMeal + ' repeated meals, consider making a 4-week rotation plan. This ensures each meal appears max once per cycle and workers anticipate variety.' });
-  }
-
-  if (!sugs.length) {
-    sugs.push({ icon:'✅', title:'Menu planning looks great!', desc:'No major issues detected this period. Continue monitoring variety and consider collecting worker feedback on favorite menus.' });
-    sugs.push({ icon:'💾', title:'Document your menu winners', desc:'Track which menus consistently get low leftover. These are your "star menus" — schedule them strategically on high-attendance days.' });
-  }
-
-  sugs.push({ icon:'🥗', title:'Nutritional balance tip', desc:'Ensure each meal includes: protein (meat/tofu/egg), vegetables (cooked + fresh), carb (rice/noodle), and a refreshing element (fruit/soup). This reduces leftover from boredom.' });
-
-  document.getElementById('suggestionList').innerHTML = sugs.map(function(s) {
-    return '<div class="sug-card">' +
-      '<span class="sug-icon">' + s.icon + '</span>' +
-      '<div><div class="sug-title">' + s.title + '</div><div class="sug-desc">' + s.desc + '</div></div>' +
-      '</div>';
+  if((a.repeatedMeal||[]).length>3) sugs.push({icon:'📋',title:'Create a meal rotation calendar',desc:'With '+(a.repeatedMeal||[]).length+' repeated meals, a 4-week rotation plan ensures variety.'});
+  if(!sugs.length){ sugs.push({icon:'✅',title:'Menu planning looks great!',desc:'No major issues. Consider collecting worker feedback on favourite menus.'}); }
+  sugs.push({icon:'🥗',title:'Nutritional balance tip',desc:'Each meal: protein + vegetables + carb + fruit/soup. This reduces leftover from monotony.'});
+  document.getElementById('suggestionList').innerHTML=sugs.map(function(s){
+    return '<div class="sug-card"><span class="sug-icon">'+s.icon+'</span>'+
+      '<div><div class="sug-title">'+s.title+'</div><div class="sug-desc">'+s.desc+'</div></div></div>';
   }).join('');
 }
 
-function renderRepeated(elId, items, col) {
-  var el = document.getElementById(elId);
-  if (!items.length) {
-    el.innerHTML = '<div style="padding:16px;text-align:center;font-size:11px;color:var(--green)">✅ No repeated menus detected this period.</div>';
-    return;
-  }
-  var maxCount = Math.max.apply(null, items.map(function(i){return i.count;}));
-  el.innerHTML = items.map(function(item) {
-    var pct   = Math.round(item.count / maxCount * 100);
-    var cls   = item.count >= 3 ? 'danger' : 'warn';
-    var wkLbl = item.weeks.map(function(w){return 'W'+w;}).join(', ');
-    return '<div class="repeat-card ' + cls + '">' +
-      '<div class="repeat-hdr">' +
-        '<span class="repeat-name">' + item.name + '</span>' +
-        '<span class="repeat-weeks">' + item.count + '× (' + wkLbl + ')</span>' +
-      '</div>' +
-      '<div class="repeat-bar-bg"><div class="repeat-bar-fill" style="width:' + pct + '%;background:' + col + '"></div></div>' +
-      '</div>';
+function renderRepeated(elId,items,col) {
+  var el=document.getElementById(elId);
+  if(!items.length){el.innerHTML='<div style="padding:16px;text-align:center;font-size:11px;color:var(--green)">✅ No repeated menus detected.</div>';return;}
+  var max=Math.max.apply(null,items.map(function(i){return i.count;}));
+  el.innerHTML=items.map(function(item){
+    var pct=Math.round(item.count/max*100);
+    var cls=item.count>=3?'danger':'warn';
+    var wkLbl=item.weeks.map(function(w){return 'W'+w;}).join(', ');
+    return '<div class="repeat-card '+cls+'">'+
+      '<div class="repeat-hdr"><span class="repeat-name">'+item.name+'</span>'+
+      '<span class="repeat-weeks">'+item.count+'× ('+wkLbl+')</span></div>'+
+      '<div class="repeat-bar-bg"><div class="repeat-bar-fill" style="width:'+pct+'%;background:'+col+'"></div></div></div>';
   }).join('');
 }
 
-function renderTopMenu(elId, items, col) {
-  var el = document.getElementById(elId);
-  if (!items.length) { el.innerHTML = '<div class="empty" style="padding:12px">No data yet.</div>'; return; }
-  var max = items[0] ? items[0].count : 1;
-  el.innerHTML = '<div class="top-list">' + items.map(function(item, i) {
-    var pct = Math.round(item.count / max * 100);
-    return '<div class="top-item">' +
-      '<span class="top-rank">' + (i+1) + '</span>' +
-      '<span class="top-name">' + item.name + '</span>' +
-      '<div class="top-bar-bg"><div class="top-bar-fill" style="width:' + pct + '%;background:' + col + '"></div></div>' +
-      '<span class="top-count">' + item.count + '×</span>' +
-      '</div>';
-  }).join('') + '</div>';
+function renderTopMenu(elId,items,col) {
+  var el=document.getElementById(elId);
+  if(!items.length){el.innerHTML='<div style="padding:12px;text-align:center;font-size:11px;color:var(--text-3)">No data yet.</div>';return;}
+  var max=items[0]?items[0].count:1;
+  el.innerHTML=items.map(function(item,i){
+    var pct=Math.round(item.count/max*100);
+    return '<div class="top-item">'+
+      '<span class="top-rank">'+(i+1)+'</span>'+
+      '<span class="top-name">'+item.name+'</span>'+
+      '<div class="top-bar-bg"><div class="top-bar-fill" style="width:'+pct+'%;background:'+col+'"></div></div>'+
+      '<span class="top-count">'+item.count+'×</span></div>';
+  }).join('');
 }
 
-// ══════════════════════════════════════════════
+// ═══════════════════════════════════════════════════
+//  ISO WEEK HELPERS
+// ═══════════════════════════════════════════════════
+function getISOWeekNum(d) {
+  var date=new Date(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate()));
+  var dn=date.getUTCDay()||7;
+  date.setUTCDate(date.getUTCDate()+4-dn);
+  var y=new Date(Date.UTC(date.getUTCFullYear(),0,1));
+  return Math.ceil((((date-y)/86400000)+1)/7);
+}
+function getISOWeekYear(d) {
+  var date=new Date(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate()));
+  var dn=date.getUTCDay()||7;
+  date.setUTCDate(date.getUTCDate()+4-dn);
+  return date.getUTCFullYear();
+}
+function getMondayOf(d) {
+  var day=d.getDay()||7;
+  var mon=new Date(d); mon.setDate(d.getDate()+(1-day)); return mon;
+}
+function getSundayOf(d) {
+  var mon=getMondayOf(d); var sun=new Date(mon); sun.setDate(mon.getDate()+6); return sun;
+}
+function isoKey(d) {
+  return 'W'+getISOWeekYear(d)+'-'+String(getISOWeekNum(d)).padStart(2,'0');
+}
+function isoWeekToMonday(key) {
+  if(!key){ return getMondayOf(new Date()); }
+  var parts=key.replace('W','').split('-');
+  var y=parseInt(parts[0]),w=parseInt(parts[1]);
+  var jan4=new Date(y,0,4);
+  var mon=getMondayOf(jan4);
+  mon.setDate(mon.getDate()+(w-1)*7);
+  return mon;
+}
+function weekLabel(key) {
+  var mon=isoWeekToMonday(key);
+  var sun=getSundayOf(mon);
+  var fmt=function(dt){return dt.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});};
+  return fmt(mon)+' – '+fmt(sun);
+}
+
+// ═══════════════════════════════════════════════════
 //  CALENDAR
-// ══════════════════════════════════════════════
-var calView = 'month'; // 'month' | 'week'
-var calWeekKey = ''; // current ISO week key e.g. "W2026-17"
-
+// ═══════════════════════════════════════════════════
+var CV='month';
 function setCalView(v) {
-  calView = v;
-  document.getElementById('cvMonth').className = 'cal-view-btn' + (v==='month'?' active':'');
-  document.getElementById('cvWeek').className  = 'cal-view-btn' + (v==='week' ?' active':'');
-  document.getElementById('calMonthView').style.display = v==='month'?'':'none';
-  document.getElementById('calWeekView').style.display  = v==='week' ?'':'none';
-  document.getElementById('calWeekSel').style.display   = v==='week' ?'':'none';
-  if (v==='month') renderCalMonth();
+  CV=v;
+  document.getElementById('cvMonth').className='cal-view-btn'+(v==='month'?' active':'');
+  document.getElementById('cvWeek').className ='cal-view-btn'+(v==='week' ?' active':'');
+  document.getElementById('calMonthView').style.display=v==='month'?'':'none';
+  document.getElementById('calWeekView').style.display =v==='week' ?'':'none';
+  document.getElementById('calWeekSel').style.display  =v==='week' ?'':'none';
+  if(v==='month') renderCalMonth();
   else renderCalWeek();
 }
-
 function calPrev() {
-  if (calView === 'month') {
-    calMonth--;
-    if (calMonth < 0) { calMonth = 11; calYear--; }
-    renderCalMonth();
+  if(CV==='month'){
+    calMonth--; if(calMonth<0){calMonth=11;calYear--;} renderCalMonth();
   } else {
-    // Previous ISO week
-    var d = isoWeekToMonday(calWeekKey);
-    d.setDate(d.getDate() - 7);
-    calWeekKey = 'W' + getISOWeekYear(d) + '-' + String(getISOWeekNum(d)).padStart(2,'0');
-    renderCalWeek();
+    var mon=isoWeekToMonday(calWeekKey); mon.setDate(mon.getDate()-7);
+    calWeekKey=isoKey(mon); renderCalWeek();
   }
 }
 function calNext() {
-  if (calView === 'month') {
-    calMonth++;
-    if (calMonth > 11) { calMonth = 0; calYear++; }
-    renderCalMonth();
+  if(CV==='month'){
+    calMonth++; if(calMonth>11){calMonth=0;calYear++;} renderCalMonth();
   } else {
-    var d = isoWeekToMonday(calWeekKey);
-    d.setDate(d.getDate() + 7);
-    calWeekKey = 'W' + getISOWeekYear(d) + '-' + String(getISOWeekNum(d)).padStart(2,'0');
-    renderCalWeek();
+    var mon=isoWeekToMonday(calWeekKey); mon.setDate(mon.getDate()+7);
+    calWeekKey=isoKey(mon); renderCalWeek();
   }
 }
-
-// Convert ISO week key "W2026-17" to its Monday Date
-function isoWeekToMonday(key) {
-  if (!key) {
-    var now = new Date();
-    return getMondayOf(now);
-  }
-  var parts = key.replace('W','').split('-');
-  var y = parseInt(parts[0]), w = parseInt(parts[1]);
-  // Jan 4 is always in week 1
-  var jan4   = new Date(y, 0, 4);
-  var monday = getMondayOf(jan4);
-  monday.setDate(monday.getDate() + (w - 1) * 7);
-  return monday;
+function renderCalendar() {
+  if(selWeek){ calWeekKey=selWeek; var m=isoWeekToMonday(selWeek); calYear=m.getFullYear(); calMonth=m.getMonth(); }
+  if(CV==='month') renderCalMonth(); else renderCalWeek();
 }
-
-// Build week selector options from DATA.byWeek
 function buildWeekSelector() {
-  var sel = document.getElementById('calWeekSel');
-  if (!sel || !DATA || !DATA.byWeek) return;
-  var keys = Object.keys(DATA.byWeek).sort();
-  sel.innerHTML = '<option value="">Jump to week…</option>';
-  keys.forEach(function(k) {
-    var w = DATA.byWeek[k];
-    var o = document.createElement('option');
-    o.value = k;
-    o.textContent = k + ' · ' + (w.label || '');
-    if (k === calWeekKey) o.selected = true;
+  var sel=document.getElementById('calWeekSel'); if(!sel||!DATA||!DATA.byWeek) return;
+  sel.innerHTML='<option value="">Jump to week…</option>';
+  Object.keys(DATA.byWeek).sort().forEach(function(k){
+    var w=DATA.byWeek[k];
+    var o=document.createElement('option');
+    o.value=k; o.textContent=w.label||k;
+    if(k===calWeekKey) o.selected=true;
     sel.appendChild(o);
   });
 }
+function jumpToWeek(key) { if(key){calWeekKey=key; renderCalWeek();} }
 
-function jumpToWeek(key) {
-  if (!key) return;
-  calWeekKey = key;
-  renderCalWeek();
-}
-
-// ── MONTH VIEW ────────────────────────────────
 function renderCalMonth() {
-  var MONTHS = ['January','February','March','April','May','June',
-                'July','August','September','October','November','December'];
-  document.getElementById('calMonthLabel').textContent = MONTHS[calMonth] + ' ' + calYear;
-
-  var firstDay    = new Date(calYear, calMonth, 1).getDay();
-  var startOffset = (firstDay + 6) % 7; // Mon=0
-  var daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
-  var today       = new Date();
-  var byDate      = (DATA && DATA.byDate) || {};
-
-  var cells = '';
-  for (var i = 0; i < startOffset; i++) cells += '<div class="cal-cell empty"></div>';
-
-  for (var d = 1; d <= daysInMonth; d++) {
-    var dt      = new Date(calYear, calMonth, d);
-    var rawKey  = dt.getFullYear() + '-' +
-                  String(dt.getMonth()+1).padStart(2,'0') + '-' +
-                  String(dt.getDate()).padStart(2,'0');
-    var isToday = dt.toDateString() === today.toDateString();
-    var day     = byDate[rawKey] || null;
-    var cls     = 'cal-cell' + (day?' has-data':'') + (isToday?' today':'');
-    var onclick = day ? 'openDayModal("' + rawKey + '")' : '';
-    var inner   = '<div class="cal-date">' + d + '</div>';
-    if (day) {
-      if (day.snack && day.snack.length)
-        inner += '<div class="cal-menu-item cal-snack">🥐 ' + cap(day.snack[0].menuName) + '</div>';
-      if (day.meal && day.meal.length) {
-        inner += '<div class="cal-menu-item cal-meal">🍱 ' + cap(day.meal[0].menuName) + '</div>';
-        if (day.meal.length > 1) inner += '<div class="cal-more">+' + (day.meal.length-1) + ' more</div>';
+  var MN=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  document.getElementById('calMonthLabel').textContent=MN[calMonth]+' '+calYear;
+  var first=(new Date(calYear,calMonth,1).getDay()+6)%7;
+  var last=new Date(calYear,calMonth+1,0).getDate();
+  var today=new Date();
+  var byDate=(DATA&&DATA.byDate)||{};
+  var cells='';
+  for(var i=0;i<first;i++) cells+='<div class="cal-cell empty"></div>';
+  for(var d=1;d<=last;d++){
+    var dt=new Date(calYear,calMonth,d);
+    var rk=dt.getFullYear()+'-'+String(dt.getMonth()+1).padStart(2,'0')+'-'+String(dt.getDate()).padStart(2,'0');
+    var isT=dt.toDateString()===today.toDateString();
+    var day=byDate[rk]||null;
+    var cls='cal-cell'+(day?' has-data':'')+(isT?' today':'');
+    var inner='<div class="cal-date">'+d+'</div>';
+    if(day){
+      if(day.snack&&day.snack.length) inner+='<div class="cal-menu-item cal-snack">🥐 '+cap(day.snack[0].menuName)+'</div>';
+      if(day.meal&&day.meal.length){
+        inner+='<div class="cal-menu-item cal-meal">🍱 '+cap(day.meal[0].menuName)+'</div>';
+        if(day.meal.length>1) inner+='<div class="cal-more">+'+(day.meal.length-1)+' more</div>';
       }
     }
-    cells += '<div class="' + cls + '"' + (onclick ? 'onclick="' + onclick + '"' : '') + '>' + inner + '</div>';
+    var oc=day ? ' onclick="openDayModal(\''+rk+'\')"' : '';
+    cells+='<div class="'+cls+'"'+oc+'>'+inner+'</div>';
   }
-
-  var rem = (startOffset + daysInMonth) % 7;
-  if (rem > 0) for (var j = 0; j < 7-rem; j++) cells += '<div class="cal-cell empty"></div>';
-  document.getElementById('calGrid').innerHTML = cells;
+  var rem=(first+last)%7;
+  if(rem>0) for(var j=0;j<7-rem;j++) cells+='<div class="cal-cell empty"></div>';
+  document.getElementById('calGrid').innerHTML=cells;
 }
 
-// ── WEEK VIEW ─────────────────────────────────
 function renderCalWeek() {
-  if (!calWeekKey) {
-    // Default: current week
-    var now = new Date();
-    calWeekKey = 'W' + getISOWeekYear(now) + '-' + String(getISOWeekNum(now)).padStart(2,'0');
-  }
-
-  var mon    = isoWeekToMonday(calWeekKey);
-  var byDate = (DATA && DATA.byDate) || {};
-  var DAYS   = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
-
-  // Build week range label
-  var sun = new Date(mon); sun.setDate(mon.getDate() + 6);
-  var fmt = function(dt) { return dt.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}); };
-  document.getElementById('calMonthLabel').textContent = fmt(mon) + ' – ' + fmt(sun);
-
+  if(!calWeekKey) calWeekKey=isoKey(new Date());
+  var mon=isoWeekToMonday(calWeekKey);
+  var sun=getSundayOf(mon);
+  var fmt=function(dt){return dt.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});};
+  document.getElementById('calMonthLabel').textContent=fmt(mon)+' – '+fmt(sun);
   buildWeekSelector();
-
-  var html = '';
-  for (var i = 0; i < 7; i++) {
-    var dt     = new Date(mon); dt.setDate(mon.getDate() + i);
-    var rawKey = dt.getFullYear() + '-' + String(dt.getMonth()+1).padStart(2,'0') + '-' + String(dt.getDate()).padStart(2,'0');
-    var day    = byDate[rawKey] || null;
-    var isToday= dt.toDateString() === new Date().toDateString();
-    var dayLbl = DAYS[i] + ' ' + dt.getDate();
-
-    html += '<div style="display:grid;grid-template-columns:64px 1fr 1fr;gap:8px;padding:10px 0;border-bottom:1px solid var(--surface-2);">';
-    // Day label
-    html += '<div style="font-size:11px;font-weight:600;color:' + (isToday?'var(--navy)':'var(--text-3)') + ';padding-top:4px;">' +
-      dayLbl + (isToday?' <span style="color:var(--navy);font-size:9px">Today</span>':'') + '</div>';
-
-    // Snack
-    html += '<div>';
-    if (day && day.snack && day.snack.length) {
-      day.snack.forEach(function(e) {
-        html += '<div style="font-size:12px;font-weight:500;color:var(--amber);margin-bottom:2px">🥐 ' + cap(e.menuName) + '</div>';
-        if (e.components.length)
-          html += '<div style="font-size:10px;color:var(--text-3);margin-bottom:4px">' + e.components.join(' · ') + '</div>';
-      });
-    } else {
-      html += '<span style="font-size:11px;color:var(--text-3);font-style:italic">—</span>';
-    }
-    html += '</div>';
-
-    // Meal
-    html += '<div>';
-    if (day && day.meal && day.meal.length) {
-      day.meal.forEach(function(e) {
-        html += '<div style="font-size:12px;font-weight:500;color:var(--navy);margin-bottom:2px">🍱 ' + cap(e.menuName) + '</div>';
-      });
-      if (day.meal[0] && day.meal[0].components.length)
-        html += '<div style="font-size:10px;color:var(--text-3)">' + day.meal[0].components.slice(0,4).join(' · ') + '</div>';
-    } else {
-      html += '<span style="font-size:11px;color:var(--text-3);font-style:italic">—</span>';
-    }
-    html += '</div>';
-
-    html += '</div>';
-  }
-
-  // Column headers
-  var hdrs = '<div style="display:grid;grid-template-columns:64px 1fr 1fr;gap:8px;padding-bottom:8px;border-bottom:2px solid var(--border);margin-bottom:4px;">' +
-    '<div style="font-size:10px;font-weight:700;color:var(--text-3);text-transform:uppercase">Day</div>' +
-    '<div style="font-size:10px;font-weight:700;color:var(--amber);text-transform:uppercase">🥐 Snack</div>' +
-    '<div style="font-size:10px;font-weight:700;color:var(--navy);text-transform:uppercase">🍱 Meal</div>' +
+  var byDate=(DATA&&DATA.byDate)||{};
+  var DAYS=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  var hdrs='<div style="display:grid;grid-template-columns:64px 1fr 1fr;gap:8px;padding-bottom:8px;border-bottom:2px solid var(--border);margin-bottom:4px;">'+
+    '<div style="font-size:10px;font-weight:700;color:var(--text-3);text-transform:uppercase">Day</div>'+
+    '<div style="font-size:10px;font-weight:700;color:var(--amber);text-transform:uppercase">🥐 Snack</div>'+
+    '<div style="font-size:10px;font-weight:700;color:var(--navy);text-transform:uppercase">🍱 Meal</div>'+
     '</div>';
-  document.getElementById('calWeekGrid').innerHTML = hdrs + html;
+  var rows='';
+  for(var i=0;i<7;i++){
+    var dt=new Date(mon); dt.setDate(mon.getDate()+i);
+    var rk=dt.getFullYear()+'-'+String(dt.getMonth()+1).padStart(2,'0')+'-'+String(dt.getDate()).padStart(2,'0');
+    var day=byDate[rk]||null;
+    var isT=dt.toDateString()===new Date().toDateString();
+    var dayLbl=DAYS[i]+' '+dt.getDate()+' '+dt.toLocaleDateString('en-GB',{month:'short'});
+    rows+='<div style="display:grid;grid-template-columns:64px 1fr 1fr;gap:8px;padding:10px 0;border-bottom:1px solid var(--surface-2);">';
+    rows+='<div style="font-size:11px;font-weight:600;color:'+(isT?'var(--navy)':'var(--text-3)')+';padding-top:3px">'+dayLbl+(isT?' ✦':'')+'</div>';
+    // Snack
+    rows+='<div>';
+    if(day&&day.snack&&day.snack.length){
+      day.snack.forEach(function(e){
+        rows+='<div style="font-size:12px;font-weight:500;color:var(--amber);margin-bottom:2px">🥐 '+cap(e.menuName)+'</div>';
+        if(e.components&&e.components.length) rows+='<div style="font-size:10px;color:var(--text-3);margin-bottom:3px">'+e.components.slice(0,4).join(' · ')+'</div>';
+      });
+    } else rows+='<span style="font-size:11px;color:var(--text-3);font-style:italic">—</span>';
+    rows+='</div>';
+    // Meal
+    rows+='<div>';
+    if(day&&day.meal&&day.meal.length){
+      day.meal.forEach(function(e){
+        rows+='<div style="font-size:12px;font-weight:500;color:var(--navy);margin-bottom:2px">🍱 '+cap(e.menuName)+'</div>';
+      });
+      if(day.meal[0]&&day.meal[0].components&&day.meal[0].components.length)
+        rows+='<div style="font-size:10px;color:var(--text-3)">'+day.meal[0].components.slice(0,4).join(' · ')+'</div>';
+    } else rows+='<span style="font-size:11px;color:var(--text-3);font-style:italic">—</span>';
+    rows+='</div>';
+    rows+='</div>';
+  }
+  document.getElementById('calWeekGrid').innerHTML=hdrs+rows;
 }
 
-// ── INIT CALENDAR ─────────────────────────────
-function renderCalendar() {
-  // Sync calYear/calMonth from selMonth
-  if (selMonth) {
-    var parts = selMonth.split('-');
-    if (parts.length === 2) {
-      calYear  = parseInt(parts[0]);
-      calMonth = parseInt(parts[1]) - 1;
-    }
-  }
-  if (calView === 'month') renderCalMonth();
-  else renderCalWeek();
-}
-
-// ══════════════════════════════════════════════
-//  WEEKLY LIST
-// ══════════════════════════════════════════════
-function renderWeekly() {
-  if (!DATA || !DATA.byWeek) {
-    document.getElementById('weeklyList').innerHTML = '<div class="empty"><span class="empty-icon">📋</span>No menu data available.</div>';
-    return;
-  }
-  // ISO week keys "W2026-17" sort correctly as strings (zero-padded)
-  var weeks = Object.keys(DATA.byWeek).sort();
-
-  if (!weeks.length) {
-    document.getElementById('weeklyList').innerHTML = '<div class="empty"><span class="empty-icon">📋</span>No weekly data for this period.</div>';
-    return;
-  }
-
-  document.getElementById('weeklyList').innerHTML = weeks.map(function(wk) {
-    var w = DATA.byWeek[wk];
-    // Group by date within the week
-    var dayMap = {};
-    (w.snack || []).concat(w.meal || []).forEach(function(e) {
-      if (!dayMap[e.date]) dayMap[e.date] = { snack:[], meal:[] };
-      if (e.type.toLowerCase() === 'snack') dayMap[e.date].snack.push(e);
-      else dayMap[e.date].meal.push(e);
-    });
-    var dayKeys = Object.keys(dayMap).sort();
-
-    var rows = dayKeys.map(function(dt) {
-      var day = dayMap[dt];
-      var snackHtml = day.snack.length
-        ? '<div class="menu-pill">🥐 ' + cap(day.snack[0].menuName) + '</div>' +
-          (day.snack[0].components.length ? '<div class="menu-comps">' + day.snack[0].components.slice(0,4).join(' · ') + '</div>' : '')
-        : '<span class="no-menu">No snack</span>';
-      var mealHtml  = day.meal.length
-        ? day.meal.map(function(m) {
-            return '<div class="menu-pill">🍱 ' + cap(m.menuName) + '</div>';
-          }).join('') +
-          (day.meal[0] && day.meal[0].components.length ? '<div class="menu-comps">' + day.meal[0].components.slice(0,3).join(' · ') + '</div>' : '')
-        : '<span class="no-menu">No meal</span>';
-      return '<div class="day-row">' +
-        '<div><div class="day-label">' + dt.split(' ')[1] + ' ' + dt.split(' ')[0] + '</div></div>' +
-        '<div class="menu-pill-wrap">' + snackHtml + '</div>' +
-        '<div class="menu-pill-wrap">' + mealHtml  + '</div>' +
-        '</div>';
-    }).join('');
-
-    // Compute Mon-Sun range from first day in this week
-    var firstDateStr = dayKeys[0] ? dayKeys[0] : '';
-    var weekRange    = firstDateStr ? weekRangeLabel(firstDateStr.replace(/(\d+)\s(\w+)\s(\d+)/,
-      function(m, d, mon, y) {
-        var months = {Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11};
-        return new Date(parseInt(y), months[mon]||0, parseInt(d)).toISOString().split('T')[0];
-      })) : '';
-    var weekTitle = (w.label || ('Week ' + w.weekNum));
-    return '<div class="week-card">' +
-      '<div class="week-hdr">' +
-        '<span class="week-hdr-title">' + weekTitle + '</span>' +
-        '<span class="week-hdr-range">' + (w.label || weekRange || (dayKeys[0]+' – '+dayKeys[dayKeys.length-1])) + '</span>' +
-      '</div>' +
-      '<div class="week-body">' +
-        '<div class="day-row" style="font-size:10px;font-weight:700;color:var(--text-3);text-transform:uppercase;padding-bottom:6px;">' +
-          '<div>Date</div><div>Snack</div><div>Meal</div>' +
-        '</div>' +
-        rows +
-      '</div>' +
-      '</div>';
-  }).join('');
-}
-
-// ══════════════════════════════════════════════
+// ═══════════════════════════════════════════════════
 //  DAY MODAL
-// ══════════════════════════════════════════════
+// ═══════════════════════════════════════════════════
 function openDayModal(rawKey) {
-  if (!DATA || !DATA.byDate) return;
-  var day = DATA.byDate[rawKey];
-  if (!day) return;
-  // Format display date
-  var d = new Date(rawKey + 'T00:00:00');
-  var displayDate = isNaN(d.getTime()) ? rawKey :
-    d.toLocaleDateString('en-GB', {weekday:'long', day:'2-digit', month:'long', year:'numeric'});
-  document.getElementById('modalDate').textContent = '📅 ' + displayDate;
-  var html = '';
-  if (day.snack && day.snack.length) {
-    html += '<div style="margin-bottom:12px"><div style="font-size:10px;font-weight:700;color:var(--amber);text-transform:uppercase;margin-bottom:8px">🥐 Snack</div>';
-    day.snack.forEach(function(e) {
-      html += '<div class="modal-item"><div class="modal-item-name">' + cap(e.menuName) + '</div>';
-      if (e.components.length) html += '<div class="modal-item-comps">Components: ' + e.components.join(', ') + '</div>';
-      html += '</div>';
+  if(!DATA||!DATA.byDate) return;
+  var day=DATA.byDate[rawKey]; if(!day) return;
+  var d=new Date(rawKey+'T00:00:00');
+  var display=isNaN(d.getTime())?rawKey:d.toLocaleDateString('en-GB',{weekday:'long',day:'2-digit',month:'long',year:'numeric'});
+  document.getElementById('modalDate').textContent='📅 '+display;
+  var html='';
+  if(day.snack&&day.snack.length){
+    html+='<div style="margin-bottom:12px"><div style="font-size:10px;font-weight:700;color:var(--amber);text-transform:uppercase;margin-bottom:8px">🥐 Snack</div>';
+    day.snack.forEach(function(e){
+      html+='<div class="modal-item"><div class="modal-item-name">'+cap(e.menuName)+'</div>';
+      if(e.components&&e.components.length) html+='<div class="modal-item-comps">'+e.components.join(', ')+'</div>';
+      html+='</div>';
     });
-    html += '</div>';
+    html+='</div>';
   }
-  if (day.meal && day.meal.length) {
-    html += '<div><div style="font-size:10px;font-weight:700;color:var(--navy);text-transform:uppercase;margin-bottom:8px">🍱 Meal</div>';
-    day.meal.forEach(function(e) {
-      html += '<div class="modal-item"><div class="modal-item-name">' + cap(e.menuName) + '</div>';
-      if (e.components.length) html += '<div class="modal-item-comps">Components: ' + e.components.join(', ') + '</div>';
-      html += '</div>';
+  if(day.meal&&day.meal.length){
+    html+='<div><div style="font-size:10px;font-weight:700;color:var(--navy);text-transform:uppercase;margin-bottom:8px">🍱 Meal</div>';
+    day.meal.forEach(function(e){
+      html+='<div class="modal-item"><div class="modal-item-name">'+cap(e.menuName)+'</div>';
+      if(e.components&&e.components.length) html+='<div class="modal-item-comps">'+e.components.join(', ')+'</div>';
+      html+='</div>';
     });
-    html += '</div>';
+    html+='</div>';
   }
-  document.getElementById('modalBody').innerHTML = html;
+  if(!html) html='<div style="color:var(--text-3);font-size:12px;padding:12px 0">No menu data for this day.</div>';
+  document.getElementById('modalBody').innerHTML=html;
   document.getElementById('dayModal').classList.add('show');
 }
 function closeDayModal() { document.getElementById('dayModal').classList.remove('show'); }
 
-// ══════════════════════════════════════════════
+// ═══════════════════════════════════════════════════
+//  WEEKLY LIST
+// ═══════════════════════════════════════════════════
+function renderWeekly() {
+  var container=document.getElementById('weeklyList');
+  if(!DATA||!DATA.byWeek){ container.innerHTML='<div class="empty"><span class="empty-icon">📋</span>No menu data available.</div>'; return; }
+
+  // Filter to selected week or show all
+  var keys=Object.keys(DATA.byWeek).sort();
+  if(selWeek) keys=keys.filter(function(k){return k===selWeek;});
+  if(!keys.length){ container.innerHTML='<div class="empty"><span class="empty-icon">📋</span>No data for this week.</div>'; return; }
+
+  container.innerHTML=keys.map(function(wk){
+    var w=DATA.byWeek[wk];
+    var dayMap={};
+    (w.snack||[]).concat(w.meal||[]).forEach(function(e){
+      var dk=e.rawDate||e.date;
+      if(!dayMap[dk]) dayMap[dk]={snack:[],meal:[],dateStr:e.date};
+      if(e.type.toLowerCase()==='snack') dayMap[dk].snack.push(e);
+      else dayMap[dk].meal.push(e);
+    });
+    var dayKeys=Object.keys(dayMap).sort();
+    var rows=dayKeys.map(function(dk){
+      var day=dayMap[dk];
+      var snH=day.snack.length
+        ?'<div style="font-size:12px;font-weight:500;color:var(--amber)">🥐 '+cap(day.snack[0].menuName)+'</div>'+
+          (day.snack[0].components&&day.snack[0].components.length?'<div style="font-size:10px;color:var(--text-3)">'+day.snack[0].components.slice(0,4).join(' · ')+'</div>':'')
+        :'<span style="font-size:11px;color:var(--text-3);font-style:italic">No snack</span>';
+      var mlH=day.meal.length
+        ?day.meal.map(function(m){return'<div style="font-size:12px;font-weight:500;color:var(--navy)">🍱 '+cap(m.menuName)+'</div>';}).join('')+
+          (day.meal[0].components&&day.meal[0].components.length?'<div style="font-size:10px;color:var(--text-3)">'+day.meal[0].components.slice(0,3).join(' · ')+'</div>':'')
+        :'<span style="font-size:11px;color:var(--text-3);font-style:italic">No meal</span>';
+      return '<div class="day-row"><div><div class="day-label">'+day.dateStr+'</div></div>'+
+        '<div class="menu-pill-wrap">'+snH+'</div>'+
+        '<div class="menu-pill-wrap">'+mlH+'</div></div>';
+    }).join('');
+    return '<div class="week-card">'+
+      '<div class="week-hdr">'+
+        '<span class="week-hdr-title">'+wk+'</span>'+
+        '<span class="week-hdr-range">'+(w.label||weekLabel(wk))+'</span>'+
+      '</div>'+
+      '<div class="week-body">'+
+        '<div class="day-row" style="font-size:10px;font-weight:700;color:var(--text-3);text-transform:uppercase;padding-bottom:6px">'+
+          '<div>Date</div><div>🥐 Snack</div><div>🍱 Meal</div></div>'+
+        rows+
+      '</div></div>';
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════════
 //  INPUT — MANUAL
-// ══════════════════════════════════════════════
+// ═══════════════════════════════════════════════════
 function setType(t) {
-  activeType = t;
-  document.getElementById('typeSnack').className = 'type-btn' + (t==='snack'?' active-snack':'');
-  document.getElementById('typeMeal').className  = 'type-btn' + (t==='meal' ?' active-meal':'');
+  activeType=t;
+  document.getElementById('typeSnack').className='type-btn'+(t==='snack'?' active-snack':'');
+  document.getElementById('typeMeal').className ='type-btn'+(t==='meal' ?' active-meal':'');
 }
 function setPasteType(t) {
-  pasteType = t;
-  document.getElementById('pasteTypeSnack').className = 'type-btn' + (t==='snack'?' active-snack':'');
-  document.getElementById('pasteTypeMeal').className  = 'type-btn' + (t==='meal' ?' active-meal':'');
+  pasteType=t;
+  document.getElementById('pasteTypeSnack').className='type-btn'+(t==='snack'?' active-snack':'');
+  document.getElementById('pasteTypeMeal').className ='type-btn'+(t==='meal' ?' active-meal':'');
 }
-
 function addComp() {
-  var inp = document.getElementById('compInput');
-  var val = inp.value.trim();
-  if (!val) return;
-  components.push(val);
-  inp.value = '';
-  renderCompTags();
+  var inp=document.getElementById('compInput'), val=inp.value.trim();
+  if(!val) return; components.push(val); inp.value=''; renderCompTags();
 }
-function removeComp(i) {
-  components.splice(i, 1);
-  renderCompTags();
-}
+function removeComp(i) { components.splice(i,1); renderCompTags(); }
 function renderCompTags() {
-  document.getElementById('compTags').innerHTML = components.map(function(c, i) {
-    return '<span class="comp-tag">' + c + '<button onclick="removeComp(' + i + ')">×</button></span>';
+  document.getElementById('compTags').innerHTML=components.map(function(c,i){
+    return '<span class="comp-tag">'+c+'<button onclick="removeComp('+i+')">×</button></span>';
   }).join('');
 }
-
 function submitManual() {
-  var date    = document.getElementById('menuDate').value;
-  var name    = document.getElementById('menuName').value.trim();
-  if (!date || !name) { toast('Please fill date and menu name.', 'err'); return; }
-
-  var entry = { date:date, type:activeType, menuName:name, components:components.slice() };
-  saveEntries([entry], function() {
-    document.getElementById('menuName').value = '';
-    components = [];
-    renderCompTags();
-    loadData(selMonth);
+  var date=document.getElementById('menuDate').value;
+  var name=document.getElementById('menuName').value.trim();
+  if(!date||!name){toast('Please fill date and menu name.','err');return;}
+  saveEntries([{date:date,type:activeType,menuName:name,components:components.slice()}],function(){
+    document.getElementById('menuName').value=''; components=[]; renderCompTags(); loadData('');
   });
 }
 
-// ══════════════════════════════════════════════
+// ═══════════════════════════════════════════════════
 //  INPUT — BULK PASTE
-// ══════════════════════════════════════════════
-var parseMode = 'auto'; // 'auto' | 'remark'
-
+// ═══════════════════════════════════════════════════
 function setParseMode(m) {
-  parseMode = m;
-
-  // Update radio label border highlight
-  var autoLbl   = document.getElementById('modeAutoLabel');
-  var remarkLbl = document.getElementById('modeRemarkLabel');
-  if (autoLbl)   autoLbl.style.borderColor   = (m === 'auto')   ? 'var(--navy)' : 'var(--border)';
-  if (remarkLbl) remarkLbl.style.borderColor  = (m === 'remark') ? 'var(--navy)' : 'var(--border)';
-
+  parseMode=m;
+  var al=document.getElementById('modeAutoLabel'), rl=document.getElementById('modeRemarkLabel');
+  if(al) al.style.borderColor=(m==='auto')?'var(--navy)':'var(--border)';
+  if(rl) rl.style.borderColor=(m==='remark')?'var(--navy)':'var(--border)';
   updatePlaceholderAndHint();
 }
-
 function updatePlaceholderAndHint() {
-  var ta   = document.getElementById('pasteArea');
-  var hint = document.getElementById('pasteHint');
-  if (!ta || !hint) return;
-
-  if (parseMode === 'auto') {
-    ta.placeholder = [
-      'Contoh Snack (Auto mode):',
-      '',
-      '20-Apr-26   Bubur ayam',
-      '20-Apr-26   Kuah kaldu',
-      '20-Apr-26   Sambal',
-      '20-Apr-26   Kerupuk',
-      '',
-      'Baris pertama per tanggal = menu utama.',
-      'Baris berikutnya = komponen otomatis.'
-    ].join('\n');
-    hint.innerHTML =
-      '<strong>Auto mode:</strong> Baris <em>pertama</em> setiap tanggal = menu utama. ' +
-      'Semua baris berikutnya = komponen otomatis. ' +
-      'Cocok untuk copy-paste langsung dari catatan harian.';
+  var ta=document.getElementById('pasteArea'), hint=document.getElementById('pasteHint');
+  if(!ta||!hint) return;
+  if(parseMode==='auto'){
+    ta.placeholder=['Contoh Snack (Auto mode):','','20-Apr-26   Bubur ayam','20-Apr-26   Kuah kaldu','20-Apr-26   Sambal','20-Apr-26   Kerupuk','','Baris pertama per tanggal = menu utama.','Baris berikutnya = komponen otomatis.'].join('\n');
+    hint.innerHTML='<strong>Auto mode:</strong> Baris <em>pertama</em> setiap tanggal = menu utama. Semua baris berikutnya = komponen. Cocok untuk copy-paste langsung.';
   } else {
-    ta.placeholder = [
-      'Contoh Remark mode:',
-      '',
-      '20-Apr-26   Bubur ayam [s]',
-      '20-Apr-26   Kuah kaldu [c]',
-      '20-Apr-26   Sambal [c]',
-      '20-Apr-26   Kerupuk [c]',
-      '',
-      '14-Apr-26   Chicken yakiniku [s]',
-      '14-Apr-26   Fu yung hai [s]',
-      '14-Apr-26   Nasi putih [c]',
-      '14-Apr-26   Melon [c]'
-    ].join('\n');
-    hint.innerHTML =
-      '<strong>Remark mode:</strong> Tambah tag di akhir baris &mdash; ' +
-      '<code style="background:var(--surface-2);padding:1px 5px;border-radius:3px">[s]</code> = menu utama, ' +
-      '<code style="background:var(--surface-2);padding:1px 5px;border-radius:3px">[c]</code> = komponen. ' +
-      'Admin yang menentukan sendiri.';
+    ta.placeholder=['Contoh Remark mode:','','20-Apr-26   Bubur ayam [s]','20-Apr-26   Kuah kaldu [c]','20-Apr-26   Sambal [c]','20-Apr-26   Kerupuk [c]','','14-Apr-26   Chicken yakiniku [s]','14-Apr-26   Fu yung hai [s]','14-Apr-26   Nasi putih [c]','14-Apr-26   Melon [c]'].join('\n');
+    hint.innerHTML='<strong>Remark mode:</strong> Tag <code>[s]</code> = menu utama, <code>[c]</code> = komponen. Admin yang menentukan sendiri.';
   }
 }
-
 function parsePaste() {
-  var raw = document.getElementById('pasteArea').value.trim();
-  if (!raw) { toast('Paste some menu data first.', 'err'); return; }
-
-  parsedEntries = [];
-
-  if (parseMode === 'remark') {
-    parsedEntries = parseRemark(raw);
-  } else {
-    parsedEntries = parseAuto(raw);
-  }
-
-  if (!parsedEntries.length) {
-    toast('Could not parse any entries. Check format.', 'err');
-    return;
-  }
+  var raw=document.getElementById('pasteArea').value.trim();
+  if(!raw){toast('Paste some menu data first.','err');return;}
+  parsedEntries=parseMode==='remark'?parseRemark(raw):parseAuto(raw);
+  if(!parsedEntries.length){toast('Could not parse any entries.','err');return;}
   showParsedPreview();
 }
-
-// ── AUTO MODE: first line per date = main menu, rest = components
 function parseAuto(raw) {
-  var lines   = raw.split('\n');
-  var result  = [];
-  var dateMap = {}; // date string -> first entry (main menu)
-
-  lines.forEach(function(line) {
-    if (!line.trim()) return;
-
-    var tabIdx = line.indexOf('\t');
-    var part1  = tabIdx > -1 ? line.substring(0, tabIdx).trim() : line.trim();
-    var part2  = tabIdx > -1 ? line.substring(tabIdx+1).trim() : '';
-    var text   = part2 || part1;
-    if (!text) return;
-
-    var tryDate = tryParseDate(part1);
-
-    if (tryDate) {
-      if (!dateMap[tryDate]) {
-        // First item this date = main menu
-        var entry = { date:tryDate, type:pasteType, menuName:text, components:[] };
-        result.push(entry);
-        dateMap[tryDate] = entry;
-      } else {
-        // Same date again = component of that date's main menu
-        dateMap[tryDate].components.push(text);
-      }
+  var lines=raw.split('\n'), result=[], dateMap={};
+  lines.forEach(function(line){
+    if(!line.trim()) return;
+    var ti=line.indexOf('\t');
+    var p1=ti>-1?line.substring(0,ti).trim():line.trim();
+    var p2=ti>-1?line.substring(ti+1).trim():'';
+    var text=p2||p1; if(!text) return;
+    var td=tryParseDate(p1);
+    if(td){
+      if(!dateMap[td]){
+        var entry={date:td,type:pasteType,menuName:text,components:[]};
+        result.push(entry); dateMap[td]=entry;
+      } else { dateMap[td].components.push(text); }
     } else {
-      // No date = component of last entry
-      var txt = line.trim();
-      if (txt && result.length) {
-        result[result.length - 1].components.push(txt);
-      }
+      var txt=line.trim();
+      if(txt&&result.length) result[result.length-1].components.push(txt);
     }
   });
   return result;
 }
-
-// ── ISO WEEK HELPERS (Mon-Sun rolling, mirrors Code.gs) ─────
-function getISOWeekNum(d) {
-  var date   = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
-  var dayNum = date.getUTCDay() || 7;
-  date.setUTCDate(date.getUTCDate() + 4 - dayNum);
-  var yearStart = new Date(Date.UTC(date.getUTCFullYear(), 0, 1));
-  return Math.ceil((((date - yearStart) / 86400000) + 1) / 7);
-}
-function getISOWeekYear(d) {
-  var date   = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
-  var dayNum = date.getUTCDay() || 7;
-  date.setUTCDate(date.getUTCDate() + 4 - dayNum);
-  return date.getUTCFullYear();
-}
-function getMondayOf(d) {
-  var day = d.getDay() || 7;
-  var mon = new Date(d);
-  mon.setDate(d.getDate() + (1 - day));
-  return mon;
-}
-function getSundayOf(d) {
-  var mon = getMondayOf(d);
-  var sun = new Date(mon);
-  sun.setDate(mon.getDate() + 6);
-  return sun;
-}
-function isoWeekKey(dateStr) {
-  var d = new Date(dateStr + 'T00:00:00');
-  if (isNaN(d.getTime())) return 'W0000-00';
-  var wn = getISOWeekNum(d), wy = getISOWeekYear(d);
-  return 'W' + wy + '-' + String(wn).padStart(2,'0');
-}
-function weekRangeLabel(dateStr) {
-  var d   = new Date(dateStr + 'T00:00:00');
-  if (isNaN(d.getTime())) return '';
-  var mon = getMondayOf(d), sun = getSundayOf(d);
-  var fmt = function(dt) {
-    return dt.toLocaleDateString('en-GB', { day:'2-digit', month:'short' });
-  };
-  return 'Mon ' + fmt(mon) + ' – Sun ' + fmt(sun);
-}
-
-// ── REMARK MODE: use [s] / [c] tags
 function parseRemark(raw) {
-  var lines  = raw.split('\n');
-  var result = [];
-  var lastMainByDate = {}; // date → last [s] entry
-
-  lines.forEach(function(line) {
-    var trimmed = line.trim();
-    if (!trimmed) return;
-
-    // Detect remark tag — [s] or [c] at end (case-insensitive)
-    var tagMatch = trimmed.match(/\[(s|c)\]\s*$/i);
-    var tag      = tagMatch ? tagMatch[1].toLowerCase() : null;
-    var nameRaw  = tag ? trimmed.replace(/\[(s|c)\]\s*$/i, '').trim() : trimmed;
-
-    // Extract date + name
-    var tabIdx  = nameRaw.indexOf('\t');
-    var part1   = tabIdx > -1 ? nameRaw.substring(0, tabIdx).trim() : '';
-    var part2   = tabIdx > -1 ? nameRaw.substring(tabIdx+1).trim() : nameRaw;
-    var tryDate = tryParseDate(part1);
-    var name    = tryDate ? part2 : nameRaw;
-    var date    = tryDate || (result.length ? result[result.length-1].date : '');
-
-    if (!name || !date) return;
-
-    if (tag === 's' || (!tag && !lastMainByDate[date])) {
-      // Main menu
-      var entry = { date:date, type:pasteType, menuName:name, components:[] };
-      result.push(entry);
-      lastMainByDate[date] = entry;
+  var lines=raw.split('\n'), result=[], lastByDate={};
+  lines.forEach(function(line){
+    var trimmed=line.trim(); if(!trimmed) return;
+    var tm=trimmed.match(/\[(s|c)\]\s*$/i);
+    var tag=tm?tm[1].toLowerCase():null;
+    var nameRaw=tag?trimmed.replace(/\[(s|c)\]\s*$/i,'').trim():trimmed;
+    var ti=nameRaw.indexOf('\t');
+    var p1=ti>-1?nameRaw.substring(0,ti).trim():nameRaw;
+    var p2=ti>-1?nameRaw.substring(ti+1).trim():'';
+    var td=tryParseDate(p1);
+    var name=td?p2:nameRaw;
+    var date=td||(result.length?result[result.length-1].date:'');
+    if(!name||!date) return;
+    if(tag==='s'||(!tag&&!lastByDate[date])){
+      var entry={date:date,type:pasteType,menuName:name,components:[]};
+      result.push(entry); lastByDate[date]=entry;
     } else {
-      // Component — attach to last main of this date
-      var target = lastMainByDate[date] || (result.length ? result[result.length-1] : null);
-      if (target) target.components.push(name);
-      else {
-        // No main yet — create one
-        var entry = { date:date, type:pasteType, menuName:name, components:[] };
-        result.push(entry);
-        lastMainByDate[date] = entry;
-      }
+      var target=lastByDate[date]||(result.length?result[result.length-1]:null);
+      if(target) target.components.push(name);
+      else { var e={date:date,type:pasteType,menuName:name,components:[]}; result.push(e); lastByDate[date]=e; }
     }
   });
   return result;
 }
-
-function tryParseDate(str) {
-  if (!str) return null;
-  // formats: 20-Apr-26, 20-Apr-2026, 14/04/26, 2026-04-14
-  str = str.trim();
-  var patterns = [
-    /^(\d{1,2})[-\/]([A-Za-z]{3})[-\/](\d{2,4})$/, // 20-Apr-26
-    /^(\d{4})[-\/](\d{1,2})[-\/](\d{1,2})$/,         // 2026-04-14
-    /^(\d{1,2})[-\/](\d{1,2})[-\/](\d{2,4})$/         // 14/04/26
-  ];
-  var months3 = {jan:0,feb:1,mar:2,apr:3,may:4,jun:5,jul:6,aug:7,sep:8,oct:9,nov:10,dec:11};
-  var m;
-
-  // Pattern 1: dd-Mon-yy
-  m = str.match(/^(\d{1,2})[-\/]([A-Za-z]{3})[-\/](\d{2,4})$/);
-  if (m) {
-    var mon = months3[m[2].toLowerCase()];
-    if (mon === undefined) return null;
-    var yr  = parseInt(m[3]); if (yr < 100) yr += 2000;
-    var dt  = new Date(yr, mon, parseInt(m[1]));
-    if (isNaN(dt.getTime())) return null;
-    return toYMD(dt);
-  }
-  // Pattern 2: yyyy-mm-dd
-  m = str.match(/^(\d{4})[-\/](\d{1,2})[-\/](\d{1,2})$/);
-  if (m) {
-    var dt = new Date(parseInt(m[1]), parseInt(m[2])-1, parseInt(m[3]));
-    return isNaN(dt.getTime()) ? null : toYMD(dt);
-  }
-  // Pattern 3: dd/mm/yy
-  m = str.match(/^(\d{1,2})[-\/](\d{1,2})[-\/](\d{2,4})$/);
-  if (m) {
-    var yr = parseInt(m[3]); if (yr < 100) yr += 2000;
-    var dt = new Date(yr, parseInt(m[2])-1, parseInt(m[1]));
-    return isNaN(dt.getTime()) ? null : toYMD(dt);
-  }
-  return null;
-}
-
 function showParsedPreview() {
-  var modeLabel = parseMode === 'remark' ? '🏷️ Remark mode' : '🤖 Auto mode';
-  var modeNote  = '<div style="background:var(--navy-lt);border:1px solid var(--border);border-radius:7px;' +
-    'padding:8px 12px;margin-bottom:10px;font-size:11px;color:var(--text-2);">' +
-    modeLabel + ' · <strong>' + parsedEntries.length + ' main menu(s)</strong> detected — ' +
-    parsedEntries.reduce(function(a,e){return a+e.components.length;},0) + ' component(s)</div>';
-
-  document.getElementById('parsedList').innerHTML = modeNote + parsedEntries.map(function(e) {
-    var compHtml = e.components.length
-      ? '<div class="parsed-comp">📎 ' + e.components.join(' · ') + '</div>'
-      : '';
-    return '<div class="parsed-item">' +
-      '<span class="parsed-date">' + e.date + '</span>' +
-      '<div>' +
-        '<div class="parsed-menu">' +
-          '<span class="badge ' + (e.type==='snack'?'b-snack':'b-meal') + '">' + e.type + '</span> ' +
-          '<strong>' + cap(e.menuName) + '</strong>' +
-        '</div>' +
-        compHtml +
-      '</div>' +
-      '</div>';
+  var note='<div style="background:var(--navy-lt);border:1px solid var(--border);border-radius:7px;padding:8px 12px;margin-bottom:10px;font-size:11px;color:var(--text-2);">'+
+    (parseMode==='remark'?'🏷️ Remark':'🤖 Auto')+' mode · <strong>'+parsedEntries.length+' main menu(s)</strong> · '+
+    parsedEntries.reduce(function(a,e){return a+e.components.length;},0)+' component(s)</div>';
+  document.getElementById('parsedList').innerHTML=note+parsedEntries.map(function(e){
+    var comp=e.components.length?'<div class="parsed-comp">📎 '+e.components.join(' · ')+'</div>':'';
+    return '<div class="parsed-item"><span class="parsed-date">'+e.date+'</span>'+
+      '<div><div class="parsed-menu"><span class="badge '+(e.type==='snack'?'b-snack':'b-meal')+'">'+e.type+'</span> <strong>'+cap(e.menuName)+'</strong></div>'+comp+'</div></div>';
   }).join('');
-  document.getElementById('parsedPreview').style.display = 'block';
+  document.getElementById('parsedPreview').style.display='block';
 }
-
 function submitParsed() {
-  if (!parsedEntries.length) return;
-  saveEntries(parsedEntries, function() {
-    document.getElementById('pasteArea').value = '';
-    document.getElementById('parsedPreview').style.display = 'none';
-    parsedEntries = [];
-    loadData(selMonth);
-    openTab('analysis');
+  if(!parsedEntries.length) return;
+  saveEntries(parsedEntries,function(){
+    document.getElementById('pasteArea').value='';
+    document.getElementById('parsedPreview').style.display='none';
+    parsedEntries=[]; loadData(''); openTab('analysis');
   });
 }
 
-// ══════════════════════════════════════════════
-//  SAVE TO GAS — chunked to avoid URL length limit
-// ══════════════════════════════════════════════
-function saveEntries(entries, cb) {
-  var CHUNK = 8; // max entries per request
-  var chunks = [];
-  for (var i = 0; i < entries.length; i += CHUNK) {
-    chunks.push(entries.slice(i, i + CHUNK));
-  }
-
-  var total   = chunks.length;
-  var done    = 0;
-  var errors  = [];
-
-  function sendChunk(idx) {
-    if (idx >= total) {
-      // All chunks done
-      if (errors.length) {
-        toast('Partial save — ' + errors.length + ' chunk(s) failed.', 'err');
-      } else {
-        toast(entries.length + ' menu entries saved!', 'ok');
-        if (typeof cb === 'function') cb();
-      }
+// ═══════════════════════════════════════════════════
+//  SAVE TO GAS (chunked)
+// ═══════════════════════════════════════════════════
+function saveEntries(entries,cb) {
+  var CHUNK=8, chunks=[];
+  for(var i=0;i<entries.length;i+=CHUNK) chunks.push(entries.slice(i,i+CHUNK));
+  var total=chunks.length, done=0, errors=[];
+  function sendChunk(idx){
+    if(idx>=total){
+      if(errors.length) toast('Partial save — '+errors.length+' chunk(s) failed.','err');
+      else{ toast(entries.length+' menu entries saved!','ok'); if(typeof cb==='function') cb(); }
       return;
     }
-
-    var payload = { entries: chunks[idx] };
-    var encoded = encodeURIComponent(JSON.stringify(payload));
-
-    // Safety: if encoded > 6000 chars, split further
-    if (encoded.length > 6000) {
-      // Split this chunk in half and re-queue
-      var half = Math.ceil(chunks[idx].length / 2);
-      var a    = chunks[idx].slice(0, half);
-      var b    = chunks[idx].slice(half);
-      chunks.splice(idx, 1, a, b);
-      total = chunks.length;
-      sendChunk(idx);
-      return;
+    var payload={entries:chunks[idx]};
+    var encoded=encodeURIComponent(JSON.stringify(payload));
+    if(encoded.length>6000){
+      var h=Math.ceil(chunks[idx].length/2);
+      chunks.splice(idx,1,chunks[idx].slice(0,h),chunks[idx].slice(h));
+      total=chunks.length; sendChunk(idx); return;
     }
-
-    var url = GAS_URL + '?action=savemenu&payload=' + encoded;
-    fetch(url, { redirect: 'follow' })
-      .then(function(r) {
-        if (!r.ok) throw new Error('HTTP ' + r.status);
-        return r.json();
+    fetch(GAS_URL+'?action=savemenu&payload='+encoded,{redirect:'follow'})
+      .then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.json();})
+      .then(function(res){
+        if(!res.success) errors.push(res.message);
+        done++; if(total>1) toast('Saving… '+done+'/'+total,'');
+        sendChunk(idx+1);
       })
-      .then(function(res) {
-        if (!res.success) errors.push(res.message);
-        done++;
-        if (total > 1) toast('Saving… ' + done + '/' + total, '');
-        sendChunk(idx + 1);
-      })
-      .catch(function(e) {
-        errors.push(e.message);
-        done++;
-        sendChunk(idx + 1);
-      });
+      .catch(function(e){errors.push(e.message);done++;sendChunk(idx+1);});
   }
-
   sendChunk(0);
 }
 
-// ══════════════════════════════════════════════
+// ═══════════════════════════════════════════════════
 //  UTILS
-// ══════════════════════════════════════════════
-function monthToNum(monthStr) {
-  if (!monthStr) return 0;
-  var months = ['January','February','March','April','May','June',
-                'July','August','September','October','November','December'];
-  var parts  = monthStr.split(' ');
-  var idx    = months.indexOf(parts[0]);
-  return (parseInt(parts[1]||0) * 12) + (idx >= 0 ? idx : 0);
+// ═══════════════════════════════════════════════════
+function tryParseDate(str) {
+  if(!str) return null;
+  str=str.trim();
+  var months3={jan:0,feb:1,mar:2,apr:3,may:4,jun:5,jul:6,aug:7,sep:8,oct:9,nov:10,dec:11};
+  var m;
+  m=str.match(/^(\d{1,2})[-\/]([A-Za-z]{3})[-\/](\d{2,4})$/);
+  if(m){ var mo=months3[m[2].toLowerCase()]; if(mo===undefined)return null; var yr=parseInt(m[3]);if(yr<100)yr+=2000; var dt=new Date(yr,mo,parseInt(m[1]));return isNaN(dt.getTime())?null:toYMD(dt); }
+  m=str.match(/^(\d{4})[-\/](\d{1,2})[-\/](\d{1,2})$/);
+  if(m){ var dt=new Date(parseInt(m[1]),parseInt(m[2])-1,parseInt(m[3]));return isNaN(dt.getTime())?null:toYMD(dt); }
+  m=str.match(/^(\d{1,2})[-\/](\d{1,2})[-\/](\d{2,4})$/);
+  if(m){ var yr=parseInt(m[3]);if(yr<100)yr+=2000; var dt=new Date(yr,parseInt(m[2])-1,parseInt(m[1]));return isNaN(dt.getTime())?null:toYMD(dt); }
+  return null;
 }
-
-function toYMD(d) {
-  return d.getFullYear() + '-' +
-    String(d.getMonth()+1).padStart(2,'0') + '-' +
-    String(d.getDate()).padStart(2,'0');
-}
-function cap(s) {
-  if (!s) return '';
-  return s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
-}
-function toast(msg, type) {
-  var t = document.getElementById('toast');
-  t.textContent = msg;
-  t.className   = 'toast ' + (type||'');
-  t.classList.add('show');
-  setTimeout(function() { t.classList.remove('show'); }, 3200);
-}
+function toYMD(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+function cap(s){ if(!s)return''; return s.charAt(0).toUpperCase()+s.slice(1).toLowerCase(); }
+function monthToNum(ms){ if(!ms)return 0; var mn=['January','February','March','April','May','June','July','August','September','October','November','December']; var p=ms.split(' '); var i=mn.indexOf(p[0]); return(parseInt(p[1]||0)*12)+(i>=0?i:0); }
+function toast(msg,type){ var t=document.getElementById('toast'); t.textContent=msg; t.className='toast '+(type||''); t.classList.add('show'); setTimeout(function(){t.classList.remove('show');},3200); }
 </script>
 </body>
 </html>
