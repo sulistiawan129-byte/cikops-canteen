@@ -826,19 +826,6 @@ function renderSummary(k){
 // ══════════════════════════════════════════════════
 //  TREND CHARTS
 // ══════════════════════════════════════════════════
-function makeTrendChart(canvasId, rows, ordKey, conKey, lftKey, ordColor, conColor){
-  var old=canvasId==='trendSnack'?tSnack:tMeal;
-  if(old){old.destroy();}
-  if(!rows.length) return null;
-  var c=gc(), ctx=document.getElementById(canvasId).getContext('2d');
-  var ch=new Chart(ctx,{
-    type:'line',
-    data:{
-      labels:rows.map(function(r){return r.date;}),
-      datasets:[
-        {label:'Ordered', data:rows.map(function(r){return n(r[ordKey]);}),borderColor:ordColor,backgroundColor:'transparent',borderWidth:1.5,pointRadius:1.5,tension:.3},
-        {label:'Consumed',data:rows.map(function(r){return n(r[conKey]);}),borderColor:conColor,backgroundColor:'transparent',borderWidth:1.5,borderDash:[4,3],pointRadius:0,tension:.3},
-        {label:'Leftover',data:rows.map(function(r){return n(r[lftKey]);}),borderColor:'#fca5a5',backgroundColor:'rgba(252,165,165,.15)',borderWidth:1,pointRadius:0,tension:.3,fill:true}
 function makeTrendChart(canvasId, rows, ordKey, conKey, lftKey, ordColor, conColor) {
   var old = canvasId === 'trendSnack' ? tSnack : tMeal;
   if (old) { old.destroy(); }
@@ -898,14 +885,21 @@ function makeTrendChart(canvasId, rows, ordKey, conKey, lftKey, ordColor, conCol
           tension: 0.4,
           fill: true
         }
+function makeTrendChart(canvasId, rows, ordKey, conKey, lftKey, ordColor, conColor){
+  var old=canvasId==='trendSnack'?tSnack:tMeal;
+  if(old){old.destroy();}
+  if(!rows.length) return null;
+  var c=gc(), ctx=document.getElementById(canvasId).getContext('2d');
+  var ch=new Chart(ctx,{
+    type:'line',
+    data:{
+      labels:rows.map(function(r){return r.date;}),
+      datasets:[
+        {label:'Ordered', data:rows.map(function(r){return n(r[ordKey]);}),borderColor:ordColor,backgroundColor:'transparent',borderWidth:1.5,pointRadius:1.5,tension:.3},
+        {label:'Consumed',data:rows.map(function(r){return n(r[conKey]);}),borderColor:conColor,backgroundColor:'transparent',borderWidth:1.5,borderDash:[4,3],pointRadius:0,tension:.3},
+        {label:'Leftover',data:rows.map(function(r){return n(r[lftKey]);}),borderColor:'#fca5a5',backgroundColor:'rgba(252,165,165,.15)',borderWidth:1,pointRadius:0,tension:.3,fill:true}
       ]
     },
-    options:{
-      responsive:true,maintainAspectRatio:true,aspectRatio:2.2,animation:{duration:350},
-      plugins:{legend:{display:false},tooltip:{callbacks:{label:function(ctx){return ctx.dataset.label+': '+n(ctx.raw).toLocaleString();}}}},
-      scales:{
-        x:{grid:{color:c.grid},ticks:{color:c.txt,font:{size:10,family:"'Inter',sans-serif"},maxTicksLimit:12}},
-        y:{grid:{color:c.grid},ticks:{color:c.txt,font:{size:10,family:"'Inter',sans-serif"},callback:function(v){return v.toLocaleString();}},beginAtZero:true}
     options: {
       responsive: true,
       maintainAspectRatio: true,
@@ -953,12 +947,18 @@ function makeTrendChart(canvasId, rows, ordKey, conKey, lftKey, ordColor, conCol
           },
           beginAtZero: true
         }
+    options:{
+      responsive:true,maintainAspectRatio:true,aspectRatio:2.2,animation:{duration:350},
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:function(ctx){return ctx.dataset.label+': '+n(ctx.raw).toLocaleString();}}}},
+      scales:{
+        x:{grid:{color:c.grid},ticks:{color:c.txt,font:{size:10,family:"'Inter',sans-serif"},maxTicksLimit:12}},
+        y:{grid:{color:c.grid},ticks:{color:c.txt,font:{size:10,family:"'Inter',sans-serif"},callback:function(v){return v.toLocaleString();}},beginAtZero:true}
       }
     }
   });
-  if(canvasId==='trendSnack') tSnack=ch; else tMeal=ch;
 
   if (canvasId === 'trendSnack') tSnack = ch; else tMeal = ch;
+  if(canvasId==='trendSnack') tSnack=ch; else tMeal=ch;
   return ch;
 }
 
