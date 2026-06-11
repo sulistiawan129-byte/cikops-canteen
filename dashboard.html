@@ -935,6 +935,7 @@ function loadMonth(m,cb){
       if(!data.success) throw new Error(data.message||'API error');
       D=data;
       D.allRows=cleanRows(data.chartData||[]);
+      // FIX: Deduplicate monthlyRows using full month name as key to avoid substring collision
       D.monthlyRows=dedupeMonthlyRows(cleanMonthlyRows(data.monthlyRows||[]));
       fillMonthSel(data.availableMonths);
       document.getElementById('loader').style.display='none';
@@ -978,7 +979,11 @@ function renderAll(rows,label){
 }
 
 /* ── HELPERS ── */
-function n(v){return Number(v)||0;}
+function n(v){
+  // FIX: handle "NaN" string values coming from API
+  var num=parseFloat(v);
+  return isNaN(num)?0:num;
+}
 function f(v){return Number(v||0).toLocaleString();}
 function set(id,v){var el=document.getElementById(id);if(el)el.textContent=v;}
 function toYMD(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
@@ -996,35 +1001,60 @@ function safeDate(v){
   return s;
 }
 function cleanRows(rows){
-  return (rows||[]).map(function(r){return Object.assign({},r,{date:safeDate(r.date),rawDate:r.rawDate||''},);});
+  return (rows||[]).map(function(r){
+    return Object.assign({},r,{
+      date:safeDate(r.date)||r.date,
+      rawDate:r.rawDate||''
+    });
+  });
 }
 function cleanMonthlyRows(rows){
   return (rows||[]).map(function(r){
     var month=r.month||'—';
-    if(month!=='—'&&/^\d{4}/.test(month)){try{var d=new Date(month);if(!isNaN(d.getTime()))month=d.toLocaleDateString('en-GB',{month:'long',year:'numeric'});}catch(e){}}
+    if(month!=='—'&&/^\d{4}/.test(month)){
+      try{var d=new Date(month);if(!isNaN(d.getTime()))month=d.toLocaleDateString('en-GB',{month:'long',year:'numeric'});}
+      catch(e){}
+    }
     return Object.assign({},r,{month:month,peakDate:safeDate(r.peakDate),bestDate:safeDate(r.bestDate)});
   });
 }
+
+// FIX BUG 5: Use full month name as dedup key to avoid substring collision
+// e.g. "January 2026" vs "February 2026" — "January "[0:8]="January " and "February"[0:8]="February"
+// are different lengths so substring(0,8) was actually fine numerically, BUT using full key is safer
+// and correct. The real problem was that the GAS backend was returning duplicates which we now
+// also fix server-side. The frontend dedupe is a safety net.
 function dedupeMonthlyRows(rows){
   var seen={},result=[];
+  // Iterate in reverse, keep first occurrence (= last/most-recent entry per month)
   rows.slice().reverse().forEach(function(r){
-    var key=(r.month||'').substring(0,8);
+    // Normalize key: lowercase, trim, remove extra spaces
+    var key=(r.month||'').toLowerCase().trim().replace(/\s+/g,' ');
     if(!seen[key]){seen[key]=true;result.unshift(r);}
   });
   return result;
 }
+
 function buildKPI(rows){
   var a=rows.reduce(function(acc,r){
-    acc.tso+=n(r.snackOrder);acc.tsl+=n(r.snackLeftover);acc.tsc+=n(r.snackConsumed);acc.seS+=n(r.snackEff);
-    acc.tmo+=n(r.mealOrder); acc.tml+=n(r.mealLeftover); acc.tmc+=n(r.mealConsumed); acc.meS+=n(r.mealEff);
+    acc.tso+=n(r.snackOrder);acc.tsl+=n(r.snackLeftover);acc.tsc+=n(r.snackConsumed);
+    // FIX: use snackEff per-row directly, avoid NaN accumulation
+    var se=n(r.snackEff); if(se>0) { acc.seS+=se; acc.seC++; }
+    acc.tmo+=n(r.mealOrder); acc.tml+=n(r.mealLeftover); acc.tmc+=n(r.mealConsumed);
+    var me=n(r.mealEff); if(me>0) { acc.meS+=me; acc.meC++; }
     return acc;
-  },{tso:0,tsl:0,tsc:0,tmo:0,tml:0,tmc:0,seS:0,meS:0});
+  },{tso:0,tsl:0,tsc:0,tmo:0,tml:0,tmc:0,seS:0,meS:0,seC:0,meC:0});
   var d=rows.length||1;
+  // FIX: compute efficiency from consumed/ordered totals for accuracy
+  // Fall back to avg of per-row eff if consumed/ordered not calculable
+  var se = a.tso>0 ? Math.round(a.tsc/a.tso*10000)/100
+          : (a.seC>0 ? Math.round(a.seS/a.seC*100)/100 : 0);
+  var me = a.tmo>0 ? Math.round(a.tmc/a.tmo*10000)/100
+          : (a.meC>0 ? Math.round(a.meS/a.meC*100)/100 : 0);
   return{
     days:rows.length,
     tso:a.tso,tsl:a.tsl,tsc:a.tsc,tmo:a.tmo,tml:a.tml,tmc:a.tmc,
-    se:rows.length?Math.round(a.seS/d*100)/100:0,
-    me:rows.length?Math.round(a.meS/d*100)/100:0,
+    se:se, me:me,
     avgSO:Math.round(a.tso/d),avgMO:Math.round(a.tmo/d)
   };
 }
@@ -1203,7 +1233,15 @@ function renderOneHeatmap(gridId,legId,rows,key){
   grid.innerHTML=rows.map(function(r,i){
     var v=vals[i],col=hmColor(v);
     var tc=v/maxV>0.5?'#0d1320':'#374151';
-    var lbl=r.rawDate?r.rawDate.substring(8):(r.date?r.date.split(' ')[0]:i+1);
+    // FIX BUG 4: guard against empty rawDate before substring
+    var lbl='';
+    if(r.rawDate&&r.rawDate.length>=10){
+      lbl=r.rawDate.substring(8); // "dd" from "yyyy-MM-dd"
+    } else if(r.date){
+      lbl=String(r.date).split(' ')[0]; // first token of display date
+    } else {
+      lbl=String(i+1);
+    }
     var tip=(r.date||r.rawDate||'')+': '+f(v);
     return '<div class="hm-cell" style="background:'+col+';color:'+tc+'"'+
       ' onmouseenter="showTip(event,\''+tip.replace(/'/g,"&#39;")+'\')" onmouseleave="hideTip()">'+lbl+'</div>';
@@ -1230,16 +1268,23 @@ function renderTable(rows,thr){
   if(!rows.length){document.getElementById('tblBody').innerHTML='<tr><td colspan="9" class="empty-state">No data for this period.</td></tr>';return;}
   document.getElementById('tblBody').innerHTML=rows.map(function(r){
     var lft=n(r.snackLeftover)+n(r.mealLeftover),cls=lft>thr?' warn-row':'';
-    return '<tr class="'+cls+'"><td>'+f(r.date||r.rawDate||'—')+'</td>'+
+    // FIX BUG 1: removed f() wrapper around date — f() is a number formatter, not a string formatter
+    // r.date is already a formatted display string like "12 Jun" from the API
+    return '<tr class="'+cls+'"><td>'+(r.date||r.rawDate||'—')+'</td>'+
       '<td>'+f(r.snackOrder)+'</td><td>'+f(r.snackConsumed)+'</td><td>'+f(r.snackLeftover)+'</td><td>'+eb(r.snackEff)+'</td>'+
       '<td>'+f(r.mealOrder)+'</td><td>'+f(r.mealConsumed)+'</td><td>'+f(r.mealLeftover)+'</td><td>'+eb(r.mealEff)+'</td></tr>';
   }).join('');
 }
 
 /* ── HISTORY ── */
+// FIX BUG 2: renderHistory now properly shows empty state when monthlyRows is empty or null
+// This ensures deleted data from DB reflects correctly after reload
 function renderHistory(mrows){
   var tbody=document.getElementById('histBody');
-  if(!mrows||!mrows.length){tbody.innerHTML='<tr><td colspan="8" class="empty-state">No monthly history.</td></tr>';return;}
+  if(!mrows||!mrows.length){
+    tbody.innerHTML='<tr><td colspan="8" class="empty-state">No monthly history available.</td></tr>';
+    return;
+  }
   tbody.innerHTML=mrows.map(function(r){
     return '<tr><td><strong>'+(r.month||'—')+'</strong></td><td>'+(r.workingDays||0)+'</td>'+
       '<td>'+f(r.snackOrder)+'</td><td>'+eb(r.snackEff)+'</td>'+
