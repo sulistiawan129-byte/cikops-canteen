@@ -1032,6 +1032,134 @@ select.inp{cursor:pointer;}
   }
 }
 
+
+/* ══ MENU FINDER ══ */
+.mf-search-bar{display:flex;gap:8px;margin-bottom:14px;align-items:center;flex-wrap:wrap;}
+.mf-search-inp{
+  flex:1;min-width:180px;
+  border:1.5px solid var(--border);border-radius:var(--r-sm);
+  padding:10px 14px 10px 38px;font-size:13px;font-family:var(--font);
+  background:var(--surface-2);color:var(--t1);
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%239ba3be' stroke-width='2' stroke-linecap='round'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:12px center;
+  transition:border-color .12s,background-color .12s;
+}
+.mf-search-inp:focus{outline:none;border-color:var(--a-blue);background-color:var(--surface);}
+.mf-type-grp{display:flex;border:1.5px solid var(--border);border-radius:var(--r-sm);overflow:hidden;background:var(--surface-2);flex-shrink:0;}
+.mf-type-btn{padding:7px 14px;font-size:11.5px;font-weight:600;font-family:var(--font);border:none;background:none;cursor:pointer;color:var(--t3);transition:all .12s;}
+.mf-type-btn.active{background:var(--navy);color:#fff;}
+.mf-month-sel{border:1.5px solid var(--border);border-radius:var(--r-sm);padding:8px 10px;font-size:12px;font-family:var(--font);background:var(--surface-2);color:var(--t1);cursor:pointer;flex-shrink:0;}
+.mf-month-sel:focus{outline:none;border-color:var(--a-blue);}
+
+/* Result header */
+.mf-result-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:6px;}
+.mf-result-count{font-family:var(--mono);font-size:10px;font-weight:700;color:var(--t3);letter-spacing:.08em;}
+.mf-sort-sel{border:1px solid var(--border);border-radius:6px;padding:4px 8px;font-size:10px;font-family:var(--font);background:var(--surface-2);color:var(--t2);cursor:pointer;}
+
+/* Occurrence cards */
+.mf-menu-card{
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--r);
+  padding:14px 16px;margin-bottom:8px;box-shadow:var(--shadow);
+  transition:border-color .12s;
+}
+.mf-menu-card:hover{border-color:var(--a-blue);}
+.mf-menu-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;gap:10px;flex-wrap:wrap;}
+.mf-menu-name{font-size:14px;font-weight:700;color:var(--t1);text-transform:capitalize;letter-spacing:-.2px;}
+.mf-menu-stats{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.mf-stat-pill{
+  display:inline-flex;align-items:center;gap:4px;
+  border-radius:var(--r-pill);padding:3px 10px;
+  font-family:var(--mono);font-size:10px;font-weight:700;
+}
+.mf-pill-count{background:var(--navy-4);border:1px solid rgba(59,110,245,.2);color:var(--a-blue);}
+.mf-pill-snack{background:var(--snack-lt);border:1px solid var(--snack-border);color:var(--snack);}
+.mf-pill-meal{background:var(--meal-lt);border:1px solid var(--meal-border);color:var(--meal);}
+
+/* Date occurrence chips */
+.mf-dates-wrap{display:flex;flex-wrap:wrap;gap:4px;}
+.mf-date-chip{
+  display:inline-flex;align-items:center;gap:4px;
+  background:var(--surface-2);border:1px solid var(--border);
+  border-radius:6px;padding:3px 9px;font-size:11px;color:var(--t2);
+  font-family:var(--mono);
+}
+.mf-date-chip.highlight{background:rgba(59,110,245,.08);border-color:rgba(59,110,245,.25);color:var(--a-blue);}
+.mf-expand-btn{background:none;border:1px solid var(--border);border-radius:6px;padding:3px 9px;font-size:10px;font-family:var(--mono);color:var(--t4);cursor:pointer;transition:all .12s;}
+.mf-expand-btn:hover{background:var(--border);color:var(--t2);}
+
+/* Month bar chart */
+.mf-month-bars{display:flex;flex-direction:column;gap:5px;margin-top:8px;}
+.mf-month-row{display:flex;align-items:center;gap:8px;}
+.mf-month-lbl{font-size:10px;font-family:var(--mono);color:var(--t3);min-width:70px;flex-shrink:0;text-align:right;}
+.mf-month-bar-bg{flex:1;height:6px;background:var(--surface-3);border-radius:4px;overflow:hidden;border:1px solid var(--border);}
+.mf-month-bar-fill{height:100%;border-radius:4px;transition:width .4s cubic-bezier(.4,0,.2,1);}
+.mf-month-count{font-size:10px;font-family:var(--mono);color:var(--t3);min-width:20px;}
+
+/* Empty state */
+.mf-empty{padding:40px;text-align:center;color:var(--t4);}
+.mf-empty-icon{font-size:36px;display:block;margin-bottom:10px;}
+
+/* ══ DISTRIBUTION PLANNER ══ */
+.dist-hero{
+  background:linear-gradient(135deg,var(--navy) 0%,#243461 100%);
+  border-radius:var(--r);padding:20px 22px;margin-bottom:16px;
+  position:relative;overflow:hidden;
+}
+.dist-hero::before{content:'';position:absolute;top:-50px;right:-50px;width:180px;height:180px;border-radius:50%;background:rgba(59,110,245,.15);}
+.dist-hero-title{font-size:16px;font-weight:800;color:#fff;margin-bottom:3px;position:relative;}
+.dist-hero-sub{font-size:12px;color:rgba(255,255,255,.55);position:relative;margin-bottom:14px;}
+.dist-controls{display:flex;gap:8px;flex-wrap:wrap;position:relative;}
+.dist-ctrl{border:1.5px solid rgba(255,255,255,.2);border-radius:var(--r-sm);padding:7px 12px;font-size:12px;font-family:var(--font);background:rgba(255,255,255,.1);color:#fff;cursor:pointer;}
+.dist-ctrl:focus{outline:none;border-color:rgba(255,255,255,.5);}
+.dist-ctrl option{background:var(--navy);color:#fff;}
+.dist-btn{display:flex;align-items:center;gap:5px;padding:8px 16px;background:#fff;border:none;border-radius:var(--r-sm);font-size:12px;font-weight:700;font-family:var(--font);color:var(--navy);cursor:pointer;transition:opacity .12s;white-space:nowrap;}
+.dist-btn:hover{opacity:.88;}
+.dist-btn svg{width:12px;height:12px;stroke:var(--navy);fill:none;stroke-width:2.5;stroke-linecap:round;}
+
+/* Stats summary row */
+.dist-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px;}
+@media(max-width:700px){.dist-stats{grid-template-columns:repeat(2,1fr);}}
+.dist-stat{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-sm);padding:10px 12px;text-align:center;}
+.dist-stat-val{font-size:22px;font-weight:800;color:var(--t1);font-variant-numeric:tabular-nums;letter-spacing:-.3px;}
+.dist-stat-lbl{font-size:9px;font-family:var(--mono);color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin-top:2px;}
+
+/* Distribution calendar */
+.dist-cal-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;box-shadow:var(--shadow);}
+.dist-cal-hdr{background:var(--navy);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;}
+.dist-cal-title{font-size:13px;font-weight:700;color:#fff;font-family:var(--mono);}
+.dist-cal-sub{font-size:10px;color:rgba(255,255,255,.45);font-family:var(--mono);}
+.dist-day-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:0;}
+.dist-day-hdr{padding:7px 4px;font-family:var(--mono);font-size:8.5px;font-weight:700;color:var(--t4);text-align:center;text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid var(--border);}
+.dist-day-cell{
+  border-right:1px solid var(--border);border-bottom:1px solid var(--border);
+  padding:6px 6px;min-height:72px;
+  display:flex;flex-direction:column;gap:3px;
+}
+.dist-day-cell:nth-child(7n){border-right:none;}
+.dist-day-cell.empty-cell{background:var(--surface-2);opacity:.4;}
+.dist-day-cell.weekend-cell{background:rgba(0,0,0,.015);}
+[data-theme="dark"] .dist-day-cell.weekend-cell{background:rgba(255,255,255,.015);}
+.dist-day-num{font-family:var(--mono);font-size:10px;font-weight:700;color:var(--t3);margin-bottom:2px;}
+.dist-day-num.today-num{
+  display:inline-flex;width:18px;height:18px;align-items:center;justify-content:center;
+  background:var(--a-blue);color:#fff;border-radius:50%;font-size:9px;
+}
+.dist-menu-chip{
+  border-radius:4px;padding:2px 5px;font-size:9px;font-weight:600;
+  line-height:1.3;text-transform:capitalize;overflow:hidden;
+  text-overflow:ellipsis;white-space:nowrap;
+}
+.dist-chip-snack{background:rgba(245,158,11,.12);color:#92400e;}
+[data-theme="dark"] .dist-chip-snack{background:rgba(245,158,11,.18);color:#fcd34d;}
+.dist-chip-meal{background:var(--meal-lt);color:var(--meal);}
+[data-theme="dark"] .dist-chip-meal{color:#93c5fd;}
+.dist-chip-new{outline:1.5px solid var(--a-blue);outline-offset:-1px;}
+
+/* Legend */
+.dist-legend{display:flex;align-items:center;gap:12px;padding:10px 16px;border-top:1px solid var(--border);font-size:10px;color:var(--t3);flex-wrap:wrap;}
+.dist-leg{display:flex;align-items:center;gap:4px;}
+.dist-leg-sq{width:10px;height:10px;border-radius:3px;}
+
 </style>
 </head>
 <body>
@@ -1075,6 +1203,12 @@ select.inp{cursor:pointer;}
     </button>
     <button class="rail-tab" id="tab-report" onclick="openTab('report')">
       <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>Report
+    </button>
+    <button class="rail-tab" id="tab-finder" onclick="openTab('finder')">
+      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>Menu Finder
+    </button>
+    <button class="rail-tab" id="tab-distrib" onclick="openTab('distrib')">
+      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>Distribusi
     </button>
 
   </nav>
@@ -1354,6 +1488,67 @@ select.inp{cursor:pointer;}
       </div>
 
     </div><!-- /pane-report -->
+
+    <!-- ══ TAB: MENU FINDER ══ -->
+    <div id="pane-finder" style="display:none">
+      <!-- Search bar -->
+      <div class="mf-search-bar">
+        <input type="text" class="mf-search-inp" id="mfQuery"
+          placeholder="Ketik nama menu… misal: nasi, ayam, bakso"
+          oninput="mfSearch()" autocomplete="off" spellcheck="false">
+        <div class="mf-type-grp">
+          <button class="mf-type-btn active" id="mfTypeAll"   onclick="mfSetType('all')">Semua</button>
+          <button class="mf-type-btn"         id="mfTypeSnack" onclick="mfSetType('snack')">🥐 Snack</button>
+          <button class="mf-type-btn"         id="mfTypeMeal"  onclick="mfSetType('meal')">🍱 Meal</button>
+        </div>
+        <select class="mf-month-sel" id="mfMonthSel" onchange="mfSearch()">
+          <option value="">Semua Bulan</option>
+        </select>
+      </div>
+      <!-- Results -->
+      <div class="mf-result-hdr">
+        <span class="mf-result-count" id="mfCount">Ketik untuk mencari…</span>
+        <select class="mf-sort-sel" id="mfSort" onchange="mfSearch()">
+          <option value="freq">Frekuensi ↓</option>
+          <option value="alpha">A–Z</option>
+          <option value="latest">Terbaru</option>
+        </select>
+      </div>
+      <div id="mfResults"></div>
+    </div><!-- /pane-finder -->
+
+    <!-- ══ TAB: DISTRIBUSI MENU ══ -->
+    <div id="pane-distrib" style="display:none">
+      <!-- Hero -->
+      <div class="dist-hero">
+        <div class="dist-hero-title">🎲 Smart Menu Distribution</div>
+        <div class="dist-hero-sub">Distribusikan semua menu vendor secara merata untuk satu bulan ke depan — otomatis, tanpa duplikat berturut-turut.</div>
+        <div class="dist-controls">
+          <select class="dist-ctrl" id="distType">
+            <option value="both">Snack + Meal</option>
+            <option value="snack">Snack saja</option>
+            <option value="meal">Meal saja</option>
+          </select>
+          <select class="dist-ctrl" id="distMonth" onchange="distUpdateStats()">
+            <option value="">-- Pilih Bulan Target --</option>
+          </select>
+          <select class="dist-ctrl" id="distSource" title="Ambil menu dari histori berapa bulan terakhir">
+            <option value="3">Histori 3 bulan</option>
+            <option value="6">Histori 6 bulan</option>
+            <option value="12">Histori 12 bulan</option>
+            <option value="0">Semua histori</option>
+          </select>
+          <button class="dist-btn" onclick="distGenerate()">
+            <svg viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>
+            Generate Distribusi
+          </button>
+        </div>
+      </div>
+      <!-- Stats -->
+      <div class="dist-stats" id="distStats"></div>
+      <!-- Calendar output -->
+      <div id="distCalWrap"></div>
+    </div><!-- /pane-distrib -->
 
   </div>
 </div>
@@ -3613,6 +3808,418 @@ function tvFillWeekSel() {
   if (!cur && sel.options.length > 1) sel.selectedIndex = sel.options.length - 1;
 }
 
+// ══════════════════════════════════════════════════════════════
+// MENU FINDER  —  Keyword search + month frequency
+// ══════════════════════════════════════════════════════════════
+var MF = { type:'all', query:'', month:'' };
+
+function openTab(name){
+  ['analysis','calendar','weekly','input','report','finder','distrib'].forEach(function(t){
+    var pane=document.getElementById('pane-'+t);
+    if(pane) pane.style.display=t===name?'':'none';
+    var btn=document.getElementById('tab-'+t);
+    if(btn)btn.classList.toggle('active',t===name);
+  });
+  if(name==='calendar'){
+    if(selWeek){calWeekKey=selWeek;var m=isoWeekToMonday(selWeek);calYear=m.getFullYear();calMonth=m.getMonth();}
+    if(DATA)renderCalendar();
+  }
+  if(name==='weekly'&&DATA)renderWeekly();
+  if(name==='report'){rptFillSelectors();tvFillWeekSel();if(RPT.mode==='weekly')rptSetMode('weekly');else rptRender();}
+  if(name==='finder'){mfInit();mfSearch();}
+  if(name==='distrib'){distInit();}
+  var vp=document.getElementById('viewingPeriod');
+  if(vp)vp.textContent=selWeek?(DATA&&DATA.byWeek&&DATA.byWeek[selWeek]&&DATA.byWeek[selWeek].label)||selWeek:'All Data';
+  // Sync mobile nav
+  ['analysis','calendar','weekly','input','report','finder','distrib'].forEach(function(t){
+    var mb=document.getElementById('mobtab-'+t);
+    if(mb) mb.classList.toggle('active',t===name);
+  });
+  if(typeof isMobile==='function'&&isMobile()){
+    var pa=document.querySelector('.page-area');
+    if(pa)pa.scrollTop=0;
+  }
+}
+
+function mfInit(){
+  if(!DATA) return;
+  // Fill month selector
+  var sel=document.getElementById('mfMonthSel');
+  if(!sel) return;
+  var months={};
+  (DATA.allEntries||[]).forEach(function(e){
+    if(!e.rawDate) return;
+    var d=new Date(e.rawDate+'T00:00:00');
+    var mk=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
+    var ml=d.toLocaleDateString('id-ID',{month:'long',year:'numeric'});
+    months[mk]=ml;
+  });
+  sel.innerHTML='<option value="">Semua Bulan</option>';
+  Object.keys(months).sort().reverse().forEach(function(mk){
+    var o=document.createElement('option');
+    o.value=mk; o.textContent=months[mk];
+    if(mk===MF.month) o.selected=true;
+    sel.appendChild(o);
+  });
+}
+
+function mfSetType(t){
+  MF.type=t;
+  ['All','Snack','Meal'].forEach(function(x){
+    var b=document.getElementById('mfType'+x);
+    if(b)b.classList.toggle('active',x.toLowerCase()===(t==='all'?'all':t));
+  });
+  mfSearch();
+}
+
+function mfSearch(){
+  if(!DATA){
+    document.getElementById('mfResults').innerHTML='<div class="mf-empty"><span class="mf-empty-icon">⏳</span>Memuat data…</div>';
+    return;
+  }
+  var q=(document.getElementById('mfQuery').value||'').trim().toLowerCase();
+  MF.query=q;
+  MF.month=(document.getElementById('mfMonthSel').value)||'';
+  var sort=(document.getElementById('mfSort').value)||'freq';
+
+  var entries=DATA.allEntries||[];
+
+  // Filter by type
+  if(MF.type!=='all'){
+    entries=entries.filter(function(e){return e.type.toLowerCase()===MF.type;});
+  }
+  // Filter by month
+  if(MF.month){
+    entries=entries.filter(function(e){
+      if(!e.rawDate) return false;
+      var mk=e.rawDate.substring(0,7);
+      return mk===MF.month;
+    });
+  }
+  // Filter by keyword
+  if(q){
+    entries=entries.filter(function(e){
+      return e.menuName.toLowerCase().indexOf(q)>=0 ||
+             (e.components||[]).some(function(c){return c.toLowerCase().indexOf(q)>=0;});
+    });
+  }
+
+  if(!q&&!MF.month){
+    document.getElementById('mfCount').textContent='Ketik nama menu untuk mencari…';
+    document.getElementById('mfResults').innerHTML=
+      '<div class="mf-empty"><span class="mf-empty-icon">🔍</span>Ketik keyword di atas untuk mencari menu</div>';
+    return;
+  }
+
+  // Group by menu name
+  var grouped={};
+  entries.forEach(function(e){
+    var k=e.menuName.trim().toLowerCase();
+    if(!grouped[k]) grouped[k]={name:e.menuName,type:e.type,dates:[],monthCount:{},snackCount:0,mealCount:0,latestDate:''};
+    var rd=e.rawDate||'';
+    grouped[k].dates.push({rawDate:rd,displayDate:e.date,type:e.type});
+    if(rd>grouped[k].latestDate) grouped[k].latestDate=rd;
+    if(e.type.toLowerCase()==='snack') grouped[k].snackCount++;
+    else grouped[k].mealCount++;
+    var mk=rd.substring(0,7);
+    grouped[k].monthCount[mk]=(grouped[k].monthCount[mk]||0)+1;
+  });
+
+  var items=Object.values(grouped);
+  // Sort
+  if(sort==='freq') items.sort(function(a,b){return (b.snackCount+b.mealCount)-(a.snackCount+a.mealCount);});
+  else if(sort==='alpha') items.sort(function(a,b){return a.name.toLowerCase().localeCompare(b.name.toLowerCase());});
+  else if(sort==='latest') items.sort(function(a,b){return b.latestDate.localeCompare(a.latestDate);});
+
+  document.getElementById('mfCount').textContent=
+    items.length+' menu ditemukan'+
+    (q?' untuk "'+q+'"':'')+
+    (MF.month?' · '+document.getElementById('mfMonthSel').options[document.getElementById('mfMonthSel').selectedIndex].text:'');
+
+  if(!items.length){
+    document.getElementById('mfResults').innerHTML=
+      '<div class="mf-empty"><span class="mf-empty-icon">😕</span>Tidak ada menu yang cocok</div>';
+    return;
+  }
+
+  var monthKeys=[];
+  items.forEach(function(it){Object.keys(it.monthCount).forEach(function(mk){if(monthKeys.indexOf(mk)<0)monthKeys.push(mk);});});
+  monthKeys.sort();
+
+  document.getElementById('mfResults').innerHTML=items.map(function(it){
+    var total=it.snackCount+it.mealCount;
+    // Date chips — show latest 8, rest collapsible
+    var sortedDates=it.dates.slice().sort(function(a,b){return b.rawDate.localeCompare(a.rawDate);});
+    var shown=sortedDates.slice(0,8);
+    var hidden=sortedDates.slice(8);
+    var chips=shown.map(function(d){
+      var dt=new Date((d.rawDate||'')+'T00:00:00');
+      var label=isNaN(dt)?d.displayDate:dt.toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric'});
+      return '<span class="mf-date-chip">'+label+'</span>';
+    }).join('');
+    var moreBtn=hidden.length?'<button class="mf-expand-btn" onclick="mfExpandDates(this,\''+encodeURIComponent(JSON.stringify(hidden))+'\')">+'+hidden.length+' lagi</button>':'';
+
+    // Month bar chart
+    var maxMC=Math.max.apply(null,Object.values(it.monthCount).concat([1]));
+    var bars=monthKeys.map(function(mk){
+      var cnt=it.monthCount[mk]||0;
+      var pct=Math.round(cnt/maxMC*100);
+      var dt2=new Date(mk+'-01');
+      var lbl=isNaN(dt2)?mk:dt2.toLocaleDateString('id-ID',{month:'short',year:'2-digit'});
+      return '<div class="mf-month-row">'+
+        '<span class="mf-month-lbl">'+lbl+'</span>'+
+        '<div class="mf-month-bar-bg"><div class="mf-month-bar-fill" style="width:'+pct+'%;background:'+(it.snackCount>it.mealCount?'var(--a-amber)':'var(--meal)')+'"></div></div>'+
+        '<span class="mf-month-count">'+cnt+'</span>'+
+        '</div>';
+    }).join('');
+
+    // Type badges
+    var typePills='';
+    if(it.snackCount) typePills+='<span class="mf-stat-pill mf-pill-snack">🥐 '+it.snackCount+'× snack</span>';
+    if(it.mealCount)  typePills+='<span class="mf-stat-pill mf-pill-meal">🍱 '+it.mealCount+'× meal</span>';
+
+    return '<div class="mf-menu-card">'+
+      '<div class="mf-menu-top">'+
+        '<span class="mf-menu-name">'+cap(it.name)+'</span>'+
+        '<div class="mf-menu-stats">'+
+          '<span class="mf-stat-pill mf-pill-count">'+total+'× total</span>'+
+          typePills+
+        '</div>'+
+      '</div>'+
+      '<div class="mf-dates-wrap" style="margin-bottom:8px">'+chips+moreBtn+'</div>'+
+      (monthKeys.length>1?'<div class="mf-month-bars">'+bars+'</div>':'')+
+      '</div>';
+  }).join('');
+}
+
+function mfExpandDates(btn,encoded){
+  var hidden=JSON.parse(decodeURIComponent(encoded));
+  var wrap=btn.parentNode;
+  hidden.forEach(function(d){
+    var dt=new Date((d.rawDate||'')+'T00:00:00');
+    var label=isNaN(dt)?d.displayDate:dt.toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric'});
+    var chip=document.createElement('span');
+    chip.className='mf-date-chip';
+    chip.textContent=label;
+    wrap.insertBefore(chip,btn);
+  });
+  btn.remove();
+}
+
+// ══════════════════════════════════════════════════════════════
+// SMART MENU DISTRIBUTION — Even spread across a month
+// ══════════════════════════════════════════════════════════════
+function distInit(){
+  if(!DATA) return;
+  // Fill month selector with future months (next 3) + current
+  var sel=document.getElementById('distMonth');
+  if(!sel) return;
+  var now=new Date();
+  sel.innerHTML='<option value="">-- Pilih Bulan Target --</option>';
+  for(var i=0;i<4;i++){
+    var d=new Date(now.getFullYear(),now.getMonth()+i,1);
+    var mk=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
+    var ml=d.toLocaleDateString('id-ID',{month:'long',year:'numeric'});
+    var o=document.createElement('option');
+    o.value=mk; o.textContent=ml;
+    if(i===1) o.selected=true; // default: next month
+    sel.appendChild(o);
+  }
+  distUpdateStats();
+}
+
+function distUpdateStats(){
+  if(!DATA) return;
+  var type=(document.getElementById('distType').value)||'both';
+  var src=parseInt(document.getElementById('distSource').value)||3;
+  var pool=distGetPool(type,src);
+  var monthKey=(document.getElementById('distMonth').value)||'';
+  var daysInMonth=monthKey?new Date(parseInt(monthKey.split('-')[0]),parseInt(monthKey.split('-')[1]),0).getDate():30;
+  var workDays=monthKey?distCountWorkdays(monthKey):Math.round(daysInMonth*5/7);
+
+  document.getElementById('distStats').innerHTML=[
+    {val:pool.snack.length, lbl:'Varian Snack', col:'var(--a-amber)'},
+    {val:pool.meal.length,  lbl:'Varian Lauk',  col:'var(--meal)'},
+    {val:workDays,          lbl:'Hari Kerja',    col:'var(--a-blue)'},
+    {val:pool.snack.length+pool.meal.length, lbl:'Total Menu Pool', col:'var(--a-green)'}
+  ].map(function(s){
+    return '<div class="dist-stat"><div class="dist-stat-val" style="color:'+s.col+'">'+s.val+'</div><div class="dist-stat-lbl">'+s.lbl+'</div></div>';
+  }).join('');
+}
+
+function distGetPool(type,srcMonths){
+  // Collect unique menus from history
+  var entries=DATA.allEntries||[];
+  if(srcMonths>0){
+    var cutoff=new Date(); cutoff.setMonth(cutoff.getMonth()-srcMonths);
+    var cutoffStr=cutoff.getFullYear()+'-'+String(cutoff.getMonth()+1).padStart(2,'0');
+    entries=entries.filter(function(e){
+      if(!e.rawDate) return false;
+      return e.rawDate.substring(0,7)>=cutoffStr;
+    });
+  }
+  var snackSet={}, mealSet={};
+  entries.forEach(function(e){
+    var k=e.menuName.trim().toLowerCase();
+    if(e.type.toLowerCase()==='snack') snackSet[k]={name:e.menuName,freq:(snackSet[k]?snackSet[k].freq:0)+1};
+    else mealSet[k]={name:e.menuName,freq:(mealSet[k]?mealSet[k].freq:0)+1};
+  });
+  return {
+    snack: (type==='meal')?[]:Object.values(snackSet),
+    meal:  (type==='snack')?[]:Object.values(mealSet)
+  };
+}
+
+function distCountWorkdays(monthKey){
+  var y=parseInt(monthKey.split('-')[0]),m=parseInt(monthKey.split('-')[1])-1;
+  var days=new Date(y,m+1,0).getDate(),count=0;
+  for(var d=1;d<=days;d++){var wd=new Date(y,m,d).getDay();if(wd!==0&&wd!==6)count++;}
+  return count;
+}
+
+function distGenerate(){
+  if(!DATA){toast('Data belum dimuat.','err');return;}
+  var type=(document.getElementById('distType').value)||'both';
+  var src=parseInt(document.getElementById('distSource').value)||3;
+  var monthKey=(document.getElementById('distMonth').value)||'';
+  if(!monthKey){toast('Pilih bulan target terlebih dahulu.','err');return;}
+
+  var pool=distGetPool(type,src);
+  if(!pool.snack.length&&!pool.meal.length){toast('Tidak ada data menu dalam histori yang dipilih.','err');return;}
+
+  var y=parseInt(monthKey.split('-')[0]),m=parseInt(monthKey.split('-')[1])-1;
+  var daysInMonth=new Date(y,m+1,0).getDate();
+  var today=new Date();
+
+  // ── Algorithm: Interleave menus, no same menu on consecutive workdays ──
+  function buildSchedule(pool_items){
+    if(!pool_items.length) return {};
+    // Sort by frequency ascending (least used first = gets priority)
+    var sorted=pool_items.slice().sort(function(a,b){return a.freq-b.freq;});
+    var names=sorted.map(function(x){return x.name;});
+    var schedule={};
+    var ptr=0, lastUsed='';
+    for(var day=1;day<=daysInMonth;day++){
+      var wd=new Date(y,m,day).getDay();
+      if(wd===0||wd===6) continue; // skip weekends
+      // Pick next menu, skip if same as yesterday
+      var attempts=0;
+      var picked=null;
+      while(attempts<names.length){
+        var candidate=names[ptr%names.length];
+        ptr++;
+        if(candidate.toLowerCase()!==lastUsed.toLowerCase()){picked=candidate;break;}
+        attempts++;
+      }
+      if(!picked) picked=names[ptr%names.length]; // fallback
+      lastUsed=picked;
+      var dk=y+'-'+String(m+1).padStart(2,'0')+'-'+String(day).padStart(2,'0');
+      schedule[dk]=picked;
+    }
+    return schedule;
+  }
+
+  var snackSched=buildSchedule(pool.snack);
+  var mealSched =buildSchedule(pool.meal);
+
+  // Count how many times each menu was assigned
+  var snackUsed={}, mealUsed={};
+  Object.values(snackSched).forEach(function(n){snackUsed[n.toLowerCase()]=(snackUsed[n.toLowerCase()]||0)+1;});
+  Object.values(mealSched).forEach(function(n){mealUsed[n.toLowerCase()]=(mealUsed[n.toLowerCase()]||0)+1;});
+
+  // Render calendar
+  distRenderCalendar(y,m,daysInMonth,today,snackSched,mealSched,pool,snackUsed,mealUsed,type,monthKey);
+
+  toast('Distribusi untuk '+document.getElementById('distMonth').options[document.getElementById('distMonth').selectedIndex].text+' berhasil dibuat!','ok');
+}
+
+function distRenderCalendar(y,m,days,today,snackSched,mealSched,pool,snackUsed,mealUsed,type,monthKey){
+  var DAYS=['Sen','Sel','Rab','Kam','Jum','Sab','Min'];
+  var firstDay=(new Date(y,m,1).getDay()+6)%7; // 0=Mon
+  var totalSnackSlots=Object.keys(snackSched).length;
+  var totalMealSlots =Object.keys(mealSched).length;
+
+  // Header
+  var hdr='<div class="dist-cal-wrap">'+
+    '<div class="dist-cal-hdr">'+
+      '<div>'+
+        '<div class="dist-cal-title">📅 Jadwal Menu — '+new Date(y,m,1).toLocaleDateString('id-ID',{month:'long',year:'numeric'})+'</div>'+
+        '<div class="dist-cal-sub">'+totalSnackSlots+' slot snack · '+totalMealSlots+' slot meal · Tidak ada duplikat berturut-turut</div>'+
+      '</div>'+
+    '</div>'+
+    '<div class="dist-day-grid">'+
+    DAYS.map(function(d){return '<div class="dist-day-hdr">'+d+'</div>';}).join('');
+
+  // Empty cells before first day
+  for(var e=0;e<firstDay;e++) hdr+='<div class="dist-day-cell empty-cell"></div>';
+
+  var cells='';
+  for(var d=1;d<=days;d++){
+    var wd=new Date(y,m,d).getDay(); // 0=Sun
+    var isWeekend=(wd===0||wd===6);
+    var dk=y+'-'+String(m+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');
+    var isToday=new Date(y,m,d).toDateString()===today.toDateString();
+    var cls='dist-day-cell'+(isWeekend?' weekend-cell':'');
+    var numHtml=isToday?'<span class="dist-day-num today-num">'+d+'</span>':'<span class="dist-day-num">'+d+'</span>';
+
+    var snack=snackSched[dk]||'', meal=mealSched[dk]||'';
+    var chipsHtml='';
+    if(snack) chipsHtml+='<div class="dist-menu-chip dist-chip-snack" title="🥐 '+cap(snack)+'">'+cap(snack.length>14?snack.substring(0,13)+'…':snack)+'</div>';
+    if(meal)  chipsHtml+='<div class="dist-menu-chip dist-chip-meal"  title="🍱 '+cap(meal)+'">'+cap(meal.length>14?meal.substring(0,13)+'…':meal)+'</div>';
+    if(isWeekend&&!snack&&!meal) chipsHtml='<div style="font-size:9px;color:var(--t4);font-style:italic;margin-top:2px;">libur</div>';
+
+    cells+='<div class="'+cls+'">'+numHtml+chipsHtml+'</div>';
+  }
+
+  // Trailing empty cells
+  var total=firstDay+days;
+  var rem=total%7;
+  if(rem>0) for(var f=0;f<7-rem;f++) cells+='<div class="dist-day-cell empty-cell"></div>';
+
+  // Legend + frequency table
+  var topSnack=Object.keys(snackUsed).sort(function(a,b){return snackUsed[b]-snackUsed[a];}).slice(0,5);
+  var topMeal =Object.keys(mealUsed).sort(function(a,b){return mealUsed[b]-mealUsed[a];}).slice(0,5);
+  var legend='<div class="dist-legend">'+
+    '<span class="dist-leg"><span class="dist-leg-sq dist-chip-snack"></span>Snack</span>'+
+    '<span class="dist-leg"><span class="dist-leg-sq dist-chip-meal"></span>Meal</span>'+
+    '<span style="margin-left:auto;font-size:10px;color:var(--t4)">'+
+      (type!=='meal'&&pool.snack.length?pool.snack.length+' varian snack':'')+(type==='both'?' · ':'')+
+      (type!=='snack'&&pool.meal.length?pool.meal.length+' varian lauk':'')+
+      ' terdistribusi merata'+
+    '</span>'+
+  '</div>';
+
+  // Frequency breakdown
+  var freqHtml='<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:16px;">';
+  if(type!=='meal'&&topSnack.length){
+    freqHtml+='<div>'+
+      '<div style="font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.1em;color:var(--a-amber);text-transform:uppercase;margin-bottom:8px">🥐 Distribusi Snack</div>'+
+      topSnack.map(function(k){
+        var pct=Math.round(snackUsed[k]/totalSnackSlots*100);
+        return '<div style="display:flex;align-items:center;gap:6px;margin-bottom:5px;">'+
+          '<span style="font-size:11px;color:var(--t1);text-transform:capitalize;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+cap(k)+'</span>'+
+          '<span style="font-size:10px;font-family:var(--mono);color:var(--t3);flex-shrink:0;">'+snackUsed[k]+'×</span>'+
+          '</div>';
+      }).join('')+
+    '</div>';
+  }
+  if(type!=='snack'&&topMeal.length){
+    freqHtml+='<div>'+
+      '<div style="font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.1em;color:var(--meal);text-transform:uppercase;margin-bottom:8px">🍱 Distribusi Lauk</div>'+
+      topMeal.map(function(k){
+        return '<div style="display:flex;align-items:center;gap:6px;margin-bottom:5px;">'+
+          '<span style="font-size:11px;color:var(--t1);text-transform:capitalize;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+cap(k)+'</span>'+
+          '<span style="font-size:10px;font-family:var(--mono);color:var(--t3);flex-shrink:0;">'+mealUsed[k]+'×</span>'+
+          '</div>';
+      }).join('')+
+    '</div>';
+  }
+  freqHtml+='</div>';
+
+  document.getElementById('distCalWrap').innerHTML=
+    hdr+cells+'</div>'+legend+freqHtml+'</div>';
+}
+
 // ══ UTILS ══
 function tryParseDate(str){
   if(!str)return null;str=str.trim();
@@ -3716,6 +4323,14 @@ window.addEventListener('resize', mobInit);
   <button class="mob-nav-item" id="mobtab-report" onclick="openTab('report')" aria-label="Report">
     <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
     Report
+  </button>
+  <button class="mob-nav-item" id="mobtab-finder" onclick="openTab('finder')" aria-label="Finder">
+    <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    Finder
+  </button>
+  <button class="mob-nav-item" id="mobtab-distrib" onclick="openTab('distrib')" aria-label="Distribusi">
+    <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
+    Distribusi
   </button>
 </nav>
 
