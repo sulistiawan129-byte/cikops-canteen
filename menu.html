@@ -563,6 +563,80 @@ select.inp{cursor:pointer;}
   #pane-report{display:block!important;}
   .rpt-doc{box-shadow:none;border:none;}
 }
+
+/* ══ TV TEMPLATE PANE ══ */
+.tv-preview-wrap{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-bottom:14px;}
+@media(max-width:700px){.tv-preview-wrap{grid-template-columns:1fr;}}
+.tv-thumb{border-radius:var(--r);overflow:hidden;cursor:pointer;border:2.5px solid transparent;transition:border-color .15s,transform .15s,box-shadow .15s;aspect-ratio:16/9;position:relative;box-shadow:var(--shadow);}
+.tv-thumb:hover{border-color:var(--navy-3);transform:translateY(-2px);box-shadow:0 8px 24px rgba(13,19,48,.15);}
+.tv-thumb.selected{border-color:var(--a-blue);box-shadow:0 0 0 3px rgba(59,110,245,.25);}
+.tv-thumb-label{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,.7));color:#fff;font-size:11px;font-weight:700;padding:18px 10px 8px;font-family:var(--mono);}
+.tv-launch-btn{width:100%;padding:13px;background:linear-gradient(135deg,var(--navy) 0%,#1d4ed8 100%);color:#fff;border:none;border-radius:var(--r-sm);font-size:14px;font-weight:700;font-family:var(--font);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:opacity .15s;box-shadow:0 4px 16px rgba(26,42,108,.3);}
+.tv-launch-btn:hover{opacity:.9;}
+.tv-launch-btn svg{width:16px;height:16px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;}
+
+/* ── SLIDE ENGINE — 16:9 canvas inside modal ── */
+.tv-slide-canvas{
+  width:100%; max-width:min(100vw, calc(100vh * 16/9));
+  aspect-ratio:16/9;
+  position:relative;overflow:hidden;
+  font-family:'Inter',system-ui,sans-serif;
+}
+
+/* ── TEMPLATE 1 — Navy Elegan ── */
+.tpl1{background:linear-gradient(145deg,#0a1628 0%,#0d2048 50%,#0a1628 100%);}
+.tpl1-deco-circle{position:absolute;border-radius:50%;opacity:.07;}
+.tpl1 .slide-tag{font-family:'JetBrains Mono',monospace;font-size:1.1em;font-weight:700;letter-spacing:.25em;color:rgba(255,255,255,.45);text-transform:uppercase;}
+.tpl1 .slide-title{font-size:5.5em;font-weight:900;color:#fff;line-height:1;letter-spacing:-.03em;margin:.15em 0 .1em;}
+.tpl1 .slide-accent{color:#60a5fa;}
+.tpl1 .slide-period{font-size:1.8em;font-weight:500;color:rgba(255,255,255,.6);font-family:'JetBrains Mono',monospace;}
+.tpl1 .slide-badge{display:inline-flex;align-items:center;gap:.4em;background:rgba(59,110,245,.25);border:1px solid rgba(59,110,245,.4);border-radius:100px;padding:.3em 1.2em;font-size:1em;font-weight:600;color:#93c5fd;margin-top:1em;}
+.tpl1 .menu-day-block{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:.5em;padding:.6em .8em;margin-bottom:.4em;}
+.tpl1 .day-lbl{font-family:'JetBrains Mono',monospace;font-size:.9em;font-weight:700;color:#60a5fa;letter-spacing:.08em;margin-bottom:.2em;}
+.tpl1 .day-menu{font-size:1em;font-weight:600;color:#fff;text-transform:capitalize;line-height:1.3;}
+.tpl1 .day-comps{font-size:.78em;color:rgba(255,255,255,.4);margin-top:.1em;font-family:'JetBrains Mono',monospace;}
+.tpl1 .closing-big{font-size:3.8em;font-weight:900;color:#fff;line-height:1.15;letter-spacing:-.03em;}
+.tpl1 .closing-sub{font-size:1.4em;color:rgba(255,255,255,.55);margin-top:.5em;}
+
+/* ── TEMPLATE 2 — Warm Harvest ── */
+.tpl2{background:linear-gradient(160deg,#78350f 0%,#92400e 40%,#b45309 100%);}
+.tpl2 .slide-tag{font-family:'JetBrains Mono',monospace;font-size:1.1em;letter-spacing:.2em;color:rgba(255,255,255,.5);text-transform:uppercase;}
+.tpl2 .slide-title{font-size:5.2em;font-weight:900;color:#fef3c7;line-height:1;letter-spacing:-.02em;margin:.1em 0;}
+.tpl2 .slide-period{font-size:1.7em;color:#fcd34d;font-weight:600;}
+.tpl2 .menu-day-block{background:rgba(0,0,0,.18);border-left:3px solid #fcd34d;border-radius:0 .4em .4em 0;padding:.55em .9em;margin-bottom:.38em;}
+.tpl2 .day-lbl{font-size:.9em;font-weight:700;color:#fcd34d;letter-spacing:.06em;margin-bottom:.15em;}
+.tpl2 .day-menu{font-size:1em;font-weight:700;color:#fef3c7;text-transform:capitalize;}
+.tpl2 .day-comps{font-size:.78em;color:rgba(254,243,199,.5);margin-top:.1em;}
+.tpl2 .closing-big{font-size:3.6em;font-weight:900;color:#fef3c7;line-height:1.15;}
+.tpl2 .closing-sub{font-size:1.3em;color:#fcd34d;margin-top:.5em;}
+
+/* ── TEMPLATE 3 — Fresh Garden ── */
+.tpl3{background:linear-gradient(150deg,#052e16 0%,#14532d 50%,#166534 100%);}
+.tpl3 .slide-tag{font-family:'JetBrains Mono',monospace;font-size:1.1em;letter-spacing:.2em;color:rgba(255,255,255,.4);text-transform:uppercase;}
+.tpl3 .slide-title{font-size:5.2em;font-weight:900;color:#dcfce7;line-height:1;letter-spacing:-.02em;margin:.1em 0;}
+.tpl3 .slide-period{font-size:1.7em;color:#86efac;font-weight:600;}
+.tpl3 .menu-day-block{background:rgba(0,0,0,.2);border:1px solid rgba(134,239,172,.2);border-radius:.5em;padding:.55em .85em;margin-bottom:.38em;}
+.tpl3 .day-lbl{font-size:.9em;font-weight:700;color:#86efac;letter-spacing:.06em;margin-bottom:.15em;}
+.tpl3 .day-menu{font-size:1em;font-weight:700;color:#dcfce7;text-transform:capitalize;}
+.tpl3 .day-comps{font-size:.78em;color:rgba(220,252,231,.45);margin-top:.1em;}
+.tpl3 .closing-big{font-size:3.6em;font-weight:900;color:#dcfce7;line-height:1.15;}
+.tpl3 .closing-sub{font-size:1.3em;color:#86efac;margin-top:.5em;}
+
+/* ── TEMPLATE 4 — Bold Dark ── */
+.tpl4{background:#09090b;}
+.tpl4 .slide-tag{font-family:'JetBrains Mono',monospace;font-size:1.1em;letter-spacing:.25em;color:#52525b;text-transform:uppercase;}
+.tpl4 .slide-title{font-size:5.5em;font-weight:900;color:#fff;line-height:1;letter-spacing:-.04em;margin:.1em 0;}
+.tpl4 .slide-accent{background:linear-gradient(90deg,#f59e0b,#ef4444);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.tpl4 .slide-period{font-size:1.7em;color:#a1a1aa;font-family:'JetBrains Mono',monospace;}
+.tpl4 .menu-day-block{border-bottom:1px solid #27272a;padding:.55em 0;margin-bottom:.2em;}
+.tpl4 .menu-day-block:last-child{border-bottom:none;}
+.tpl4 .day-lbl{font-size:.85em;font-weight:700;color:#f59e0b;letter-spacing:.1em;text-transform:uppercase;margin-bottom:.15em;font-family:'JetBrains Mono',monospace;}
+.tpl4 .day-menu{font-size:1em;font-weight:700;color:#fff;text-transform:capitalize;}
+.tpl4 .day-comps{font-size:.75em;color:#52525b;margin-top:.08em;font-family:'JetBrains Mono',monospace;}
+.tpl4 .closing-big{font-size:3.8em;font-weight:900;color:#fff;line-height:1.1;}
+.tpl4 .closing-sub{font-size:1.3em;color:#71717a;margin-top:.5em;}
+.tpl4-stripe{position:absolute;top:0;left:0;width:6px;height:100%;background:linear-gradient(180deg,#f59e0b,#ef4444);}
+
 </style>
 </head>
 <body>
@@ -837,6 +911,7 @@ select.inp{cursor:pointer;}
         <div class="rpt-mode-grp">
           <button class="rpt-mode-btn active" id="rptBtnWeekly"  onclick="rptSetMode('weekly')">📅 Weekly Report</button>
           <button class="rpt-mode-btn"         id="rptBtnMonthly" onclick="rptSetMode('monthly')">📆 Monthly Report</button>
+          <button class="rpt-mode-btn"         id="rptBtnTV"      onclick="rptSetMode('tv')">📺 TV Display</button>
         </div>
         <div class="rpt-selectors">
           <select class="rpt-sel" id="rptWeekSel"  onchange="rptRender()" style="display:none">
@@ -844,6 +919,15 @@ select.inp{cursor:pointer;}
           </select>
           <select class="rpt-sel" id="rptMonthSel" onchange="rptRender()" style="display:none">
             <option value="">-- Pilih Bulan --</option>
+          </select>
+          <select class="rpt-sel" id="rptTVWeekSel" onchange="rptRender()" style="display:none">
+            <option value="">-- Pilih Minggu --</option>
+          </select>
+          <select class="rpt-sel" id="rptTVTemplateSel" onchange="rptRender()" style="display:none">
+            <option value="1">Template 1 — Navy Elegan</option>
+            <option value="2">Template 2 — Warm Harvest</option>
+            <option value="3">Template 3 — Fresh Garden</option>
+            <option value="4">Template 4 — Bold Dark</option>
           </select>
           <button class="rpt-print-btn" onclick="rptPrint()">
             <svg viewBox="0 0 24 24" style="width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
@@ -867,6 +951,27 @@ select.inp{cursor:pointer;}
 </div>
 
 
+
+<!-- TV SLIDESHOW MODAL -->
+<div id="tvModal" style="display:none;position:fixed;inset:0;z-index:500;background:#000;flex-direction:column;">
+  <!-- Controls overlay -->
+  <div id="tvControls" style="position:absolute;top:0;left:0;right:0;z-index:10;display:flex;align-items:center;justify-content:space-between;padding:12px 18px;background:linear-gradient(rgba(0,0,0,.7),transparent);opacity:0;transition:opacity .3s;">
+    <div style="display:flex;align-items:center;gap:10px;">
+      <button onclick="tvClose()" style="background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);color:#fff;border-radius:8px;padding:6px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font);">✕ Tutup</button>
+      <div id="tvSlideInfo" style="font-family:var(--mono);font-size:11px;color:rgba(255,255,255,.6);"></div>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;">
+      <button onclick="tvPrev()" style="background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);color:#fff;border-radius:8px;padding:6px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font);">← Prev</button>
+      <button onclick="tvToggleAuto()" id="tvAutoBtn" style="background:rgba(59,110,245,.6);border:1px solid rgba(59,110,245,.8);color:#fff;border-radius:8px;padding:6px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font);">⏵ Auto</button>
+      <button onclick="tvNext()" style="background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);color:#fff;border-radius:8px;padding:6px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font);">Next →</button>
+      <button onclick="tvFullscreen()" style="background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);color:#fff;border-radius:8px;padding:6px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font);">⛶ Fullscreen</button>
+    </div>
+  </div>
+  <!-- Dots indicator -->
+  <div id="tvDots" style="position:absolute;bottom:18px;left:50%;transform:translateX(-50%);display:flex;gap:8px;z-index:10;opacity:0;transition:opacity .3s;"></div>
+  <!-- Slide container -->
+  <div id="tvSlide" style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;"></div>
+</div>
 
 <!-- DAY DETAIL MODAL -->
 <div class="modal-overlay" id="dayModal" onclick="if(event.target===this)closeDayModal()">
@@ -927,7 +1032,7 @@ function openTab(name){
     if(DATA)renderCalendar();
   }
   if(name==='weekly'&&DATA)renderWeekly();
-  if(name==='report'){rptFillSelectors();if(RPT.mode==='weekly')rptSetMode('weekly');else rptRender();}
+  if(name==='report'){rptFillSelectors();tvFillWeekSel();if(RPT.mode==='weekly')rptSetMode('weekly');else rptRender();}
   // Update viewing period label
   var vp=document.getElementById('viewingPeriod');
   if(vp)vp.textContent=selWeek?(DATA&&DATA.byWeek&&DATA.byWeek[selWeek]&&DATA.byWeek[selWeek].label)||selWeek:'All Data';
@@ -983,6 +1088,7 @@ function loadData(){
       loader.style.display='none';document.getElementById('analysisContent').style.display='';
       applyWeekFilter();
       rptFillSelectors();
+      tvFillWeekSel();
     })
     .catch(function(e){
       var msg=e.message==='timeout'?'Request took too long (>25s). Try again.':e.message;
@@ -1420,8 +1526,14 @@ function rptSetMode(m){
   RPT.mode = m;
   document.getElementById('rptBtnWeekly').classList.toggle('active',  m==='weekly');
   document.getElementById('rptBtnMonthly').classList.toggle('active', m==='monthly');
-  document.getElementById('rptWeekSel').style.display  = m==='weekly'  ? '' : 'none';
-  document.getElementById('rptMonthSel').style.display = m==='monthly' ? '' : 'none';
+  document.getElementById('rptBtnTV').classList.toggle('active',      m==='tv');
+  document.getElementById('rptWeekSel').style.display    = m==='weekly'  ? '' : 'none';
+  document.getElementById('rptMonthSel').style.display   = m==='monthly' ? '' : 'none';
+  document.getElementById('rptTVWeekSel').style.display  = m==='tv' ? '' : 'none';
+  document.getElementById('rptTVTemplateSel').style.display = m==='tv' ? '' : 'none';
+  // Hide print btn for TV mode (not needed)
+  var pb = document.querySelector('.rpt-print-btn');
+  if(pb) pb.style.display = m==='tv' ? 'none' : '';
   rptRender();
 }
 
@@ -1475,8 +1587,10 @@ function rptFillSelectors(){
 function rptRender(){
   if(!DATA){ document.getElementById('rptBody').innerHTML='<div class="loading"><div class="spin"></div><span class="load-txt">Menunggu data…</span></div>'; return; }
   rptFillSelectors();
+  tvFillWeekSel();
   if(RPT.mode==='weekly') rptRenderWeekly();
-  else rptRenderMonthly();
+  else if(RPT.mode==='monthly') rptRenderMonthly();
+  else rptRenderTV();
 }
 
 // ── WEEKLY REPORT ─────────────────────────────────────────────
@@ -1941,6 +2055,488 @@ function rptInsight(type,hdr,txt){
 }
 function rptPrint(){ window.print(); }
 
+
+// ══════════════════════════════════════════════════════════════
+// TV DISPLAY ENGINE — 4 Templates, 4 Slides, Fullscreen Slideshow
+// ══════════════════════════════════════════════════════════════
+var TV = {
+  tpl: 1,         // active template 1-4
+  slide: 0,       // current slide index 0-3
+  slides: [],     // built slide HTML array
+  autoTimer: null,
+  autoInterval: 6000, // 6s per slide
+  wKey: '',
+  wData: null
+};
+
+var TV_DAYS = ['Senin','Selasa','Rabu','Kamis','Jumat','Sabtu','Minggu'];
+var TV_DAY_SHORT = ['Sen','Sel','Rab','Kam','Jum','Sab','Min'];
+
+var TV_CLOSING = [
+  { big: 'Selamat Menikmati\nMakanan Hari Ini!', sub: 'Semoga hari Anda menyenangkan · PT Frisian Flag Indonesia' },
+  { big: 'Terima Kasih &\nSelamat Makan!', sub: 'Nikmati setiap suapan · Kantin GDSK · Cikarang Plant' },
+  { big: 'Makan Enak,\nKerja Semangat!', sub: 'Salam hangat dari tim kantin · PT Frisian Flag Indonesia' },
+  { big: 'Bon Appétit &\nHave a Great Day!', sub: 'Thank you for dining with us · GDSK Canteen · Cikarang' }
+];
+
+// ── Init TV mode ──────────────────────────────────────────────
+function rptRenderTV() {
+  var wKey = document.getElementById('rptTVWeekSel').value;
+  var tpl  = parseInt(document.getElementById('rptTVTemplateSel').value) || 1;
+  TV.tpl = tpl;
+  TV.wKey = wKey;
+
+  if (!wKey) {
+    document.getElementById('rptBody').innerHTML =
+      '<div class="empty" style="padding:60px"><span class="empty-icon">📺</span>' +
+      'Pilih minggu yang ingin ditampilkan, lalu pilih template.</div>';
+    return;
+  }
+
+  // Build week data
+  var wData = DATA && DATA.byWeek && DATA.byWeek[wKey];
+  TV.wData = wData;
+
+  // Week date range
+  var mon = isoWeekToMonday(wKey);
+  var sun = new Date(mon); sun.setDate(mon.getDate() + 6);
+  var fmtPeriod = mon.toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'}) +
+                  ' – ' + sun.toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'});
+  TV.period = fmtPeriod;
+  TV.mon = mon;
+  TV.sun = sun;
+
+  // Build per-day menu maps
+  var byDate = {};
+  if (wData) {
+    var entries = (wData.snack||[]).concat(wData.meal||[]);
+    entries.forEach(function(e) {
+      var dk = e.rawDate || '';
+      if (!byDate[dk]) byDate[dk] = {snack:[], meal:[], dt: new Date(dk+'T00:00:00')};
+      if (e.type.toLowerCase()==='snack') byDate[dk].snack.push(e);
+      else byDate[dk].meal.push(e);
+    });
+  }
+  TV.byDate = byDate;
+
+  // Render preview pane
+  var thumbs = [1,2,3,4].map(function(t) {
+    return '<div class="tv-thumb'+(t===tpl?' selected':'')+'" onclick="tvSelectTemplate('+t+')" title="Template '+t+'">' +
+      tvMiniPreview(t) +
+      '<div class="tv-thumb-label">Template '+t+' · '+tvTemplateName(t)+'</div>' +
+    '</div>';
+  }).join('');
+
+  document.getElementById('rptBody').innerHTML =
+    '<div style="margin-bottom:14px">' +
+      '<div style="font-size:12px;font-weight:600;color:var(--t2);margin-bottom:10px;display:flex;align-items:center;gap:8px;">' +
+        '<span style="font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.12em;color:var(--t4);text-transform:uppercase">Pilih Template</span>' +
+      '</div>' +
+      '<div class="tv-preview-wrap">'+thumbs+'</div>' +
+    '</div>' +
+    '<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px;margin-bottom:12px;">' +
+      '<div style="font-size:12px;color:var(--t2);margin-bottom:8px;">'+
+        '<strong>Minggu:</strong> '+wKey+' &nbsp;·&nbsp; '+fmtPeriod +
+      '</div>' +
+      '<div style="font-size:11px;color:var(--t3);font-family:var(--mono)">'+
+        '4 slide akan ditampilkan: Cover · Snack Senin–Minggu · Meal Senin–Minggu · Penutup' +
+      '</div>' +
+    '</div>' +
+    '<button class="tv-launch-btn" onclick="tvLaunch()">' +
+      '<svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><polyline points="8 21 12 17 16 21"/></svg>' +
+      'Tampilkan di TV (Fullscreen)' +
+    '</button>';
+}
+
+function tvTemplateName(t) {
+  return ['','Navy Elegan','Warm Harvest','Fresh Garden','Bold Dark'][t] || '';
+}
+
+function tvSelectTemplate(t) {
+  TV.tpl = t;
+  document.getElementById('rptTVTemplateSel').value = String(t);
+  rptRenderTV();
+}
+
+// ── Mini SVG preview thumbnail ────────────────────────────────
+function tvMiniPreview(t) {
+  var bg  = ['','#0a1628','#92400e','#052e16','#09090b'][t];
+  var c1  = ['','#60a5fa','#fcd34d','#86efac','#f59e0b'][t];
+  var c2  = ['','rgba(255,255,255,.8)','#fef3c7','#dcfce7','#ffffff'][t];
+  var c3  = ['','rgba(255,255,255,.3)','rgba(255,255,255,.3)','rgba(255,255,255,.3)','#52525b'][t];
+  var stripe = t===4 ? '<rect x="0" y="0" width="8" height="100%" fill="url(#g'+t+')" rx="0"/>' : '';
+  return '<svg viewBox="0 0 320 180" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;display:block;">' +
+    (t===4?'<defs><linearGradient id="g4" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#f59e0b"/><stop offset="100%" stop-color="#ef4444"/></linearGradient></defs>':'') +
+    '<rect width="320" height="180" fill="'+bg+'"/>' +
+    (t===4?'<rect x="0" y="0" width="8" height="180" fill="url(#g4)"/>':'') +
+    '<rect x="'+(t===4?'24':'20')+'" y="60" width="160" height="8" rx="2" fill="'+c2+'" opacity=".9"/>' +
+    '<rect x="'+(t===4?'24':'20')+'" y="76" width="100" height="6" rx="2" fill="'+c1+'" opacity=".8"/>' +
+    '<rect x="'+(t===4?'24':'20')+'" y="92" width="130" height="5" rx="2" fill="'+c2+'" opacity=".4"/>' +
+    '<rect x="'+(t===4?'24':'20')+'" y="35" width="60" height="4" rx="2" fill="'+c1+'" opacity=".5"/>' +
+    '<rect x="'+(t===4?'24':'20')+'" y="108" width="40" height="4" rx="2" fill="'+c1+'" opacity=".35"/>' +
+    '<rect x="'+(t===4?'24':'20')+'" y="118" width="80" height="3" rx="2" fill="'+c3+'" opacity=".5"/>' +
+    (t===1?'<circle cx="280" cy="90" r="60" fill="rgba(59,110,245,.08)"/><circle cx="260" cy="160" r="40" fill="rgba(59,110,245,.05)"/>':'')+
+    '</svg>';
+}
+
+// ── Build all 4 slides ────────────────────────────────────────
+function tvBuildSlides() {
+  var t = TV.tpl;
+  var cls = 'tpl'+t;
+  var slides = [];
+  var closingIdx = (t-1) % TV_CLOSING.length;
+  var cl = TV_CLOSING[closingIdx];
+
+  // Map day index 0-6 to actual dates in the week
+  var dayEntries = [];
+  for (var di = 0; di < 7; di++) {
+    var dt = new Date(TV.mon);
+    dt.setDate(TV.mon.getDate() + di);
+    var dk = dt.getFullYear()+'-'+String(dt.getMonth()+1).padStart(2,'0')+'-'+String(dt.getDate()).padStart(2,'0');
+    var dayData = TV.byDate && TV.byDate[dk];
+    dayEntries.push({ di:di, dt:dt, dk:dk, snack: dayData?dayData.snack:[], meal: dayData?dayData.meal:[] });
+  }
+
+  // ── SLIDE 1: Cover ────────────────────────────────────────
+  slides.push(tvSlide1(cls, t));
+
+  // ── SLIDE 2: Snack Mon–Sun ────────────────────────────────
+  slides.push(tvSlideMenu(cls, t, 'snack', dayEntries));
+
+  // ── SLIDE 3: Meal Mon–Sun ─────────────────────────────────
+  slides.push(tvSlideMenu(cls, t, 'meal', dayEntries));
+
+  // ── SLIDE 4: Closing ─────────────────────────────────────
+  slides.push(tvSlide4(cls, t, cl));
+
+  return slides;
+}
+
+// ── SLIDE 1 — Cover ──────────────────────────────────────────
+function tvSlide1(cls, t) {
+  var wkLabel = TV.wKey;
+  var period  = TV.period;
+  var bg = tvBgStyle(t);
+
+  var inner = '';
+  if (t===1) {
+    inner =
+      '<div style="position:absolute;width:600px;height:600px;border-radius:50%;background:rgba(59,110,245,.07);top:-100px;right:-120px;"></div>'+
+      '<div style="position:absolute;width:300px;height:300px;border-radius:50%;background:rgba(59,110,245,.05);bottom:-60px;left:-60px;"></div>'+
+      '<div style="position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;padding:0 6% 0 8%;">'+
+        '<div class="slide-tag">PT Frisian Flag Indonesia · Cikarang Plant · Vendor GDSK</div>'+
+        '<div class="slide-title">MENU<br><span class="slide-accent">KANTIN</span></div>'+
+        '<div class="slide-period">'+period+'</div>'+
+        '<div class="slide-badge">📅 '+wkLabel+' &nbsp;·&nbsp; Senin – Minggu</div>'+
+      '</div>';
+  } else if (t===2) {
+    inner =
+      '<div style="position:absolute;top:0;right:0;width:45%;height:100%;background:rgba(0,0,0,.15);clip-path:polygon(20% 0%,100% 0%,100% 100%,0% 100%);"></div>'+
+      '<div style="position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;padding:0 5% 0 7%;">'+
+        '<div class="slide-tag">PT Frisian Flag Indonesia · Cikarang</div>'+
+        '<div class="slide-title">MENU<br>KANTIN 🍽️</div>'+
+        '<div class="slide-period">'+period+'</div>'+
+        '<div style="margin-top:.8em;font-size:1.3em;color:rgba(255,255,255,.55);">'+wkLabel+'</div>'+
+      '</div>';
+  } else if (t===3) {
+    inner =
+      '<div style="position:absolute;top:-40%;right:-10%;width:80%;height:180%;background:radial-gradient(circle,rgba(134,239,172,.08) 0%,transparent 70%);"></div>'+
+      '<div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0 8%;">'+
+        '<div style="font-size:4em;margin-bottom:.1em;">🥗🍱🥐</div>'+
+        '<div class="slide-tag">PT Frisian Flag Indonesia · Cikarang Plant</div>'+
+        '<div class="slide-title">MENU KANTIN</div>'+
+        '<div class="slide-period">'+period+'</div>'+
+        '<div style="margin-top:.8em;background:rgba(134,239,172,.15);border:1px solid rgba(134,239,172,.3);border-radius:100px;padding:.35em 1.5em;font-size:1em;font-weight:600;color:#86efac;">'+wkLabel+'</div>'+
+      '</div>';
+  } else {
+    inner =
+      '<div style="position:absolute;top:0;left:0;width:6px;height:100%;background:linear-gradient(180deg,#f59e0b,#ef4444);"></div>'+
+      '<div style="position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;padding:0 6% 0 9%;">'+
+        '<div class="slide-tag">PT Frisian Flag Indonesia · Cikarang</div>'+
+        '<div class="slide-title">MENU <span class="slide-accent">KANTIN</span></div>'+
+        '<div class="slide-period">'+period+'</div>'+
+        '<div style="margin-top:.8em;display:flex;align-items:center;gap:.6em;font-size:1em;color:#52525b;font-family:\'JetBrains Mono\',monospace;">'+
+          '<span style="width:20px;height:2px;background:#f59e0b;display:inline-block;"></span>'+wkLabel+
+        '</div>'+
+      '</div>';
+  }
+
+  return '<div class="tv-slide-canvas '+cls+'" style="'+bg+'">'+inner+'</div>';
+}
+
+// ── SLIDE 2 & 3 — Menu per Hari ──────────────────────────────
+function tvSlideMenu(cls, t, type, dayEntries) {
+  var isSnack = type==='snack';
+  var icon    = isSnack ? '🥐' : '🍱';
+  var title   = isSnack ? 'MENU SNACK' : 'MENU MAKAN';
+  var accentColor = {
+    1: isSnack?'#f59e0b':'#60a5fa',
+    2: '#fcd34d',
+    3: '#86efac',
+    4: isSnack?'#f59e0b':'#60a5fa'
+  }[t];
+  var bg = tvBgStyle(t);
+
+  // Build day rows — 7 cols layout
+  var dayHtml = dayEntries.map(function(d) {
+    var entries = d[type];
+    var dayLbl = TV_DAY_SHORT[d.di];
+    var dateStr = d.dt.toLocaleDateString('id-ID',{day:'2-digit',month:'short'});
+
+    var menuContent = '';
+    if (!entries.length) {
+      menuContent = '<div style="font-size:.75em;color:rgba(255,255,255,.25);font-style:italic;">—</div>';
+    } else if (isSnack) {
+      menuContent = entries.map(function(e) {
+        var comps = (e.components||[]).slice(0,2).join(', ');
+        return '<div class="day-menu">'+cap(e.menuName)+'</div>' +
+               (comps?'<div class="day-comps">'+comps+'</div>':'');
+      }).join('');
+    } else {
+      // Meal: numbered lauk
+      menuContent = entries.map(function(e,i) {
+        return '<div class="day-menu"><span style="font-size:.75em;opacity:.6;margin-right:.2em;">'+(i+1)+'.</span>'+cap(e.menuName)+'</div>';
+      }).join('');
+      // Shared pelengkap
+      var allComps={};
+      entries.forEach(function(e){(e.components||[]).forEach(function(c){if(c.trim())allComps[c.toLowerCase()]=c.trim();});});
+      var comps=Object.values(allComps).slice(0,3).join(' · ');
+      if(comps) menuContent += '<div class="day-comps">'+comps+'</div>';
+    }
+
+    return '<div class="menu-day-block" style="flex:1;min-width:0;">'+
+      '<div class="day-lbl">'+dayLbl+'<br><span style="font-size:.75em;opacity:.55;">'+dateStr+'</span></div>'+
+      menuContent+
+    '</div>';
+  }).join('');
+
+  // Template-specific layout
+  var inner = '';
+  if (t===1||t===3) {
+    inner =
+      '<div style="position:absolute;inset:0;display:flex;flex-direction:column;padding:3% 5%;">'+
+        '<div style="display:flex;align-items:center;gap:.6em;margin-bottom:1.2em;">'+
+          '<span style="font-size:2.4em;">'+icon+'</span>'+
+          '<span class="slide-title" style="font-size:2.8em;margin:0;">'+title+'</span>'+
+          '<span style="margin-left:auto;font-size:.9em;font-family:\'JetBrains Mono\',monospace;color:rgba(255,255,255,.35);">'+TV.wKey+'</span>'+
+        '</div>'+
+        '<div style="display:flex;gap:.5em;flex:1;">'+dayHtml+'</div>'+
+      '</div>';
+  } else if (t===2) {
+    inner =
+      '<div style="position:absolute;inset:0;display:flex;flex-direction:column;padding:3% 5%;">'+
+        '<div style="display:flex;align-items:center;gap:.6em;margin-bottom:1em;border-bottom:2px solid rgba(252,211,77,.3);padding-bottom:.7em;">'+
+          '<span style="font-size:2.2em;">'+icon+'</span>'+
+          '<span class="slide-title" style="font-size:2.6em;margin:0;">'+title+'</span>'+
+          '<span style="margin-left:auto;font-size:.85em;font-family:\'JetBrains Mono\',monospace;color:rgba(255,255,255,.35);">'+TV.wKey+'</span>'+
+        '</div>'+
+        '<div style="display:flex;gap:.45em;flex:1;">'+dayHtml+'</div>'+
+      '</div>';
+  } else {
+    inner =
+      '<div style="position:absolute;top:0;left:0;width:6px;height:100%;background:linear-gradient(180deg,#f59e0b,#ef4444);"></div>'+
+      '<div style="position:absolute;inset:0;display:flex;flex-direction:column;padding:3% 5% 3% 6%;">'+
+        '<div style="display:flex;align-items:center;gap:.6em;margin-bottom:1em;">'+
+          '<span style="font-size:2.2em;">'+icon+'</span>'+
+          '<span class="slide-title" style="font-size:2.6em;margin:0;">'+title+'</span>'+
+          '<span style="margin-left:auto;font-size:.85em;font-family:\'JetBrains Mono\',monospace;color:#52525b;">'+TV.wKey+'</span>'+
+        '</div>'+
+        '<div style="display:flex;gap:.45em;flex:1;">'+dayHtml+'</div>'+
+      '</div>';
+  }
+
+  return '<div class="tv-slide-canvas '+cls+'" style="'+bg+'">'+inner+'</div>';
+}
+
+// ── SLIDE 4 — Closing ─────────────────────────────────────────
+function tvSlide4(cls, t, cl) {
+  var bg = tvBgStyle(t);
+  var inner = '';
+  var bigLines = cl.big.split('\n');
+
+  if (t===1) {
+    inner =
+      '<div style="position:absolute;width:500px;height:500px;border-radius:50%;background:rgba(59,110,245,.08);top:-80px;right:-80px;"></div>'+
+      '<div style="position:absolute;width:250px;height:250px;border-radius:50%;background:rgba(59,110,245,.05);bottom:-40px;left:-40px;"></div>'+
+      '<div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0 8%;">'+
+        '<div style="font-size:3.5em;margin-bottom:.3em;">🙏</div>'+
+        '<div class="closing-big">'+bigLines.join('<br>')+'</div>'+
+        '<div class="closing-sub">'+cl.sub+'</div>'+
+        '<div style="margin-top:1.5em;display:flex;gap:.5em;align-items:center;"><span style="width:30px;height:2px;background:rgba(96,165,250,.4);display:inline-block;"></span><span style="font-size:.9em;font-family:\'JetBrains Mono\',monospace;color:rgba(255,255,255,.3);letter-spacing:.15em;">FFI · GDSK · CIKARANG</span><span style="width:30px;height:2px;background:rgba(96,165,250,.4);display:inline-block;"></span></div>'+
+      '</div>';
+  } else if (t===2) {
+    inner =
+      '<div style="position:absolute;top:0;right:0;width:40%;height:100%;background:rgba(0,0,0,.12);clip-path:polygon(25% 0%,100% 0%,100% 100%,0% 100%);"></div>'+
+      '<div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0 10%;">'+
+        '<div style="font-size:3.5em;margin-bottom:.3em;">🍽️✨</div>'+
+        '<div class="closing-big">'+bigLines.join('<br>')+'</div>'+
+        '<div class="closing-sub">'+cl.sub+'</div>'+
+      '</div>';
+  } else if (t===3) {
+    inner =
+      '<div style="position:absolute;top:-20%;right:-10%;width:80%;height:160%;background:radial-gradient(circle,rgba(134,239,172,.07) 0%,transparent 70%);"></div>'+
+      '<div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0 8%;">'+
+        '<div style="font-size:3.5em;margin-bottom:.3em;">🌿🙏</div>'+
+        '<div class="closing-big">'+bigLines.join('<br>')+'</div>'+
+        '<div class="closing-sub">'+cl.sub+'</div>'+
+        '<div style="margin-top:1.5em;background:rgba(134,239,172,.1);border:1px solid rgba(134,239,172,.2);border-radius:100px;padding:.4em 2em;font-size:.9em;color:rgba(134,239,172,.7);font-family:\'JetBrains Mono\',monospace;">FFI · GDSK · CIKARANG</div>'+
+      '</div>';
+  } else {
+    inner =
+      '<div style="position:absolute;top:0;left:0;width:6px;height:100%;background:linear-gradient(180deg,#f59e0b,#ef4444);"></div>'+
+      '<div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0 9%;">'+
+        '<div style="font-size:3.5em;margin-bottom:.3em;">🙌</div>'+
+        '<div class="closing-big">'+bigLines.join('<br>')+'</div>'+
+        '<div style="margin-top:.6em;width:60px;height:3px;background:linear-gradient(90deg,#f59e0b,#ef4444);border-radius:3px;margin-left:auto;margin-right:auto;"></div>'+
+        '<div class="closing-sub" style="margin-top:.8em;">'+cl.sub+'</div>'+
+      '</div>';
+  }
+
+  return '<div class="tv-slide-canvas '+cls+'" style="'+bg+'">'+inner+'</div>';
+}
+
+// ── Background style per template ─────────────────────────────
+function tvBgStyle(t) {
+  var bgs = {
+    1: 'background:linear-gradient(145deg,#0a1628 0%,#0d2048 50%,#0a1628 100%);width:100%;height:100%;',
+    2: 'background:linear-gradient(160deg,#78350f 0%,#92400e 40%,#b45309 100%);width:100%;height:100%;',
+    3: 'background:linear-gradient(150deg,#052e16 0%,#14532d 50%,#166534 100%);width:100%;height:100%;',
+    4: 'background:#09090b;width:100%;height:100%;'
+  };
+  return bgs[t] || bgs[1];
+}
+
+// ── Launch slideshow ──────────────────────────────────────────
+function tvLaunch() {
+  if (!TV.wKey) { toast('Pilih minggu terlebih dahulu.','err'); return; }
+  TV.slides = tvBuildSlides();
+  TV.slide  = 0;
+  var modal = document.getElementById('tvModal');
+  modal.style.display = 'flex';
+  tvShowSlide(0);
+  tvShowControls();
+  // Prevent body scroll
+  document.body.style.overflow = 'hidden';
+}
+
+function tvClose() {
+  tvStopAuto();
+  document.getElementById('tvModal').style.display = 'none';
+  document.body.style.overflow = '';
+  if (document.fullscreenElement) document.exitFullscreen();
+}
+
+function tvShowSlide(idx) {
+  idx = ((idx % TV.slides.length) + TV.slides.length) % TV.slides.length;
+  TV.slide = idx;
+  var container = document.getElementById('tvSlide');
+  container.innerHTML = TV.slides[idx];
+  // Scale the slide canvas to fit the viewport maintaining 16:9
+  tvScaleSlide();
+  tvUpdateDots();
+  document.getElementById('tvSlideInfo').textContent =
+    'Slide '+(idx+1)+' / '+TV.slides.length+' · Template '+TV.tpl+' · '+tvTemplateName(TV.tpl);
+}
+
+function tvScaleSlide() {
+  var canvas = document.getElementById('tvSlide').querySelector('.tv-slide-canvas');
+  if (!canvas) return;
+  var vw = window.innerWidth, vh = window.innerHeight;
+  var targetW = Math.min(vw, vh * 16/9);
+  var targetH = targetW * 9/16;
+  if (targetH > vh) { targetH = vh; targetW = targetH * 16/9; }
+  // Use font-size scaling trick: base design is 1280px wide
+  var scale = targetW / 1280;
+  canvas.style.fontSize = (scale * 16) + 'px';
+  canvas.style.width  = targetW + 'px';
+  canvas.style.height = targetH + 'px';
+}
+
+window.addEventListener('resize', function() {
+  if (document.getElementById('tvModal').style.display !== 'none') tvScaleSlide();
+});
+
+function tvNext() { tvShowSlide(TV.slide + 1); }
+function tvPrev() { tvShowSlide(TV.slide - 1); }
+
+function tvUpdateDots() {
+  var dots = document.getElementById('tvDots');
+  dots.innerHTML = TV.slides.map(function(_, i) {
+    return '<div onclick="tvShowSlide('+i+')" style="width:'+(i===TV.slide?'24':'8')+'px;height:8px;border-radius:4px;background:'+(i===TV.slide?'#fff':'rgba(255,255,255,.35)')+';cursor:pointer;transition:all .25s;"></div>';
+  }).join('');
+}
+
+// ── Auto-advance ──────────────────────────────────────────────
+function tvToggleAuto() {
+  if (TV.autoTimer) { tvStopAuto(); }
+  else { tvStartAuto(); }
+}
+function tvStartAuto() {
+  TV.autoTimer = setInterval(function() { tvShowSlide(TV.slide + 1); }, TV.autoInterval);
+  var btn = document.getElementById('tvAutoBtn');
+  if (btn) { btn.textContent = '⏸ Stop'; btn.style.background = 'rgba(239,68,68,.6)'; btn.style.borderColor = 'rgba(239,68,68,.8)'; }
+}
+function tvStopAuto() {
+  if (TV.autoTimer) { clearInterval(TV.autoTimer); TV.autoTimer = null; }
+  var btn = document.getElementById('tvAutoBtn');
+  if (btn) { btn.textContent = '⏵ Auto'; btn.style.background = 'rgba(59,110,245,.6)'; btn.style.borderColor = 'rgba(59,110,245,.8)'; }
+}
+
+// ── Controls hover show/hide ──────────────────────────────────
+var tvHideTimer = null;
+function tvShowControls() {
+  var ctrl = document.getElementById('tvControls');
+  var dots = document.getElementById('tvDots');
+  if (ctrl) ctrl.style.opacity = '1';
+  if (dots) dots.style.opacity = '1';
+  if (tvHideTimer) clearTimeout(tvHideTimer);
+  tvHideTimer = setTimeout(function() {
+    if (ctrl) ctrl.style.opacity = '0';
+    if (dots) dots.style.opacity = '0';
+  }, 3000);
+}
+
+document.addEventListener('mousemove', function() {
+  if (document.getElementById('tvModal').style.display !== 'none') tvShowControls();
+});
+
+// Keyboard navigation
+document.addEventListener('keydown', function(e) {
+  if (document.getElementById('tvModal').style.display === 'none') return;
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown') tvNext();
+  if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   tvPrev();
+  if (e.key === 'Escape')  tvClose();
+  if (e.key === 'f' || e.key === 'F') tvFullscreen();
+  if (e.key === ' ') { e.preventDefault(); tvToggleAuto(); }
+});
+
+// ── Fullscreen ────────────────────────────────────────────────
+function tvFullscreen() {
+  var el = document.getElementById('tvModal');
+  if (!document.fullscreenElement) {
+    el.requestFullscreen().catch(function(){});
+  } else {
+    document.exitFullscreen();
+  }
+}
+
+document.addEventListener('fullscreenchange', function() {
+  setTimeout(tvScaleSlide, 100);
+});
+
+// ── Fill TV week selector ─────────────────────────────────────
+function tvFillWeekSel() {
+  if (!DATA) return;
+  var sel = document.getElementById('rptTVWeekSel');
+  var cur = sel.value;
+  sel.innerHTML = '<option value="">-- Pilih Minggu --</option>';
+  (DATA.availableWeeks||[]).filter(function(w){
+    return w.value && !w.value.includes('NaN') && /^W\d{4}-\d{2}$/.test(w.value);
+  }).forEach(function(w){
+    sel.innerHTML += '<option value="'+w.value+'"'+(w.value===cur?' selected':'')+'>'+w.value+' · '+(w.label||'')+'</option>';
+  });
+  if (!cur && sel.options.length > 1) sel.selectedIndex = sel.options.length - 1;
+}
 
 // ══ UTILS ══
 function tryParseDate(str){
