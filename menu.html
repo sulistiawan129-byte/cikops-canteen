@@ -606,8 +606,8 @@ select.inp{cursor:pointer;}
 .tv-slides-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px;}
 .tv-strip-card{border-radius:var(--r-sm);overflow:hidden;border:1px solid var(--border);box-shadow:var(--shadow);}
 .tv-strip-label{background:var(--surface-2);padding:5px 8px;font-size:9px;font-weight:700;font-family:var(--mono);color:var(--t3);letter-spacing:.08em;text-transform:uppercase;border-top:1px solid var(--border);}
-.tv-btn-mp4{background:var(--surface-2);border-color:var(--border);color:var(--t2);}
-.tv-btn-mp4:hover{background:#7f1d1d;border-color:#dc2626;color:#fff;}
+.tv-btn-jpg{background:var(--surface-2);border-color:var(--border);color:var(--t2);}
+.tv-btn-jpg:hover{background:#14532d;border-color:#16a34a;color:#fff;}
 /* MP4 progress overlay */
 .mp4-overlay{display:none;position:fixed;inset:0;z-index:600;background:rgba(0,0,0,.75);backdrop-filter:blur(6px);align-items:center;justify-content:center;}
 .mp4-overlay.show{display:flex;}
@@ -951,18 +951,17 @@ select.inp{cursor:pointer;}
 
 
 
-<!-- MP4 PROGRESS MODAL -->
+<!-- JPG PROGRESS MODAL -->
 <div class="mp4-overlay" id="mp4Overlay">
   <div class="mp4-box">
-    <div class="mp4-icon">🎬</div>
-    <div class="mp4-title">Merender Video MP4…</div>
-    <div class="mp4-sub" id="mp4SubTitle">Menyiapkan slide…</div>
+    <div class="mp4-icon">🖼️</div>
+    <div class="mp4-title">Mengekspor Slide sebagai JPG…</div>
+    <div class="mp4-sub" id="mp4SubTitle">Menyiapkan…</div>
     <div class="mp4-bar-bg"><div class="mp4-bar-fill" id="mp4Bar"></div></div>
     <div class="mp4-pct" id="mp4Pct">0%</div>
     <div class="mp4-status" id="mp4Status">Initializing…</div>
     <div class="mp4-warn">
-      ⚠️ Proses ini membutuhkan <strong>20–40 detik</strong>. Browser merender setiap frame slide ke Canvas lalu encode ke video WebM/MP4.<br>
-      Jangan tutup tab selama proses berlangsung.
+      💡 4 file JPG akan didownload otomatis (1 per slide). Resolusi <strong>1920×1080px</strong> — siap diedit di Canva, Photoshop, atau aplikasi lain.
     </div>
     <button class="mp4-cancel" id="mp4CancelBtn" onclick="tvMP4Cancel()">Batalkan</button>
   </div>
@@ -2172,9 +2171,9 @@ function rptRenderTV() {
             '<svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>' +
             'Download HTML' +
           '</button>' +
-          '<button class="tv-btn-dl tv-btn-mp4" id="tvMp4Btn" onclick="tvDownloadMP4()" title="Download MP4 Video">' +
-            '<svg viewBox="0 0 24 24"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>' +
-            'Download MP4' +
+          '<button class="tv-btn-dl tv-btn-jpg" onclick="tvDownloadJPG()" title="Download semua slide sebagai JPG">' +
+            '<svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>' +
+            'Download JPG' +
           '</button>' +
           '<button class="tv-btn-launch" onclick="tvLaunch()">' +
             '<svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><polyline points="8 21 12 17 16 21"/></svg>' +
@@ -2374,128 +2373,123 @@ function tvMakeSlideMenu(t, cls, type, dayEntries) {
   var icon    = isSnack?'🥐':'🍱';
   var title   = isSnack?'MENU SNACK':'MENU MAKAN';
   var subtitle= isSnack?'Lezat, Bergizi, Energi Positif Setiap Hari!':'Pilih Lauk Favoritmu, Nikmati Setiap Hari!';
-  var acc = tvAcc(t), textC = tvText(t), subC = tvSub(t), mutedC = tvMuted(t), borderC = tvBorder(t);
+  var acc=tvAcc(t),textC=tvText(t),subC=tvSub(t),mutedC=tvMuted(t),borderC=tvBorder(t);
   var hdrBg  = ['','#0f2057','#6b1e07','#0a3d1f','#130d20'][t]||'#0f2057';
   var hdrLine= ['','#3b82f6','#f97316','#22c55e','#a78bfa'][t]||'#3b82f6';
   var dotCol = tvAcc(t);
-  var tagBg  = ['','rgba(59,130,246,.2)','rgba(249,115,22,.2)','rgba(34,197,94,.18)','rgba(167,139,250,.18)'][t]||'rgba(59,130,246,.2)';
+  var tagBg  = ['','rgba(59,130,246,.22)','rgba(249,115,22,.22)','rgba(34,197,94,.2)','rgba(167,139,250,.2)'][t]||'rgba(59,130,246,.22)';
 
-  // Build one day card
+  // ── One day card ─────────────────────────────────────────────
   function makeCard(d, pct) {
     var entries = d[type];
     var dayFull = TV_DAYS[d.di];
     var dateStr = d.dt.toLocaleDateString('id-ID',{day:'2-digit',month:'short'});
     var isEmpty = !entries.length;
 
+    // Card header — day name big & bold
     var cardHdr =
-      '<div style="background:'+hdrBg+';border-bottom:2.5px solid '+hdrLine+';padding:.38em .65em;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">' +
-        '<div style="display:flex;align-items:center;gap:.32em;">' +
-          '<div style="width:.48em;height:.48em;border-radius:50%;background:'+dotCol+';flex-shrink:0;"></div>' +
-          '<span style="font-size:.9em;font-weight:800;color:#fff;letter-spacing:.04em;">'+dayFull.toUpperCase()+'</span>' +
+      '<div style="background:'+hdrBg+';border-bottom:3px solid '+hdrLine+';padding:.45em .7em;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">' +
+        '<div style="display:flex;align-items:center;gap:.35em;">' +
+          '<div style="width:.5em;height:.5em;border-radius:50%;background:'+dotCol+';flex-shrink:0;"></div>' +
+          '<span style="font-size:1.05em;font-weight:900;color:#fff;letter-spacing:.05em;">'+dayFull.toUpperCase()+'</span>' +
         '</div>' +
-        '<span style="font-size:.68em;font-family:\'JetBrains Mono\',monospace;color:rgba(255,255,255,.5);">'+dateStr+'</span>' +
+        '<span style="font-size:.78em;font-family:\'JetBrains Mono\',monospace;color:rgba(255,255,255,.55);font-weight:600;">'+dateStr+'</span>' +
       '</div>';
 
     var body = '';
     if (isEmpty) {
-      body = '<div style="flex:1;display:flex;align-items:center;justify-content:center;font-size:.7em;color:'+subC+';opacity:.4;font-style:italic;padding:.5em 0;">—</div>';
+      body = '<div style="flex:1;display:flex;align-items:center;justify-content:center;font-size:.85em;color:'+subC+';opacity:.4;font-style:italic;">—</div>';
     } else if (isSnack) {
       var e = entries[0];
-      var comps = (e.components||[]).slice(0,5);
+      var comps = (e.components||[]).slice(0,4);
+      // Big menu name
       body =
-        '<div style="font-size:1em;font-weight:800;color:'+textC+';text-transform:capitalize;line-height:1.2;margin-bottom:.32em;border-bottom:1px solid '+borderC+';padding-bottom:.28em;">'+cap(e.menuName)+'</div>' +
-        (comps.length ?
-          comps.map(function(c){
-            return '<div style="display:flex;align-items:baseline;gap:.28em;margin-bottom:.1em;">' +
-              '<span style="color:'+dotCol+';font-size:.88em;flex-shrink:0;line-height:1;">•</span>' +
-              '<span style="font-size:.72em;color:'+subC+';text-transform:capitalize;line-height:1.25;">'+cap(c)+'</span>' +
-            '</div>';
-          }).join('') : '');
+        '<div style="font-size:1.15em;font-weight:900;color:'+textC+';text-transform:capitalize;line-height:1.18;margin-bottom:.35em;padding-bottom:.3em;border-bottom:1.5px solid '+borderC+';">'+cap(e.menuName)+'</div>' +
+        comps.map(function(c){
+          return '<div style="display:flex;align-items:baseline;gap:.3em;margin-bottom:.15em;">' +
+            '<span style="color:'+dotCol+';font-size:1em;flex-shrink:0;line-height:1;font-weight:700;">•</span>' +
+            '<span style="font-size:.85em;color:'+subC+';text-transform:capitalize;line-height:1.3;">'+cap(c)+'</span>' +
+          '</div>';
+        }).join('');
     } else {
-      // Meal: numbered lauk
+      // Meal: numbered lauk — name prominent
       var laukHtml = entries.map(function(e,i){
-        return '<div style="display:flex;align-items:flex-start;gap:.28em;margin-bottom:.22em;">' +
-          '<span style="font-size:.7em;font-weight:800;color:'+acc+';background:'+tagBg+';border:1px solid '+borderC+';border-radius:.22em;padding:.04em .3em;flex-shrink:0;font-family:\'JetBrains Mono\',monospace;line-height:1.4;">'+(i+1)+'</span>' +
-          '<span style="font-size:.82em;font-weight:700;color:'+textC+';text-transform:capitalize;line-height:1.2;">'+cap(e.menuName)+'</span>' +
+        return '<div style="display:flex;align-items:flex-start;gap:.32em;margin-bottom:.28em;">' +
+          '<span style="font-size:.82em;font-weight:900;color:'+acc+';background:'+tagBg+';border:1.5px solid '+borderC+';border-radius:.25em;padding:.06em .34em;flex-shrink:0;font-family:\'JetBrains Mono\',monospace;line-height:1.35;min-width:1.4em;text-align:center;">'+(i+1)+'</span>' +
+          '<span style="font-size:.98em;font-weight:800;color:'+textC+';text-transform:capitalize;line-height:1.22;">'+cap(e.menuName)+'</span>' +
         '</div>';
       }).join('');
-      // shared pelengkap
+      // Pelengkap chips
       var allC={};
       entries.forEach(function(e){(e.components||[]).forEach(function(c){if(c.trim())allC[c.toLowerCase()]=cap(c.trim());});});
-      var pelList = Object.values(allC).slice(0,4);
-      var pelHtml = pelList.length ?
-        '<div style="margin-top:.28em;padding-top:.24em;border-top:1px dashed '+borderC+'">' +
-          pelList.map(function(p){
-            return '<span style="font-size:.62em;background:'+tagBg+';border-radius:.2em;padding:.05em .28em;color:'+subC+';display:inline-block;margin:1px;">'+p+'</span>';
-          }).join('') +
-        '</div>' : '';
+      var pelList=Object.values(allC).slice(0,4);
+      var pelHtml = pelList.length
+        ? '<div style="margin-top:.3em;padding-top:.25em;border-top:1.5px dashed '+borderC+';display:flex;flex-wrap:wrap;gap:.15em;">' +
+            pelList.map(function(p){
+              return '<span style="font-size:.72em;background:'+tagBg+';border:1px solid '+borderC+';border-radius:.22em;padding:.08em .32em;color:'+subC+';text-transform:capitalize;">'+p+'</span>';
+            }).join('') +
+          '</div>'
+        : '';
       body = laukHtml + pelHtml;
     }
 
-    return '<div style="width:'+pct+'%;flex-shrink:0;background:'+mutedC+';border:1px solid '+borderC+';border-radius:.42em;overflow:hidden;display:flex;flex-direction:column;">' +
+    return '<div style="width:'+pct+'%;flex-shrink:0;background:'+mutedC+';border:1.5px solid '+borderC+';border-radius:.45em;overflow:hidden;display:flex;flex-direction:column;">' +
       cardHdr +
-      '<div style="padding:.4em .58em .45em;flex:1;display:flex;flex-direction:column;">'+body+'</div>' +
+      '<div style="padding:.5em .65em .5em;flex:1;display:flex;flex-direction:column;">'+body+'</div>' +
     '</div>';
   }
 
-  // Row 1: Mon–Thu (4 cards ~24.5% each), Row 2: Fri–Sun (3 cards ~32% each)
-  var gap = 0.45; // em gap — approximate, cards use % width
-  var row1 = dayEntries.slice(0,4).map(function(d){ return makeCard(d, 24.5); }).join('');
+  // Row 1: Mon–Thu (4 cards), Row 2: Fri–Sun (3 cards)
+  var row1 = dayEntries.slice(0,4).map(function(d){ return makeCard(d, 24.4); }).join('');
   var row2 = dayEntries.slice(4,7).map(function(d){ return makeCard(d, 32.5); }).join('');
 
   // Bottom strip
   var bottomStrip = '';
   if (!isSnack) {
     var weekPel={};
-    dayEntries.forEach(function(d){
-      (d.meal||[]).forEach(function(e){(e.components||[]).forEach(function(c){if(c.trim())weekPel[c.toLowerCase()]=cap(c.trim());});});
-    });
-    var wPL = Object.values(weekPel).slice(0,7);
-    if (wPL.length) {
-      bottomStrip =
-        '<div style="margin-top:.4em;flex-shrink:0;background:'+tagBg+';border:1px solid '+borderC+';border-radius:.38em;padding:.3em .7em;display:flex;align-items:center;gap:.5em;flex-wrap:wrap;">' +
-          '<span style="font-size:.75em;font-weight:800;color:'+acc+';letter-spacing:.08em;text-transform:uppercase;white-space:nowrap;flex-shrink:0;">Setiap Hari</span>' +
-          '<span style="width:1px;height:.9em;background:'+borderC+';flex-shrink:0;"></span>' +
-          wPL.map(function(p){return '<span style="font-size:.72em;font-weight:600;color:'+textC+';">'+p+'</span>';})
-             .join('<span style="font-size:.68em;color:'+subC+';padding:0 .12em;opacity:.6;">·</span>') +
+    dayEntries.forEach(function(d){(d.meal||[]).forEach(function(e){(e.components||[]).forEach(function(c){if(c.trim())weekPel[c.toLowerCase()]=cap(c.trim());});});});
+    var wPL=Object.values(weekPel).slice(0,8);
+    if(wPL.length){
+      bottomStrip=
+        '<div style="margin-top:.42em;flex-shrink:0;background:'+tagBg+';border:1.5px solid '+borderC+';border-radius:.4em;padding:.32em .8em;display:flex;align-items:center;gap:.55em;flex-wrap:wrap;">' +
+          '<span style="font-size:.82em;font-weight:900;color:'+acc+';letter-spacing:.1em;text-transform:uppercase;white-space:nowrap;flex-shrink:0;">Setiap Hari</span>' +
+          '<span style="width:1px;height:1em;background:'+borderC+';flex-shrink:0;"></span>' +
+          wPL.map(function(p){return '<span style="font-size:.8em;font-weight:700;color:'+textC+';">'+p+'</span>';})
+             .join('<span style="font-size:.75em;color:'+subC+';padding:0 .1em;opacity:.5;">·</span>') +
         '</div>';
     }
   } else {
-    bottomStrip =
-      '<div style="margin-top:.4em;flex-shrink:0;background:'+tagBg+';border:1px solid '+borderC+';border-radius:.38em;padding:.3em .8em;display:flex;align-items:center;justify-content:center;">' +
-        '<span style="font-size:.78em;font-weight:700;color:'+acc+';letter-spacing:.04em;">'+subtitle+'</span>' +
+    bottomStrip=
+      '<div style="margin-top:.42em;flex-shrink:0;background:'+tagBg+';border:1.5px solid '+borderC+';border-radius:.4em;padding:.32em .8em;display:flex;align-items:center;justify-content:center;">' +
+        '<span style="font-size:.88em;font-weight:800;color:'+acc+';letter-spacing:.04em;">'+subtitle+'</span>' +
       '</div>';
   }
 
-  var lp = t===4?'6%':'5%';
+  var lp=t===4?'6%':'5%';
   return '<div class="tv-slide-canvas '+cls+'" style="'+tvBg(t)+'">' + tvDeco(t) +
-    '<div style="position:absolute;inset:0;display:flex;flex-direction:column;padding:2% '+lp+' 1.6% '+lp+'">' +
+    '<div style="position:absolute;inset:0;display:flex;flex-direction:column;padding:1.8% '+lp+' 1.5% '+lp+'">' +
 
-      // Header row
-      '<div style="display:flex;align-items:center;gap:.5em;margin-bottom:.65em;flex-shrink:0;">' +
-        '<span style="font-size:1.9em;line-height:1;">'+icon+'</span>' +
+      // Header
+      '<div style="display:flex;align-items:center;gap:.55em;margin-bottom:.6em;flex-shrink:0;padding-bottom:.5em;border-bottom:1px solid '+borderC+'">' +
+        '<span style="font-size:2em;line-height:1;">'+icon+'</span>' +
         '<div>' +
-          '<div style="font-size:2.5em;font-weight:900;color:'+textC+';letter-spacing:-.04em;line-height:1;">'+title+'</div>' +
-          '<div style="font-size:.85em;color:'+subC+';margin-top:.04em;opacity:.8;">'+subtitle+'</div>' +
+          '<div style="font-size:2.6em;font-weight:900;color:'+textC+';letter-spacing:-.04em;line-height:1;">'+title+'</div>' +
+          '<div style="font-size:.88em;color:'+subC+';margin-top:.05em;">'+subtitle+'</div>' +
         '</div>' +
         '<div style="margin-left:auto;text-align:right;flex-shrink:0;">' +
-          '<div style="font-size:.82em;font-family:\'JetBrains Mono\',monospace;color:'+acc+';font-weight:700;">'+TV.wKey+'</div>' +
-          '<div style="font-size:.68em;font-family:\'JetBrains Mono\',monospace;color:'+subC+';opacity:.55;margin-top:.08em;">'+TV.period+'</div>' +
+          '<div style="font-size:.9em;font-family:\'JetBrains Mono\',monospace;color:'+acc+';font-weight:800;">'+TV.wKey+'</div>' +
+          '<div style="font-size:.72em;font-family:\'JetBrains Mono\',monospace;color:'+subC+';opacity:.6;margin-top:.06em;">'+TV.period+'</div>' +
         '</div>' +
       '</div>' +
 
-      // Row 1: Mon–Thu
-      '<div style="display:flex;gap:.45em;flex:1;min-height:0;">'+row1+'</div>' +
+      '<div style="display:flex;gap:.48em;flex:1;min-height:0;">'+row1+'</div>' +
+      '<div style="display:flex;gap:.48em;flex:1;min-height:0;margin-top:.42em;">'+row2+'</div>' +
 
-      // Row 2: Fri–Sun
-      '<div style="display:flex;gap:.45em;flex:1;min-height:0;margin-top:.4em;">'+row2+'</div>' +
-
-      // Bottom strip
       bottomStrip +
-
     '</div>' +
   '</div>';
 }
+
 // ── SLIDE 4: Closing ──────────────────────────────────────────
 function tvMakeSlide4(t, cls, cl) {
   var acc=tvAcc(t), textC=tvText(t), subC=tvSub(t), mutedC=tvMuted(t), borderC=tvBorder(t);
@@ -2687,192 +2681,139 @@ function tvDownloadHTML() {
   toast('File HTML berhasil didownload!','ok');
 }
 
-// ── DOWNLOAD MP4 — Canvas + MediaRecorder ────────────────────
-var MP4_CANCELLED = false;
+// ── DOWNLOAD JPG — Canvas render per slide ───────────────────
+// Renders each slide as a 1920×1080 JPG and downloads all 4.
 
-function tvDownloadMP4() {
+var MP4_CANCELLED = false;  // reuse cancel flag
+
+function tvDownloadJPG() {
   if (!TV.wKey) { toast('Pilih minggu terlebih dahulu.','err'); return; }
-  if (typeof MediaRecorder === 'undefined') {
-    toast('Browser tidak mendukung rekam video. Gunakan Chrome/Edge.','err'); return;
-  }
-  var mimeType = '';
-  ['video/webm;codecs=vp9','video/webm;codecs=vp8','video/webm','video/mp4'].forEach(function(m){
-    if(!mimeType && MediaRecorder.isTypeSupported(m)) mimeType=m;
-  });
-  if (!mimeType) { toast('Browser tidak mendukung video recording.','err'); return; }
-
   TV.slides = tvBuildSlides();
   MP4_CANCELLED = false;
+
+  var tmpl   = TV_TEMPLATES[TV.tpl-1];
+  var base   = 'menu-kantin-'+TV.wKey+'-'+tmpl.name.toLowerCase().replace(/\s+/g,'-');
+  var labels = ['cover','snack','meal','penutup'];
+  var W = 1920, H = 1080;
+
   mp4ShowOverlay();
+  document.getElementById('mp4SubTitle').textContent =
+    TV.wKey+' · '+tmpl.name+' · 4 slide · 1920×1080px';
+  document.getElementById('mp4Pct').textContent = '';
+  mp4SetStatus('Menyiapkan render…', 3);
 
-  var tmpl = TV_TEMPLATES[TV.tpl-1];
-  var ext = mimeType.includes('mp4')?'.mp4':'.webm';
-  var fileName = 'menu-kantin-'+TV.wKey+'-'+tmpl.name.toLowerCase().replace(/\s+/g,'-')+ext;
+  var idx = 0;
 
-  var W=1280, H=720, FPS=30, SLIDE_DUR=7;
-  var TRANS_FRAMES = Math.round(FPS*0.7);
-  var totalFrames  = TV.slides.length * FPS * SLIDE_DUR;
+  function renderNext() {
+    if (MP4_CANCELLED) { mp4HideOverlay(); return; }
+    if (idx >= TV.slides.length) {
+      mp4HideOverlay();
+      toast('✅ '+TV.slides.length+' file JPG berhasil didownload!', 'ok');
+      return;
+    }
 
-  var canvas = document.createElement('canvas');
-  canvas.width=W; canvas.height=H;
-  var ctx = canvas.getContext('2d');
-  ctx.imageSmoothingEnabled=true; ctx.imageSmoothingQuality='high';
+    var pct = Math.round(idx / TV.slides.length * 90) + 5;
+    mp4SetStatus('Rendering slide '+(idx+1)+' / '+TV.slides.length+' …', pct);
 
-  var chunks=[];
-  var stream=canvas.captureStream(FPS);
-  var recorder=new MediaRecorder(stream,{mimeType:mimeType,videoBitsPerSecond:8000000});
-  recorder.ondataavailable=function(e){if(e.data.size>0)chunks.push(e.data);};
-  recorder.onstop=function(){
-    mp4SetStatus('Menyiapkan file download…',99);
-    var blob=new Blob(chunks,{type:mimeType});
-    var url=URL.createObjectURL(blob);
-    var a=document.createElement('a'); a.href=url; a.download=fileName;
-    document.body.appendChild(a); a.click(); document.body.removeChild(a);
-    setTimeout(function(){URL.revokeObjectURL(url);},3000);
-    mp4HideOverlay();
-    toast('Video '+fileName+' berhasil didownload!','ok');
-  };
-  recorder.start(200);
+    tvRenderSlideToJPG(TV.slides[idx], W, H, function(dataUrl) {
+      if (MP4_CANCELLED) { mp4HideOverlay(); return; }
 
-  mp4SetStatus('Merender slide ke gambar…',2);
-  mp4RenderToImages(TV.slides, W, H, function(images){
-    if(MP4_CANCELLED){recorder.stop();mp4HideOverlay();return;}
-    mp4SetStatus('Encoding video…',10);
-    mp4EncodeFrames(ctx,images,W,H,FPS,SLIDE_DUR,TRANS_FRAMES,totalFrames,recorder);
-  });
-}
+      // Trigger download
+      var a = document.createElement('a');
+      a.href = dataUrl;
+      a.download = base+'-'+String(idx+1).padStart(2,'0')+'-'+labels[idx]+'.jpg';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
 
-function mp4RenderToImages(slides,W,H,callback){
-  var images=[], idx=0;
-  var bgColors=['#020818','#1a0800','#011208','#0d0d0d'];
-
-  function next(){
-    if(MP4_CANCELLED||idx>=slides.length){callback(images);return;}
-    mp4SetStatus('Merender slide '+(idx+1)+'/'+slides.length+'…', Math.round(idx/slides.length*7)+2);
-
-    // Build minimal inline HTML — no external fonts to avoid CORS issues
-    var slideHtml = slides[idx];
-    var inlineDoc =
-      '<!DOCTYPE html><html><head><meta charset="UTF-8">'+
-      '<style>'+
-        '*{box-sizing:border-box;margin:0;padding:0;}'+
-        'html,body{width:'+W+'px;height:'+H+'px;overflow:hidden;background:#000;}'+
-        '.tv-slide-canvas{width:'+W+'px!important;height:'+H+'px!important;'+
-          'font-size:'+(W/1280*16)+'px!important;position:relative;overflow:hidden;display:block;}'+
-        // Embed generic fallback fonts
-        'body{font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;}'+
-        'code,pre,[style*="JetBrains"],[style*="monospace"]{font-family:"Courier New",Courier,monospace;}'+
-      '</style></head><body>'+slideHtml+'</body></html>';
-
-    // SVG foreignObject approach
-    var svgStr =
-      '<svg xmlns="http://www.w3.org/2000/svg" width="'+W+'" height="'+H+'">'+
-      '<foreignObject width="100%" height="100%">'+
-      '<div xmlns="http://www.w3.org/1999/xhtml">'+inlineDoc+'</div>'+
-      '</foreignObject></svg>';
-
-    var img=new Image();
-    img.onload=function(){
-      images.push(img);
       idx++;
-      setTimeout(next,80);
-    };
-    img.onerror=function(){
-      // Fallback: draw colored rect with text
-      var fb=document.createElement('canvas'); fb.width=W; fb.height=H;
-      var fc=fb.getContext('2d');
-      fc.fillStyle=bgColors[(TV.tpl-1)%bgColors.length];
-      fc.fillRect(0,0,W,H);
-      fc.fillStyle='rgba(255,255,255,.8)';
-      fc.font='bold '+(H/12)+'px system-ui,sans-serif';
-      fc.textAlign='center'; fc.textBaseline='middle';
-      var labels=['MENU KANTIN','MENU SNACK','MENU MAKAN','TERIMA KASIH'];
-      fc.fillText(labels[idx]||'Slide '+(idx+1), W/2, H/2);
-      fc.font=(H/24)+'px system-ui,sans-serif';
-      fc.fillStyle='rgba(255,255,255,.45)';
-      fc.fillText(TV.wKey+' · '+TV.period, W/2, H/2+(H/9));
-      var fallbackImg=new Image();
-      fallbackImg.src=fb.toDataURL('image/png');
-      fallbackImg.onload=function(){images.push(fallbackImg);idx++;setTimeout(next,80);};
-    };
-    var blob=new Blob([svgStr],{type:'image/svg+xml;charset=utf-8'});
-    var url=URL.createObjectURL(blob);
-    img.src=url;
-    setTimeout(function(){URL.revokeObjectURL(url);},5000);
+      // Small delay so browser can process the download
+      setTimeout(renderNext, 600);
+    });
   }
-  next();
+
+  renderNext();
 }
 
-function mp4EncodeFrames(ctx,images,W,H,FPS,slideDur,transFrames,totalFrames,recorder){
-  var slideCount=TV.slides.length;
-  var slideFrames=FPS*slideDur;
-  var frame=0;
+// Render one slide HTML string to a JPG data URL at W×H
+function tvRenderSlideToJPG(slideHtml, W, H, callback) {
+  var canvas = document.createElement('canvas');
+  canvas.width  = W;
+  canvas.height = H;
+  var ctx = canvas.getContext('2d');
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = 'high';
 
-  function renderNext(){
-    if(MP4_CANCELLED){recorder.stop();mp4HideOverlay();return;}
-    if(frame>=totalFrames){recorder.stop();return;}
+  // Inline styles needed (no external fonts to avoid CORS)
+  var inlineCSS =
+    '*{box-sizing:border-box;margin:0;padding:0;}' +
+    'html,body{width:'+W+'px;height:'+H+'px;overflow:hidden;background:#000;}' +
+    '.tv-slide-canvas{width:'+W+'px!important;height:'+H+'px!important;' +
+      'font-size:'+(W/1280*16)+'px!important;' +
+      'position:relative;overflow:hidden;display:block;}' +
+    'body{font-family:system-ui,-apple-system,"Segoe UI",sans-serif;}' +
+    // inline monospace fallback
+    '[style*="JetBrains"]{font-family:"Courier New",Courier,monospace!important;}';
 
-    var slideIdx=Math.floor(frame/slideFrames)%slideCount;
-    var frameInSlide=frame%slideFrames;
-    var nextIdx=(slideIdx+1)%slideCount;
+  var fullDoc =
+    '<!DOCTYPE html><html><head><meta charset="UTF-8">'+
+    '<style>'+inlineCSS+'</style>'+
+    '</head><body>'+slideHtml+'</body></html>';
 
-    ctx.fillStyle='#000'; ctx.fillRect(0,0,W,H);
+  var svgStr =
+    '<svg xmlns="http://www.w3.org/2000/svg" width="'+W+'" height="'+H+'">'+
+    '<foreignObject width="100%" height="100%">'+
+      '<div xmlns="http://www.w3.org/1999/xhtml">'+fullDoc+'</div>'+
+    '</foreignObject></svg>';
 
-    // Crossfade logic
-    if(frameInSlide<transFrames && frame>=slideFrames){
-      // Fading into current slide
-      var a=frameInSlide/transFrames;
-      if(images[nextIdx]) ctx.globalAlpha=1-a; else ctx.globalAlpha=1;
-      if(images[(slideIdx-1+slideCount)%slideCount]) ctx.drawImage(images[(slideIdx-1+slideCount)%slideCount],0,0,W,H);
-      ctx.globalAlpha=a;
-      if(images[slideIdx]) ctx.drawImage(images[slideIdx],0,0,W,H);
-    } else if(frameInSlide>=slideFrames-transFrames){
-      // Fading out of current slide
-      var a2=(frameInSlide-(slideFrames-transFrames))/transFrames;
-      ctx.globalAlpha=1;
-      if(images[slideIdx]) ctx.drawImage(images[slideIdx],0,0,W,H);
-      ctx.globalAlpha=a2;
-      ctx.fillStyle='#000'; ctx.fillRect(0,0,W,H);
-    } else {
-      ctx.globalAlpha=1;
-      if(images[slideIdx]) ctx.drawImage(images[slideIdx],0,0,W,H);
-    }
-    ctx.globalAlpha=1;
-
-    // Progress update every 30 frames
-    if(frame%30===0){
-      var pct=Math.round(frame/totalFrames*85)+13;
-      var elapsed=(frame/FPS).toFixed(0);
-      var remain=Math.max(0,(totalFrames-frame)/FPS).toFixed(0);
-      mp4SetStatus('Slide '+(slideIdx+1)+'/'+slideCount+' · '+elapsed+'s / '+(totalFrames/FPS).toFixed(0)+'s · ~'+remain+'s tersisa',pct);
-    }
-    frame++;
-    setTimeout(renderNext,0);
-  }
-  renderNext();
+  var img = new Image();
+  img.onload = function() {
+    ctx.drawImage(img, 0, 0, W, H);
+    URL.revokeObjectURL(img.src);
+    // Export as JPG quality 0.95
+    callback(canvas.toDataURL('image/jpeg', 0.95));
+  };
+  img.onerror = function() {
+    URL.revokeObjectURL(img.src);
+    // Fallback: plain colored canvas
+    var bg = ['#020818','#1a0800','#011208','#0d0d0d'][(TV.tpl-1)%4];
+    ctx.fillStyle = bg;
+    ctx.fillRect(0, 0, W, H);
+    ctx.fillStyle = '#fff';
+    ctx.font = 'bold 80px system-ui,sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('Slide render error', W/2, H/2);
+    callback(canvas.toDataURL('image/jpeg', 0.9));
+  };
+  var blob = new Blob([svgStr], {type:'image/svg+xml;charset=utf-8'});
+  img.src  = URL.createObjectURL(blob);
 }
 
 function mp4ShowOverlay(){
   document.getElementById('mp4Overlay').classList.add('show');
   mp4SetStatus('Initializing…',0);
   document.getElementById('mp4CancelBtn').disabled=false;
-  document.getElementById('mp4SubTitle').textContent=
-    TV.wKey+' · '+(TV_TEMPLATES[TV.tpl-1]||{}).name+' · 4 slides · 1280×720';
+  var sub=document.getElementById('mp4SubTitle');
+  if(sub) sub.textContent=TV.wKey+' · '+(TV_TEMPLATES[TV.tpl-1]||{}).name+' · 4 slides';
 }
 function mp4HideOverlay(){ document.getElementById('mp4Overlay').classList.remove('show'); }
 function mp4SetStatus(txt,pct){
-  document.getElementById('mp4Status').textContent=txt;
-  document.getElementById('mp4Bar').style.width=pct+'%';
-  document.getElementById('mp4Pct').textContent=pct+'%';
+  var s=document.getElementById('mp4Status');
+  var b=document.getElementById('mp4Bar');
+  var p=document.getElementById('mp4Pct');
+  if(s) s.textContent=txt;
+  if(b) b.style.width=pct+'%';
+  if(p) p.textContent=pct+'%';
 }
 function tvMP4Cancel(){
   MP4_CANCELLED=true;
-  document.getElementById('mp4CancelBtn').disabled=true;
-  document.getElementById('mp4Status').textContent='Membatalkan…';
-  setTimeout(mp4HideOverlay,900);
-  toast('Download MP4 dibatalkan.','');
+  var btn=document.getElementById('mp4CancelBtn');
+  if(btn) btn.disabled=true;
+  mp4SetStatus('Membatalkan…',0);
+  setTimeout(mp4HideOverlay,700);
+  toast('Download dibatalkan.','');
 }
-
 
 // ── Fill TV week selector ─────────────────────────────────────
 function tvFillWeekSel() {
