@@ -1890,7 +1890,7 @@ function rptGenerateMonthlyInsights(mealScore,snackScore,repMeal,repSnack,weekCo
   var avg=Math.round((mealScore+snackScore)/2);
   var avgCls=avg>=80?'ok':avg>=60?'ok':avg>=40?'warn':'bad';
   ins+=rptInsight(avgCls,
-    (avg>=80?'🌟':'avg>=60?👍':'⚠️')+' Rotation Score Keseluruhan: '+avg+'%',
+    (avg>=80?'🌟':avg>=60?'👍':'⚠️')+' Rotation Score Keseluruhan: '+avg+'%',
     avg>=80?'Variasi menu bulan ini sangat baik. Karyawan mendapatkan pengalaman makan yang beragam.'
     :avg>=60?'Variasi menu cukup baik namun masih bisa ditingkatkan. Target ideal di atas 80%.'
     :avg>=40?'Variasi menu perlu perhatian. Banyak menu yang berulang dalam bulan ini.'
