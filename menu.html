@@ -564,78 +564,77 @@ select.inp{cursor:pointer;}
   .rpt-doc{box-shadow:none;border:none;}
 }
 
-/* ══ TV TEMPLATE PANE ══ */
-.tv-preview-wrap{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-bottom:14px;}
-@media(max-width:700px){.tv-preview-wrap{grid-template-columns:1fr;}}
-.tv-thumb{border-radius:var(--r);overflow:hidden;cursor:pointer;border:2.5px solid transparent;transition:border-color .15s,transform .15s,box-shadow .15s;aspect-ratio:16/9;position:relative;box-shadow:var(--shadow);}
-.tv-thumb:hover{border-color:var(--navy-3);transform:translateY(-2px);box-shadow:0 8px 24px rgba(13,19,48,.15);}
-.tv-thumb.selected{border-color:var(--a-blue);box-shadow:0 0 0 3px rgba(59,110,245,.25);}
-.tv-thumb-label{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,.7));color:#fff;font-size:11px;font-weight:700;padding:18px 10px 8px;font-family:var(--mono);}
-.tv-launch-btn{width:100%;padding:13px;background:linear-gradient(135deg,var(--navy) 0%,#1d4ed8 100%);color:#fff;border:none;border-radius:var(--r-sm);font-size:14px;font-weight:700;font-family:var(--font);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:opacity .15s;box-shadow:0 4px 16px rgba(26,42,108,.3);}
-.tv-launch-btn:hover{opacity:.9;}
-.tv-launch-btn svg{width:16px;height:16px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;}
+/* ══ TV DISPLAY — CARD LAYOUT ══ */
+.tv-hero{background:linear-gradient(135deg,#0a1628 0%,#1d2f6b 60%,#1a2a6c 100%);border-radius:var(--r-lg);padding:24px 28px;margin-bottom:16px;position:relative;overflow:hidden;}
+.tv-hero::before{content:'';position:absolute;top:-60px;right:-60px;width:220px;height:220px;border-radius:50%;background:rgba(59,110,245,.12);}
+.tv-hero::after{content:'';position:absolute;bottom:-40px;left:60px;width:140px;height:140px;border-radius:50%;background:rgba(59,110,245,.07);}
+.tv-hero-eyebrow{font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.18em;color:rgba(255,255,255,.35);text-transform:uppercase;margin-bottom:8px;position:relative;}
+.tv-hero-title{font-size:22px;font-weight:900;color:#fff;letter-spacing:-.4px;margin-bottom:4px;position:relative;}
+.tv-hero-sub{font-size:12px;color:rgba(255,255,255,.5);position:relative;}
+.tv-hero-chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;position:relative;}
+.tv-hero-chip{display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);border-radius:var(--r-pill);padding:4px 12px;font-size:10px;font-family:var(--mono);color:rgba(255,255,255,.65);}
 
-/* ── SLIDE ENGINE — 16:9 canvas inside modal ── */
-.tv-slide-canvas{
-  width:100%; max-width:min(100vw, calc(100vh * 16/9));
-  aspect-ratio:16/9;
-  position:relative;overflow:hidden;
-  font-family:'Inter',system-ui,sans-serif;
-}
+/* Template card grid */
+.tv-tpl-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px;}
+@media(max-width:900px){.tv-tpl-grid{grid-template-columns:repeat(2,1fr);}}
+@media(max-width:500px){.tv-tpl-grid{grid-template-columns:1fr 1fr;}}
 
-/* ── TEMPLATE 1 — Navy Elegan ── */
-.tpl1{background:linear-gradient(145deg,#0a1628 0%,#0d2048 50%,#0a1628 100%);}
-.tpl1-deco-circle{position:absolute;border-radius:50%;opacity:.07;}
-.tpl1 .slide-tag{font-family:'JetBrains Mono',monospace;font-size:1.1em;font-weight:700;letter-spacing:.25em;color:rgba(255,255,255,.45);text-transform:uppercase;}
-.tpl1 .slide-title{font-size:5.5em;font-weight:900;color:#fff;line-height:1;letter-spacing:-.03em;margin:.15em 0 .1em;}
-.tpl1 .slide-accent{color:#60a5fa;}
-.tpl1 .slide-period{font-size:1.8em;font-weight:500;color:rgba(255,255,255,.6);font-family:'JetBrains Mono',monospace;}
-.tpl1 .slide-badge{display:inline-flex;align-items:center;gap:.4em;background:rgba(59,110,245,.25);border:1px solid rgba(59,110,245,.4);border-radius:100px;padding:.3em 1.2em;font-size:1em;font-weight:600;color:#93c5fd;margin-top:1em;}
-.tpl1 .menu-day-block{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:.5em;padding:.6em .8em;margin-bottom:.4em;}
-.tpl1 .day-lbl{font-family:'JetBrains Mono',monospace;font-size:.9em;font-weight:700;color:#60a5fa;letter-spacing:.08em;margin-bottom:.2em;}
-.tpl1 .day-menu{font-size:1em;font-weight:600;color:#fff;text-transform:capitalize;line-height:1.3;}
-.tpl1 .day-comps{font-size:.78em;color:rgba(255,255,255,.4);margin-top:.1em;font-family:'JetBrains Mono',monospace;}
-.tpl1 .closing-big{font-size:3.8em;font-weight:900;color:#fff;line-height:1.15;letter-spacing:-.03em;}
-.tpl1 .closing-sub{font-size:1.4em;color:rgba(255,255,255,.55);margin-top:.5em;}
+.tv-card{border-radius:var(--r);overflow:hidden;cursor:pointer;border:2px solid var(--border);transition:all .18s;box-shadow:var(--shadow);background:var(--surface);}
+.tv-card:hover{transform:translateY(-3px);box-shadow:0 12px 32px rgba(13,19,48,.14);}
+.tv-card.sel{border-color:var(--acc,#3b5bdb);box-shadow:0 0 0 3px color-mix(in srgb,var(--acc,#3b5bdb) 25%,transparent),0 8px 24px rgba(13,19,48,.12);}
 
-/* ── TEMPLATE 2 — Warm Harvest ── */
-.tpl2{background:linear-gradient(160deg,#78350f 0%,#92400e 40%,#b45309 100%);}
-.tpl2 .slide-tag{font-family:'JetBrains Mono',monospace;font-size:1.1em;letter-spacing:.2em;color:rgba(255,255,255,.5);text-transform:uppercase;}
-.tpl2 .slide-title{font-size:5.2em;font-weight:900;color:#fef3c7;line-height:1;letter-spacing:-.02em;margin:.1em 0;}
-.tpl2 .slide-period{font-size:1.7em;color:#fcd34d;font-weight:600;}
-.tpl2 .menu-day-block{background:rgba(0,0,0,.18);border-left:3px solid #fcd34d;border-radius:0 .4em .4em 0;padding:.55em .9em;margin-bottom:.38em;}
-.tpl2 .day-lbl{font-size:.9em;font-weight:700;color:#fcd34d;letter-spacing:.06em;margin-bottom:.15em;}
-.tpl2 .day-menu{font-size:1em;font-weight:700;color:#fef3c7;text-transform:capitalize;}
-.tpl2 .day-comps{font-size:.78em;color:rgba(254,243,199,.5);margin-top:.1em;}
-.tpl2 .closing-big{font-size:3.6em;font-weight:900;color:#fef3c7;line-height:1.15;}
-.tpl2 .closing-sub{font-size:1.3em;color:#fcd34d;margin-top:.5em;}
+.tv-card-thumb{aspect-ratio:16/9;width:100%;position:relative;overflow:hidden;}
+.tv-card-body{padding:10px 12px 12px;}
+.tv-card-name{font-size:12px;font-weight:700;color:var(--t1);margin-bottom:2px;}
+.tv-card-desc{font-size:10px;color:var(--t3);}
+.tv-card-badge{display:inline-flex;align-items:center;gap:3px;margin-top:6px;background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r-pill);padding:2px 8px;font-size:9px;font-weight:600;font-family:var(--mono);color:var(--t4);}
 
-/* ── TEMPLATE 3 — Fresh Garden ── */
-.tpl3{background:linear-gradient(150deg,#052e16 0%,#14532d 50%,#166534 100%);}
-.tpl3 .slide-tag{font-family:'JetBrains Mono',monospace;font-size:1.1em;letter-spacing:.2em;color:rgba(255,255,255,.4);text-transform:uppercase;}
-.tpl3 .slide-title{font-size:5.2em;font-weight:900;color:#dcfce7;line-height:1;letter-spacing:-.02em;margin:.1em 0;}
-.tpl3 .slide-period{font-size:1.7em;color:#86efac;font-weight:600;}
-.tpl3 .menu-day-block{background:rgba(0,0,0,.2);border:1px solid rgba(134,239,172,.2);border-radius:.5em;padding:.55em .85em;margin-bottom:.38em;}
-.tpl3 .day-lbl{font-size:.9em;font-weight:700;color:#86efac;letter-spacing:.06em;margin-bottom:.15em;}
-.tpl3 .day-menu{font-size:1em;font-weight:700;color:#dcfce7;text-transform:capitalize;}
-.tpl3 .day-comps{font-size:.78em;color:rgba(220,252,231,.45);margin-top:.1em;}
-.tpl3 .closing-big{font-size:3.6em;font-weight:900;color:#dcfce7;line-height:1.15;}
-.tpl3 .closing-sub{font-size:1.3em;color:#86efac;margin-top:.5em;}
+/* Action bar */
+.tv-action-bar{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:12px;box-shadow:var(--shadow);}
+.tv-action-info{display:flex;flex-direction:column;gap:3px;}
+.tv-action-week{font-size:13px;font-weight:700;color:var(--t1);}
+.tv-action-period{font-size:10px;color:var(--t3);font-family:var(--mono);}
+.tv-action-btns{display:flex;gap:8px;flex-wrap:wrap;}
 
-/* ── TEMPLATE 4 — Bold Dark ── */
-.tpl4{background:#09090b;}
-.tpl4 .slide-tag{font-family:'JetBrains Mono',monospace;font-size:1.1em;letter-spacing:.25em;color:#52525b;text-transform:uppercase;}
-.tpl4 .slide-title{font-size:5.5em;font-weight:900;color:#fff;line-height:1;letter-spacing:-.04em;margin:.1em 0;}
-.tpl4 .slide-accent{background:linear-gradient(90deg,#f59e0b,#ef4444);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
-.tpl4 .slide-period{font-size:1.7em;color:#a1a1aa;font-family:'JetBrains Mono',monospace;}
-.tpl4 .menu-day-block{border-bottom:1px solid #27272a;padding:.55em 0;margin-bottom:.2em;}
-.tpl4 .menu-day-block:last-child{border-bottom:none;}
-.tpl4 .day-lbl{font-size:.85em;font-weight:700;color:#f59e0b;letter-spacing:.1em;text-transform:uppercase;margin-bottom:.15em;font-family:'JetBrains Mono',monospace;}
-.tpl4 .day-menu{font-size:1em;font-weight:700;color:#fff;text-transform:capitalize;}
-.tpl4 .day-comps{font-size:.75em;color:#52525b;margin-top:.08em;font-family:'JetBrains Mono',monospace;}
-.tpl4 .closing-big{font-size:3.8em;font-weight:900;color:#fff;line-height:1.1;}
-.tpl4 .closing-sub{font-size:1.3em;color:#71717a;margin-top:.5em;}
-.tpl4-stripe{position:absolute;top:0;left:0;width:6px;height:100%;background:linear-gradient(180deg,#f59e0b,#ef4444);}
+.tv-btn-launch{display:flex;align-items:center;gap:6px;padding:10px 20px;background:linear-gradient(135deg,#1a2a6c,#1d4ed8);color:#fff;border:none;border-radius:var(--r-sm);font-size:12px;font-weight:700;font-family:var(--font);cursor:pointer;box-shadow:0 4px 14px rgba(26,42,108,.35);transition:all .15s;}
+.tv-btn-launch:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(26,42,108,.45);}
+.tv-btn-dl{display:flex;align-items:center;gap:6px;padding:10px 16px;background:var(--surface-2);border:1.5px solid var(--border);border-radius:var(--r-sm);font-size:12px;font-weight:600;font-family:var(--font);color:var(--t2);cursor:pointer;transition:all .15s;}
+.tv-btn-dl:hover{background:var(--border);color:var(--t1);}
+.tv-btn-dl svg,.tv-btn-launch svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+
+/* Slide slides preview strip */
+.tv-slides-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px;}
+.tv-strip-card{border-radius:var(--r-sm);overflow:hidden;border:1px solid var(--border);box-shadow:var(--shadow);}
+.tv-strip-label{background:var(--surface-2);padding:5px 8px;font-size:9px;font-weight:700;font-family:var(--mono);color:var(--t3);letter-spacing:.08em;text-transform:uppercase;border-top:1px solid var(--border);}
+.tv-btn-mp4{background:var(--surface-2);border-color:var(--border);color:var(--t2);}
+.tv-btn-mp4:hover{background:#7f1d1d;border-color:#dc2626;color:#fff;}
+/* MP4 progress overlay */
+.mp4-overlay{display:none;position:fixed;inset:0;z-index:600;background:rgba(0,0,0,.75);backdrop-filter:blur(6px);align-items:center;justify-content:center;}
+.mp4-overlay.show{display:flex;}
+.mp4-box{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:28px 32px;min-width:360px;max-width:440px;text-align:center;box-shadow:0 24px 64px rgba(0,0,0,.35);}
+.mp4-icon{font-size:36px;margin-bottom:12px;}
+.mp4-title{font-size:15px;font-weight:700;color:var(--t1);margin-bottom:4px;}
+.mp4-sub{font-size:11px;color:var(--t3);font-family:var(--mono);margin-bottom:18px;}
+.mp4-bar-bg{height:8px;background:var(--surface-3);border-radius:8px;overflow:hidden;margin-bottom:10px;}
+.mp4-bar-fill{height:100%;background:linear-gradient(90deg,#dc2626,#ef4444);border-radius:8px;transition:width .2s;width:0%;}
+.mp4-pct{font-size:22px;font-weight:800;font-family:var(--mono);color:var(--t1);margin-bottom:4px;}
+.mp4-status{font-size:11px;color:var(--t3);font-family:var(--mono);min-height:16px;}
+.mp4-warn{background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.2);border-radius:var(--r-sm);padding:10px 12px;margin-top:14px;font-size:10.5px;color:#92400e;text-align:left;line-height:1.6;}
+[data-theme="dark"] .mp4-warn{background:rgba(245,158,11,.06);color:#fbbf24;}
+.mp4-cancel{margin-top:14px;background:none;border:1px solid var(--border);border-radius:var(--r-sm);padding:7px 18px;font-size:12px;font-family:var(--font);color:var(--t3);cursor:pointer;}
+.mp4-cancel:hover{background:var(--surface-2);}
+
+/* ── SLIDE ENGINE ── */
+.tv-slide-canvas{width:100%;height:100%;position:relative;overflow:hidden;font-family:'Inter',system-ui,sans-serif;}
+
+/* T1: Celestial Night */
+.tpl1{background:linear-gradient(145deg,#020818 0%,#0a1628 45%,#0c1f45 100%);}
+/* T2: Saffron Feast */
+.tpl2{background:linear-gradient(155deg,#1a0800 0%,#6b2101 40%,#c2410c 100%);}
+/* T3: Matcha Garden */
+.tpl3{background:linear-gradient(150deg,#011208 0%,#052e16 40%,#064e24 100%);}
+/* T4: Luxury Noir */
+.tpl4{background:radial-gradient(ellipse at 20% 50%,#1a0f2e 0%,#0d0d0d 60%);}
 
 </style>
 </head>
@@ -951,6 +950,23 @@ select.inp{cursor:pointer;}
 </div>
 
 
+
+<!-- MP4 PROGRESS MODAL -->
+<div class="mp4-overlay" id="mp4Overlay">
+  <div class="mp4-box">
+    <div class="mp4-icon">🎬</div>
+    <div class="mp4-title">Merender Video MP4…</div>
+    <div class="mp4-sub" id="mp4SubTitle">Menyiapkan slide…</div>
+    <div class="mp4-bar-bg"><div class="mp4-bar-fill" id="mp4Bar"></div></div>
+    <div class="mp4-pct" id="mp4Pct">0%</div>
+    <div class="mp4-status" id="mp4Status">Initializing…</div>
+    <div class="mp4-warn">
+      ⚠️ Proses ini membutuhkan <strong>20–40 detik</strong>. Browser merender setiap frame slide ke Canvas lalu encode ke video WebM/MP4.<br>
+      Jangan tutup tab selama proses berlangsung.
+    </div>
+    <button class="mp4-cancel" id="mp4CancelBtn" onclick="tvMP4Cancel()">Batalkan</button>
+  </div>
+</div>
 
 <!-- TV SLIDESHOW MODAL -->
 <div id="tvModal" style="display:none;position:fixed;inset:0;z-index:500;background:#000;flex-direction:column;">
@@ -2057,99 +2073,240 @@ function rptPrint(){ window.print(); }
 
 
 // ══════════════════════════════════════════════════════════════
-// TV DISPLAY ENGINE — 4 Templates, 4 Slides, Fullscreen Slideshow
+// TV DISPLAY ENGINE v2 — Rich Cards, Download, Fullscreen
 // ══════════════════════════════════════════════════════════════
 var TV = {
-  tpl: 1,         // active template 1-4
-  slide: 0,       // current slide index 0-3
-  slides: [],     // built slide HTML array
-  autoTimer: null,
-  autoInterval: 6000, // 6s per slide
-  wKey: '',
-  wData: null
+  tpl: 1, slide: 0, slides: [],
+  autoTimer: null, autoInterval: 7000,
+  wKey: '', mon: null, sun: null,
+  period: '', byDate: {}
 };
 
-var TV_DAYS = ['Senin','Selasa','Rabu','Kamis','Jumat','Sabtu','Minggu'];
-var TV_DAY_SHORT = ['Sen','Sel','Rab','Kam','Jum','Sab','Min'];
+var TV_DAYS  = ['Senin','Selasa','Rabu','Kamis','Jumat','Sabtu','Minggu'];
+var TV_SHORTS= ['Sen','Sel','Rab','Kam','Jum','Sab','Min'];
 
-var TV_CLOSING = [
-  { big: 'Selamat Menikmati\nMakanan Hari Ini!', sub: 'Semoga hari Anda menyenangkan · PT Frisian Flag Indonesia' },
-  { big: 'Terima Kasih &\nSelamat Makan!', sub: 'Nikmati setiap suapan · Kantin GDSK · Cikarang Plant' },
-  { big: 'Makan Enak,\nKerja Semangat!', sub: 'Salam hangat dari tim kantin · PT Frisian Flag Indonesia' },
-  { big: 'Bon Appétit &\nHave a Great Day!', sub: 'Thank you for dining with us · GDSK Canteen · Cikarang' }
+var TV_TEMPLATES = [
+  { id:1, name:'Celestial Night',  desc:'Deep navy, bintang, elegan modern', accent:'#60a5fa', bg:'#020818' },
+  { id:2, name:'Saffron Feast',    desc:'Oranye bara api, energik & hangat',  accent:'#fb923c', bg:'#1a0800' },
+  { id:3, name:'Matcha Garden',    desc:'Hijau segar alami, bersih & sehat',  accent:'#4ade80', bg:'#011208' },
+  { id:4, name:'Luxury Noir',      desc:'Hitam premium, aksen emas & ungu',   accent:'#e9d5a1', bg:'#0d0d0d' }
 ];
 
-// ── Init TV mode ──────────────────────────────────────────────
+var TV_CLOSING = [
+  { big:'Selamat Menikmati\nMakanan Hari Ini!',   sub:'Semoga hari Anda menyenangkan · PT Frisian Flag Indonesia' },
+  { big:'Terima Kasih &\nSelamat Makan!',          sub:'Nikmati setiap suapan · Kantin GDSK · Cikarang Plant' },
+  { big:'Makan Enak,\nKerja Semangat!',            sub:'Salam hangat dari tim kantin · PT Frisian Flag Indonesia' },
+  { big:'Bon Appétit!\nHave a Great Day!',         sub:'Thank you for dining with us · GDSK Canteen · Cikarang' }
+];
+
+// ── rptRenderTV ───────────────────────────────────────────────
 function rptRenderTV() {
   var wKey = document.getElementById('rptTVWeekSel').value;
   var tpl  = parseInt(document.getElementById('rptTVTemplateSel').value) || 1;
-  TV.tpl = tpl;
-  TV.wKey = wKey;
+  TV.tpl = tpl; TV.wKey = wKey;
 
-  if (!wKey) {
-    document.getElementById('rptBody').innerHTML =
-      '<div class="empty" style="padding:60px"><span class="empty-icon">📺</span>' +
-      'Pilih minggu yang ingin ditampilkan, lalu pilih template.</div>';
-    return;
-  }
+  tvPrepWeekData(wKey);
 
-  // Build week data
-  var wData = DATA && DATA.byWeek && DATA.byWeek[wKey];
-  TV.wData = wData;
+  var noData = !wKey;
+  var period = wKey ? TV.period : '—';
+  var wkLabel= wKey || '—';
 
-  // Week date range
-  var mon = isoWeekToMonday(wKey);
-  var sun = new Date(mon); sun.setDate(mon.getDate() + 6);
-  var fmtPeriod = mon.toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'}) +
-                  ' – ' + sun.toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'});
-  TV.period = fmtPeriod;
-  TV.mon = mon;
-  TV.sun = sun;
-
-  // Build per-day menu maps
-  var byDate = {};
-  if (wData) {
-    var entries = (wData.snack||[]).concat(wData.meal||[]);
-    entries.forEach(function(e) {
-      var dk = e.rawDate || '';
-      if (!byDate[dk]) byDate[dk] = {snack:[], meal:[], dt: new Date(dk+'T00:00:00')};
-      if (e.type.toLowerCase()==='snack') byDate[dk].snack.push(e);
-      else byDate[dk].meal.push(e);
-    });
-  }
-  TV.byDate = byDate;
-
-  // Render preview pane
-  var thumbs = [1,2,3,4].map(function(t) {
-    return '<div class="tv-thumb'+(t===tpl?' selected':'')+'" onclick="tvSelectTemplate('+t+')" title="Template '+t+'">' +
-      tvMiniPreview(t) +
-      '<div class="tv-thumb-label">Template '+t+' · '+tvTemplateName(t)+'</div>' +
+  // ── Hero banner ──
+  var heroHtml =
+    '<div class="tv-hero">' +
+      '<div class="tv-hero-eyebrow">TV Display · Menu Kantin · PT Frisian Flag Indonesia</div>' +
+      '<div class="tv-hero-title">📺 Pilih Template & Tampilkan di TV</div>' +
+      '<div class="tv-hero-sub">4 template premium siap pakai · Fullscreen + Download HTML</div>' +
+      '<div class="tv-hero-chips">' +
+        (wKey ? '<span class="tv-hero-chip">📅 '+wKey+'</span><span class="tv-hero-chip">📆 '+period+'</span>' : '') +
+        '<span class="tv-hero-chip">4 Slide per Template</span>' +
+        '<span class="tv-hero-chip">⌨ Arrow Keys + Space</span>' +
+      '</div>' +
     '</div>';
-  }).join('');
 
-  document.getElementById('rptBody').innerHTML =
-    '<div style="margin-bottom:14px">' +
-      '<div style="font-size:12px;font-weight:600;color:var(--t2);margin-bottom:10px;display:flex;align-items:center;gap:8px;">' +
-        '<span style="font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.12em;color:var(--t4);text-transform:uppercase">Pilih Template</span>' +
+  // ── Template cards ──
+  var tplHtml = '<div style="font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.14em;color:var(--t4);text-transform:uppercase;margin-bottom:10px">Pilih Template</div>';
+  tplHtml += '<div class="tv-tpl-grid">';
+  TV_TEMPLATES.forEach(function(tmpl) {
+    var sel = tmpl.id === tpl;
+    tplHtml += '<div class="tv-card'+(sel?' sel':'')+'" style="--acc:'+tmpl.accent+'" onclick="tvSelectTemplate('+tmpl.id+')">' +
+      '<div class="tv-card-thumb">'+tvCardThumbSVG(tmpl)+'</div>' +
+      '<div class="tv-card-body">' +
+        '<div class="tv-card-name">'+tmpl.name+'</div>' +
+        '<div class="tv-card-desc">'+tmpl.desc+'</div>' +
+        '<div class="tv-card-badge">Template '+tmpl.id+(sel?' ✓':' — klik pilih')+'</div>' +
       '</div>' +
-      '<div class="tv-preview-wrap">'+thumbs+'</div>' +
-    '</div>' +
-    '<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px;margin-bottom:12px;">' +
-      '<div style="font-size:12px;color:var(--t2);margin-bottom:8px;">'+
-        '<strong>Minggu:</strong> '+wKey+' &nbsp;·&nbsp; '+fmtPeriod +
+    '</div>';
+  });
+  tplHtml += '</div>';
+
+  // ── 4-slide strip preview ──
+  var stripLabels = ['① Cover','② Snack','③ Meal','④ Penutup'];
+  var stripHtml = '';
+  if (wKey) {
+    TV.slides = tvBuildSlides();
+    stripHtml =
+      '<div style="font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.14em;color:var(--t4);text-transform:uppercase;margin-bottom:8px">Preview 4 Slide</div>' +
+      '<div class="tv-slides-strip">';
+    TV.slides.forEach(function(s, i) {
+      stripHtml += '<div class="tv-strip-card">' +
+        '<div style="aspect-ratio:16/9;overflow:hidden;position:relative;">'+
+          '<div style="position:absolute;inset:0;transform:scale(.5);transform-origin:top left;width:200%;height:200%;pointer-events:none;">'+s+'</div>'+
+        '</div>' +
+        '<div class="tv-strip-label">'+stripLabels[i]+'</div>' +
+      '</div>';
+    });
+    stripHtml += '</div>';
+  }
+
+  // ── Action bar ──
+  var actionHtml =
+    '<div class="tv-action-bar">' +
+      '<div class="tv-action-info">' +
+        '<div class="tv-action-week">'+(wKey ? wKey+' · '+TV_TEMPLATES[tpl-1].name : 'Pilih minggu dari dropdown di atas')+'</div>' +
+        '<div class="tv-action-period">'+(wKey ? period : 'Belum ada minggu dipilih')+'</div>' +
       '</div>' +
-      '<div style="font-size:11px;color:var(--t3);font-family:var(--mono)">'+
-        '4 slide akan ditampilkan: Cover · Snack Senin–Minggu · Meal Senin–Minggu · Penutup' +
+      '<div class="tv-action-btns">' +
+        (wKey ?
+          '<button class="tv-btn-dl" onclick="tvDownloadHTML()" title="Download HTML">' +
+            '<svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>' +
+            'Download HTML' +
+          '</button>' +
+          '<button class="tv-btn-dl tv-btn-mp4" id="tvMp4Btn" onclick="tvDownloadMP4()" title="Download MP4 Video">' +
+            '<svg viewBox="0 0 24 24"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>' +
+            'Download MP4' +
+          '</button>' +
+          '<button class="tv-btn-launch" onclick="tvLaunch()">' +
+            '<svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><polyline points="8 21 12 17 16 21"/></svg>' +
+            'Tampilkan di TV' +
+          '</button>'
+        : '<span style="font-size:11px;color:var(--t4);font-family:var(--mono)">← Pilih minggu dulu</span>') +
       '</div>' +
-    '</div>' +
-    '<button class="tv-launch-btn" onclick="tvLaunch()">' +
-      '<svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><polyline points="8 21 12 17 16 21"/></svg>' +
-      'Tampilkan di TV (Fullscreen)' +
-    '</button>';
+    '</div>';
+
+  document.getElementById('rptBody').innerHTML = heroHtml + tplHtml + stripHtml + actionHtml;
 }
 
-function tvTemplateName(t) {
-  return ['','Navy Elegan','Warm Harvest','Fresh Garden','Bold Dark'][t] || '';
+// ── Card thumbnail SVG — rich visuals per template ────────────
+function tvCardThumbSVG(tmpl) {
+  var t = tmpl.id;
+  var W = 320, H = 180;
+
+  var defs = '', bg = '', deco = '', content = '';
+
+  if (t === 1) { // Celestial Night — starfield + gradient rings
+    defs = '<defs>' +
+      '<linearGradient id="cg1" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#020818"/><stop offset="100%" stop-color="#0c1f45"/></linearGradient>' +
+      '<radialGradient id="rg1" cx="70%" cy="35%" r="50%"><stop offset="0%" stop-color="#1d4ed8" stop-opacity=".5"/><stop offset="100%" stop-color="#020818" stop-opacity="0"/></radialGradient>' +
+    '</defs>';
+    bg = '<rect width="320" height="180" fill="url(#cg1)"/><rect width="320" height="180" fill="url(#rg1)"/>';
+    // Stars
+    var stars = '';
+    [[30,20],[80,45],[140,15],[200,35],[260,22],[290,60],[50,80],[170,70],[240,90],[100,110],[300,120],[20,140],[220,155],[70,160],[180,130]].forEach(function(s) {
+      var r = Math.random()*1+.5;
+      stars += '<circle cx="'+s[0]+'" cy="'+s[1]+'" r="'+r.toFixed(1)+'" fill="white" opacity="'+(Math.random()*.5+.3).toFixed(2)+'"/>';
+    });
+    deco = stars +
+      '<circle cx="270" cy="50" r="70" fill="none" stroke="#3b5bdb" stroke-width="40" opacity=".08"/>' +
+      '<circle cx="270" cy="50" r="45" fill="none" stroke="#60a5fa" stroke-width="1" opacity=".25"/>' +
+      '<line x1="0" y1="180" x2="320" y2="155" stroke="#1d4ed8" stroke-width="35" opacity=".12"/>';
+    content =
+      '<rect x="20" y="28" width="45" height="3" rx="1.5" fill="#60a5fa" opacity=".5"/>' +
+      '<rect x="20" y="58" width="180" height="11" rx="3" fill="white" opacity=".92"/>' +
+      '<rect x="20" y="75" width="130" height="8" rx="2" fill="#60a5fa" opacity=".85"/>' +
+      '<rect x="20" y="90" width="160" height="5" rx="1.5" fill="white" opacity=".28"/>' +
+      '<rect x="20" y="120" width="100" height="4" rx="1.5" fill="white" opacity=".15"/>' +
+      '<rect x="20" y="130" width="80" height="3" rx="1.5" fill="white" opacity=".1"/>' +
+      '<rect x="20" y="155" width="70" height="3" rx="1.5" fill="#60a5fa" opacity=".3"/>';
+  }
+
+  else if (t === 2) { // Saffron Feast — fire gradient, diagonal cut
+    defs = '<defs>' +
+      '<linearGradient id="cg2" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#1a0800"/><stop offset="50%" stop-color="#7c2d12"/><stop offset="100%" stop-color="#c2410c"/></linearGradient>' +
+      '<linearGradient id="rg2" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#fbbf24" stop-opacity=".6"/><stop offset="100%" stop-color="#f97316" stop-opacity="0"/></linearGradient>' +
+    '</defs>';
+    bg = '<rect width="320" height="180" fill="url(#cg2)"/>';
+    deco =
+      '<polygon points="190,0 320,0 320,180 240,180" fill="rgba(0,0,0,.2)"/>' +
+      '<rect x="0" y="0" width="320" height="60" fill="url(#rg2)"/>' +
+      '<line x1="20" y1="170" x2="300" y2="160" stroke="#fb923c" stroke-width="1" opacity=".3"/>' +
+      '<line x1="20" y1="175" x2="200" y2="170" stroke="#fbbf24" stroke-width="1" opacity=".2"/>';
+    content =
+      '<rect x="20" y="28" width="55" height="3" rx="1.5" fill="#fbbf24" opacity=".6"/>' +
+      '<rect x="20" y="55" width="185" height="12" rx="3" fill="#fef3c7" opacity=".95"/>' +
+      '<rect x="20" y="73" width="115" height="8" rx="2" fill="#fb923c" opacity=".9"/>' +
+      '<rect x="20" y="88" width="150" height="4" rx="1.5" fill="white" opacity=".25"/>' +
+      '<rect x="20" y="118" width="105" height="4" rx="1.5" fill="#fbbf24" opacity=".4"/>' +
+      '<rect x="20" y="128" width="80" height="3" rx="1.5" fill="white" opacity=".15"/>' +
+      '<rect x="20" y="155" width="65" height="3" rx="1.5" fill="#fb923c" opacity=".35"/>';
+  }
+
+  else if (t === 3) { // Matcha Garden — organic shapes, leaf vibes
+    defs = '<defs>' +
+      '<linearGradient id="cg3" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#011208"/><stop offset="50%" stop-color="#052e16"/><stop offset="100%" stop-color="#064e24"/></linearGradient>' +
+      '<radialGradient id="rg3" cx="80%" cy="20%" r="60%"><stop offset="0%" stop-color="#16a34a" stop-opacity=".35"/><stop offset="100%" stop-color="#011208" stop-opacity="0"/></radialGradient>' +
+    '</defs>';
+    bg = '<rect width="320" height="180" fill="url(#cg3)"/><rect width="320" height="180" fill="url(#rg3)"/>';
+    deco =
+      '<ellipse cx="280" cy="30" rx="80" ry="80" fill="rgba(74,222,128,.05)"/>' +
+      '<ellipse cx="280" cy="30" rx="55" ry="55" fill="none" stroke="#4ade80" stroke-width="1" opacity=".2"/>' +
+      '<ellipse cx="280" cy="30" rx="30" ry="30" fill="rgba(74,222,128,.08)"/>' +
+      '<path d="M0,140 Q80,110 160,140 Q240,170 320,140 L320,180 L0,180Z" fill="rgba(74,222,128,.04)"/>';
+    content =
+      '<rect x="20" y="28" width="50" height="3" rx="1.5" fill="#4ade80" opacity=".55"/>' +
+      '<rect x="20" y="56" width="175" height="11" rx="3" fill="#dcfce7" opacity=".92"/>' +
+      '<rect x="20" y="73" width="120" height="8" rx="2" fill="#4ade80" opacity=".85"/>' +
+      '<rect x="20" y="88" width="145" height="4" rx="1.5" fill="white" opacity=".2"/>' +
+      '<rect x="20" y="110" width="50" height="6" rx="3" fill="#4ade80" opacity=".2"/>' +
+      '<rect x="20" y="122" width="110" height="4" rx="1.5" fill="#dcfce7" opacity=".2"/>' +
+      '<rect x="20" y="132" width="85" height="3" rx="1.5" fill="white" opacity=".1"/>' +
+      '<rect x="20" y="155" width="60" height="3" rx="1.5" fill="#4ade80" opacity=".3"/>';
+  }
+
+  else { // Luxury Noir — radial glow, gold accents
+    defs = '<defs>' +
+      '<radialGradient id="cg4" cx="20%" cy="50%" r="70%"><stop offset="0%" stop-color="#1a0f2e"/><stop offset="100%" stop-color="#0d0d0d"/></radialGradient>' +
+      '<linearGradient id="gg4" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#e9d5a1"/><stop offset="50%" stop-color="#d4a854"/><stop offset="100%" stop-color="#e9d5a1"/></linearGradient>' +
+    '</defs>';
+    bg = '<rect width="320" height="180" fill="url(#cg4)"/>';
+    deco =
+      '<rect x="0" y="0" width="5" height="180" fill="url(#gg4)"/>' +
+      '<line x1="18" y1="50" x2="300" y2="50" stroke="#e9d5a1" stroke-width=".5" opacity=".12"/>' +
+      '<line x1="18" y1="145" x2="300" y2="145" stroke="#e9d5a1" stroke-width=".5" opacity=".12"/>' +
+      '<circle cx="280" cy="90" r="60" fill="rgba(167,139,250,.06)"/>' +
+      '<circle cx="280" cy="90" r="40" fill="none" stroke="#a78bfa" stroke-width="1" opacity=".15"/>';
+    content =
+      '<rect x="18" y="28" width="48" height="2.5" rx="1.2" fill="#e9d5a1" opacity=".45"/>' +
+      '<rect x="18" y="56" width="178" height="11" rx="3" fill="white" opacity=".9"/>' +
+      '<rect x="18" y="73" width="110" height="8" rx="2" fill="url(#gg4)" opacity=".85"/>' +
+      '<rect x="18" y="88" width="150" height="4" rx="1.5" fill="white" opacity=".18"/>' +
+      '<rect x="18" y="115" width="100" height="4" rx="1.5" fill="#e9d5a1" opacity=".3"/>' +
+      '<rect x="18" y="125" width="75" height="3" rx="1.5" fill="white" opacity=".12"/>' +
+      '<rect x="18" y="155" width="60" height="2.5" rx="1.2" fill="#e9d5a1" opacity=".25"/>';
+  }
+
+  return '<svg viewBox="0 0 320 180" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;display:block;">' +
+    defs + bg + deco + content + '</svg>';
+}
+
+// ── Prep week data ────────────────────────────────────────────
+function tvPrepWeekData(wKey) {
+  if (!wKey) { TV.byDate={}; TV.period=''; return; }
+  var mon = isoWeekToMonday(wKey);
+  var sun = new Date(mon); sun.setDate(mon.getDate()+6);
+  TV.mon = mon; TV.sun = sun;
+  TV.period = mon.toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'}) +
+              ' – ' + sun.toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'});
+  var wData = DATA && DATA.byWeek && DATA.byWeek[wKey];
+  TV.byDate = {};
+  if (wData) {
+    (wData.snack||[]).concat(wData.meal||[]).forEach(function(e) {
+      var dk = e.rawDate||'';
+      if (!TV.byDate[dk]) TV.byDate[dk]={snack:[],meal:[]};
+      if (e.type.toLowerCase()==='snack') TV.byDate[dk].snack.push(e);
+      else TV.byDate[dk].meal.push(e);
+    });
+  }
 }
 
 function tvSelectTemplate(t) {
@@ -2158,255 +2315,130 @@ function tvSelectTemplate(t) {
   rptRenderTV();
 }
 
-// ── Mini SVG preview thumbnail ────────────────────────────────
-function tvMiniPreview(t) {
-  var bg  = ['','#0a1628','#92400e','#052e16','#09090b'][t];
-  var c1  = ['','#60a5fa','#fcd34d','#86efac','#f59e0b'][t];
-  var c2  = ['','rgba(255,255,255,.8)','#fef3c7','#dcfce7','#ffffff'][t];
-  var c3  = ['','rgba(255,255,255,.3)','rgba(255,255,255,.3)','rgba(255,255,255,.3)','#52525b'][t];
-  var stripe = t===4 ? '<rect x="0" y="0" width="8" height="100%" fill="url(#g'+t+')" rx="0"/>' : '';
-  return '<svg viewBox="0 0 320 180" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;display:block;">' +
-    (t===4?'<defs><linearGradient id="g4" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#f59e0b"/><stop offset="100%" stop-color="#ef4444"/></linearGradient></defs>':'') +
-    '<rect width="320" height="180" fill="'+bg+'"/>' +
-    (t===4?'<rect x="0" y="0" width="8" height="180" fill="url(#g4)"/>':'') +
-    '<rect x="'+(t===4?'24':'20')+'" y="60" width="160" height="8" rx="2" fill="'+c2+'" opacity=".9"/>' +
-    '<rect x="'+(t===4?'24':'20')+'" y="76" width="100" height="6" rx="2" fill="'+c1+'" opacity=".8"/>' +
-    '<rect x="'+(t===4?'24':'20')+'" y="92" width="130" height="5" rx="2" fill="'+c2+'" opacity=".4"/>' +
-    '<rect x="'+(t===4?'24':'20')+'" y="35" width="60" height="4" rx="2" fill="'+c1+'" opacity=".5"/>' +
-    '<rect x="'+(t===4?'24':'20')+'" y="108" width="40" height="4" rx="2" fill="'+c1+'" opacity=".35"/>' +
-    '<rect x="'+(t===4?'24':'20')+'" y="118" width="80" height="3" rx="2" fill="'+c3+'" opacity=".5"/>' +
-    (t===1?'<circle cx="280" cy="90" r="60" fill="rgba(59,110,245,.08)"/><circle cx="260" cy="160" r="40" fill="rgba(59,110,245,.05)"/>':'')+
-    '</svg>';
-}
+function tvTemplateName(t){ return (TV_TEMPLATES[t-1]||{}).name||''; }
 
 // ── Build all 4 slides ────────────────────────────────────────
 function tvBuildSlides() {
-  var t = TV.tpl;
-  var cls = 'tpl'+t;
-  var slides = [];
-  var closingIdx = (t-1) % TV_CLOSING.length;
-  var cl = TV_CLOSING[closingIdx];
-
-  // Map day index 0-6 to actual dates in the week
+  if (!TV.mon) return ['','','',''];
+  var t = TV.tpl, cls = 'tpl'+t;
+  var cl = TV_CLOSING[(t-1) % TV_CLOSING.length];
   var dayEntries = [];
-  for (var di = 0; di < 7; di++) {
-    var dt = new Date(TV.mon);
-    dt.setDate(TV.mon.getDate() + di);
+  for (var di=0;di<7;di++) {
+    var dt = new Date(TV.mon); dt.setDate(TV.mon.getDate()+di);
     var dk = dt.getFullYear()+'-'+String(dt.getMonth()+1).padStart(2,'0')+'-'+String(dt.getDate()).padStart(2,'0');
-    var dayData = TV.byDate && TV.byDate[dk];
-    dayEntries.push({ di:di, dt:dt, dk:dk, snack: dayData?dayData.snack:[], meal: dayData?dayData.meal:[] });
+    var d = TV.byDate[dk]||{snack:[],meal:[]};
+    dayEntries.push({di:di,dt:dt,dk:dk,snack:d.snack,meal:d.meal});
   }
-
-  // ── SLIDE 1: Cover ────────────────────────────────────────
-  slides.push(tvSlide1(cls, t));
-
-  // ── SLIDE 2: Snack Mon–Sun ────────────────────────────────
-  slides.push(tvSlideMenu(cls, t, 'snack', dayEntries));
-
-  // ── SLIDE 3: Meal Mon–Sun ─────────────────────────────────
-  slides.push(tvSlideMenu(cls, t, 'meal', dayEntries));
-
-  // ── SLIDE 4: Closing ─────────────────────────────────────
-  slides.push(tvSlide4(cls, t, cl));
-
-  return slides;
+  return [
+    tvMakeSlide1(t, cls),
+    tvMakeSlideMenu(t, cls, 'snack', dayEntries),
+    tvMakeSlideMenu(t, cls, 'meal',  dayEntries),
+    tvMakeSlide4(t, cls, cl)
+  ];
 }
 
-// ── SLIDE 1 — Cover ──────────────────────────────────────────
-function tvSlide1(cls, t) {
-  var wkLabel = TV.wKey;
-  var period  = TV.period;
-  var bg = tvBgStyle(t);
-
-  var inner = '';
-  if (t===1) {
-    inner =
-      '<div style="position:absolute;width:600px;height:600px;border-radius:50%;background:rgba(59,110,245,.07);top:-100px;right:-120px;"></div>'+
-      '<div style="position:absolute;width:300px;height:300px;border-radius:50%;background:rgba(59,110,245,.05);bottom:-60px;left:-60px;"></div>'+
-      '<div style="position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;padding:0 6% 0 8%;">'+
-        '<div class="slide-tag">PT Frisian Flag Indonesia · Cikarang Plant · Vendor GDSK</div>'+
-        '<div class="slide-title">MENU<br><span class="slide-accent">KANTIN</span></div>'+
-        '<div class="slide-period">'+period+'</div>'+
-        '<div class="slide-badge">📅 '+wkLabel+' &nbsp;·&nbsp; Senin – Minggu</div>'+
-      '</div>';
-  } else if (t===2) {
-    inner =
-      '<div style="position:absolute;top:0;right:0;width:45%;height:100%;background:rgba(0,0,0,.15);clip-path:polygon(20% 0%,100% 0%,100% 100%,0% 100%);"></div>'+
-      '<div style="position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;padding:0 5% 0 7%;">'+
-        '<div class="slide-tag">PT Frisian Flag Indonesia · Cikarang</div>'+
-        '<div class="slide-title">MENU<br>KANTIN 🍽️</div>'+
-        '<div class="slide-period">'+period+'</div>'+
-        '<div style="margin-top:.8em;font-size:1.3em;color:rgba(255,255,255,.55);">'+wkLabel+'</div>'+
-      '</div>';
-  } else if (t===3) {
-    inner =
-      '<div style="position:absolute;top:-40%;right:-10%;width:80%;height:180%;background:radial-gradient(circle,rgba(134,239,172,.08) 0%,transparent 70%);"></div>'+
-      '<div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0 8%;">'+
-        '<div style="font-size:4em;margin-bottom:.1em;">🥗🍱🥐</div>'+
-        '<div class="slide-tag">PT Frisian Flag Indonesia · Cikarang Plant</div>'+
-        '<div class="slide-title">MENU KANTIN</div>'+
-        '<div class="slide-period">'+period+'</div>'+
-        '<div style="margin-top:.8em;background:rgba(134,239,172,.15);border:1px solid rgba(134,239,172,.3);border-radius:100px;padding:.35em 1.5em;font-size:1em;font-weight:600;color:#86efac;">'+wkLabel+'</div>'+
-      '</div>';
-  } else {
-    inner =
-      '<div style="position:absolute;top:0;left:0;width:6px;height:100%;background:linear-gradient(180deg,#f59e0b,#ef4444);"></div>'+
-      '<div style="position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;padding:0 6% 0 9%;">'+
-        '<div class="slide-tag">PT Frisian Flag Indonesia · Cikarang</div>'+
-        '<div class="slide-title">MENU <span class="slide-accent">KANTIN</span></div>'+
-        '<div class="slide-period">'+period+'</div>'+
-        '<div style="margin-top:.8em;display:flex;align-items:center;gap:.6em;font-size:1em;color:#52525b;font-family:\'JetBrains Mono\',monospace;">'+
-          '<span style="width:20px;height:2px;background:#f59e0b;display:inline-block;"></span>'+wkLabel+
-        '</div>'+
-      '</div>';
-  }
-
-  return '<div class="tv-slide-canvas '+cls+'" style="'+bg+'">'+inner+'</div>';
+// ── Slide theming helpers ─────────────────────────────────────
+function tvBg(t){ return {1:'background:linear-gradient(145deg,#020818,#0a1628,#0c1f45)',2:'background:linear-gradient(155deg,#1a0800,#7c2d12,#c2410c)',3:'background:linear-gradient(150deg,#011208,#052e16,#064e24)',4:'background:radial-gradient(ellipse at 20% 50%,#1a0f2e,#0d0d0d)'}[t]||''; }
+function tvAcc(t){ return ['','#60a5fa','#fb923c','#4ade80','#e9d5a1'][t]||'#fff'; }
+function tvText(t){ return ['','#e0f2fe','#fef3c7','#dcfce7','#f5f5f4'][t]||'#fff'; }
+function tvSub(t) { return ['','rgba(224,242,254,.5)','rgba(254,243,199,.5)','rgba(220,252,231,.5)','rgba(245,245,244,.35)'][t]||'rgba(255,255,255,.4)'; }
+function tvMuted(t){ return ['','rgba(96,165,250,.12)','rgba(251,146,60,.12)','rgba(74,222,128,.12)','rgba(233,213,161,.12)'][t]||'rgba(255,255,255,.08)'; }
+function tvBorder(t){ return ['','rgba(96,165,250,.25)','rgba(251,146,60,.25)','rgba(74,222,128,.25)','rgba(233,213,161,.2)'][t]||'rgba(255,255,255,.15)'; }
+function tvDeco(t) {
+  if(t===1) return '<div style="position:absolute;top:-80px;right:-80px;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle,rgba(29,78,216,.25),transparent 70%);pointer-events:none;"></div><div style="position:absolute;bottom:-40px;left:-40px;width:180px;height:180px;border-radius:50%;background:rgba(59,110,245,.08);pointer-events:none;"></div>';
+  if(t===2) return '<div style="position:absolute;top:0;right:0;width:50%;height:100%;background:rgba(0,0,0,.2);clip-path:polygon(30% 0%,100% 0%,100% 100%,0% 100%);pointer-events:none;"></div><div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#fbbf24,#f97316,#ef4444);pointer-events:none;"></div>';
+  if(t===3) return '<div style="position:absolute;top:-40px;right:-40px;width:220px;height:220px;border-radius:50%;background:radial-gradient(circle,rgba(74,222,128,.12),transparent 70%);pointer-events:none;"></div><div style="position:absolute;bottom:-20px;right:10%;width:120px;height:120px;border-radius:50%;background:rgba(74,222,128,.06);pointer-events:none;"></div>';
+  if(t===4) return '<div style="position:absolute;top:0;left:0;width:5px;height:100%;background:linear-gradient(180deg,#e9d5a1,#d4a854,#a78bfa);pointer-events:none;"></div><div style="position:absolute;top:50%;right:5%;transform:translateY(-50%);width:160px;height:160px;border-radius:50%;background:rgba(167,139,250,.06);border:1px solid rgba(167,139,250,.12);pointer-events:none;"></div>';
+  return '';
 }
 
-// ── SLIDE 2 & 3 — Menu per Hari ──────────────────────────────
-function tvSlideMenu(cls, t, type, dayEntries) {
+// ── SLIDE 1: Cover ────────────────────────────────────────────
+function tvMakeSlide1(t, cls) {
+  var pad = t===4?'0 6% 0 8%':'0 6% 0 7%';
+  return '<div class="tv-slide-canvas '+cls+'" style="'+tvBg(t)+'">' + tvDeco(t) +
+    '<div style="position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;padding:'+pad+'">' +
+      '<div style="font-family:\'JetBrains Mono\',monospace;font-size:1em;font-weight:700;letter-spacing:.2em;color:'+tvSub(t)+';text-transform:uppercase;margin-bottom:.6em;">PT Frisian Flag Indonesia · Cikarang · GDSK</div>' +
+      '<div style="font-size:6em;font-weight:900;color:'+tvText(t)+';line-height:.95;letter-spacing:-.04em;margin-bottom:.15em;">MENU<br><span style="color:'+tvAcc(t)+';">KANTIN</span></div>' +
+      '<div style="font-size:1.8em;font-weight:500;color:'+tvSub(t)+';font-family:\'JetBrains Mono\',monospace;margin-bottom:1em;">'+TV.period+'</div>' +
+      '<div style="display:inline-flex;align-items:center;gap:.5em;background:'+tvMuted(t)+';border:1px solid '+tvBorder(t)+';border-radius:100px;padding:.35em 1.4em;width:fit-content;">' +
+        '<span style="width:.5em;height:.5em;border-radius:50%;background:'+tvAcc(t)+';flex-shrink:0;display:inline-block;"></span>' +
+        '<span style="font-size:1em;font-weight:700;font-family:\'JetBrains Mono\',monospace;color:'+tvAcc(t)+';">'+TV.wKey+' &nbsp;·&nbsp; Senin – Minggu</span>' +
+      '</div>' +
+    '</div>' +
+  '</div>';
+}
+
+// ── SLIDE 2 & 3: Menu per Hari ────────────────────────────────
+function tvMakeSlideMenu(t, cls, type, dayEntries) {
   var isSnack = type==='snack';
-  var icon    = isSnack ? '🥐' : '🍱';
-  var title   = isSnack ? 'MENU SNACK' : 'MENU MAKAN';
-  var accentColor = {
-    1: isSnack?'#f59e0b':'#60a5fa',
-    2: '#fcd34d',
-    3: '#86efac',
-    4: isSnack?'#f59e0b':'#60a5fa'
-  }[t];
-  var bg = tvBgStyle(t);
+  var icon    = isSnack?'🥐':'🍱';
+  var title   = isSnack?'MENU SNACK':'MENU MAKAN';
+  var acc = tvAcc(t), textC = tvText(t), subC = tvSub(t), mutedC = tvMuted(t), borderC = tvBorder(t);
+  var pad = t===4?'2.5% 4% 2.5% 6%':'2.5% 4% 2.5% 5%';
 
-  // Build day rows — 7 cols layout
-  var dayHtml = dayEntries.map(function(d) {
+  var cols = dayEntries.map(function(d) {
     var entries = d[type];
-    var dayLbl = TV_DAY_SHORT[d.di];
-    var dateStr = d.dt.toLocaleDateString('id-ID',{day:'2-digit',month:'short'});
+    var dayLbl  = TV_SHORTS[d.di];
+    var dateNum = d.dt.getDate()+' '+ d.dt.toLocaleDateString('id-ID',{month:'short'});
+    var isEmpty = !entries.length;
 
-    var menuContent = '';
-    if (!entries.length) {
-      menuContent = '<div style="font-size:.75em;color:rgba(255,255,255,.25);font-style:italic;">—</div>';
+    var menuHtml = '';
+    if (isEmpty) {
+      menuHtml = '<div style="font-size:.75em;color:'+subC+';opacity:.4;font-style:italic;padding-top:.2em;">—</div>';
     } else if (isSnack) {
-      menuContent = entries.map(function(e) {
-        var comps = (e.components||[]).slice(0,2).join(', ');
-        return '<div class="day-menu">'+cap(e.menuName)+'</div>' +
-               (comps?'<div class="day-comps">'+comps+'</div>':'');
+      menuHtml = entries.map(function(e) {
+        var c=(e.components||[]).slice(0,2).map(function(x){return cap(x);}).join(' · ');
+        return '<div style="font-size:.92em;font-weight:700;color:'+textC+';line-height:1.25;text-transform:capitalize;margin-bottom:.15em;">'+cap(e.menuName)+'</div>'+
+               (c?'<div style="font-size:.72em;color:'+subC+';line-height:1.3;font-family:\'JetBrains Mono\',monospace;">'+c+'</div>':'');
       }).join('');
     } else {
-      // Meal: numbered lauk
-      menuContent = entries.map(function(e,i) {
-        return '<div class="day-menu"><span style="font-size:.75em;opacity:.6;margin-right:.2em;">'+(i+1)+'.</span>'+cap(e.menuName)+'</div>';
+      menuHtml = entries.map(function(e,i) {
+        return '<div style="display:flex;align-items:baseline;gap:.3em;margin-bottom:.12em;">'+
+          '<span style="font-size:.68em;font-weight:800;color:'+acc+';background:'+mutedC+';border-radius:3px;padding:.05em .3em;flex-shrink:0;font-family:\'JetBrains Mono\',monospace;">'+(i+1)+'</span>'+
+          '<span style="font-size:.87em;font-weight:700;color:'+textC+';text-transform:capitalize;line-height:1.2;">'+cap(e.menuName)+'</span>'+
+        '</div>';
       }).join('');
-      // Shared pelengkap
-      var allComps={};
-      entries.forEach(function(e){(e.components||[]).forEach(function(c){if(c.trim())allComps[c.toLowerCase()]=c.trim();});});
-      var comps=Object.values(allComps).slice(0,3).join(' · ');
-      if(comps) menuContent += '<div class="day-comps">'+comps+'</div>';
+      var allC={};entries.forEach(function(e){(e.components||[]).forEach(function(c){if(c.trim())allC[c.toLowerCase()]=cap(c.trim());});});
+      var sc=Object.values(allC).slice(0,3).join(' · ');
+      if(sc) menuHtml += '<div style="font-size:.68em;color:'+subC+';margin-top:.2em;font-family:\'JetBrains Mono\',monospace;opacity:.7;">'+sc+'</div>';
     }
 
-    return '<div class="menu-day-block" style="flex:1;min-width:0;">'+
-      '<div class="day-lbl">'+dayLbl+'<br><span style="font-size:.75em;opacity:.55;">'+dateStr+'</span></div>'+
-      menuContent+
+    return '<div style="flex:1;min-width:0;background:'+mutedC+';border:1px solid '+borderC+';border-radius:.45em;padding:.55em .65em;display:flex;flex-direction:column;">' +
+      '<div style="font-family:\'JetBrains Mono\',monospace;font-size:.82em;font-weight:800;color:'+acc+';letter-spacing:.05em;margin-bottom:.08em;">'+dayLbl+'</div>' +
+      '<div style="font-size:.68em;color:'+subC+';margin-bottom:.3em;opacity:.6;">'+dateNum+'</div>' +
+      menuHtml +
     '</div>';
   }).join('');
 
-  // Template-specific layout
-  var inner = '';
-  if (t===1||t===3) {
-    inner =
-      '<div style="position:absolute;inset:0;display:flex;flex-direction:column;padding:3% 5%;">'+
-        '<div style="display:flex;align-items:center;gap:.6em;margin-bottom:1.2em;">'+
-          '<span style="font-size:2.4em;">'+icon+'</span>'+
-          '<span class="slide-title" style="font-size:2.8em;margin:0;">'+title+'</span>'+
-          '<span style="margin-left:auto;font-size:.9em;font-family:\'JetBrains Mono\',monospace;color:rgba(255,255,255,.35);">'+TV.wKey+'</span>'+
-        '</div>'+
-        '<div style="display:flex;gap:.5em;flex:1;">'+dayHtml+'</div>'+
-      '</div>';
-  } else if (t===2) {
-    inner =
-      '<div style="position:absolute;inset:0;display:flex;flex-direction:column;padding:3% 5%;">'+
-        '<div style="display:flex;align-items:center;gap:.6em;margin-bottom:1em;border-bottom:2px solid rgba(252,211,77,.3);padding-bottom:.7em;">'+
-          '<span style="font-size:2.2em;">'+icon+'</span>'+
-          '<span class="slide-title" style="font-size:2.6em;margin:0;">'+title+'</span>'+
-          '<span style="margin-left:auto;font-size:.85em;font-family:\'JetBrains Mono\',monospace;color:rgba(255,255,255,.35);">'+TV.wKey+'</span>'+
-        '</div>'+
-        '<div style="display:flex;gap:.45em;flex:1;">'+dayHtml+'</div>'+
-      '</div>';
-  } else {
-    inner =
-      '<div style="position:absolute;top:0;left:0;width:6px;height:100%;background:linear-gradient(180deg,#f59e0b,#ef4444);"></div>'+
-      '<div style="position:absolute;inset:0;display:flex;flex-direction:column;padding:3% 5% 3% 6%;">'+
-        '<div style="display:flex;align-items:center;gap:.6em;margin-bottom:1em;">'+
-          '<span style="font-size:2.2em;">'+icon+'</span>'+
-          '<span class="slide-title" style="font-size:2.6em;margin:0;">'+title+'</span>'+
-          '<span style="margin-left:auto;font-size:.85em;font-family:\'JetBrains Mono\',monospace;color:#52525b;">'+TV.wKey+'</span>'+
-        '</div>'+
-        '<div style="display:flex;gap:.45em;flex:1;">'+dayHtml+'</div>'+
-      '</div>';
-  }
-
-  return '<div class="tv-slide-canvas '+cls+'" style="'+bg+'">'+inner+'</div>';
+  return '<div class="tv-slide-canvas '+cls+'" style="'+tvBg(t)+'">' + tvDeco(t) +
+    '<div style="position:absolute;inset:0;display:flex;flex-direction:column;padding:'+pad+'">' +
+      '<div style="display:flex;align-items:center;gap:.5em;margin-bottom:.9em;flex-shrink:0;">' +
+        '<span style="font-size:2.2em;">'+icon+'</span>' +
+        '<span style="font-size:2.8em;font-weight:900;color:'+textC+';letter-spacing:-.04em;line-height:1;">'+title+'</span>' +
+        '<span style="margin-left:auto;font-size:.85em;font-family:\'JetBrains Mono\',monospace;color:'+subC+';opacity:.6;">'+TV.wKey+'</span>' +
+      '</div>' +
+      '<div style="display:flex;gap:.5em;flex:1;min-height:0;">'+cols+'</div>' +
+    '</div>' +
+  '</div>';
 }
 
-// ── SLIDE 4 — Closing ─────────────────────────────────────────
-function tvSlide4(cls, t, cl) {
-  var bg = tvBgStyle(t);
-  var inner = '';
+// ── SLIDE 4: Closing ──────────────────────────────────────────
+function tvMakeSlide4(t, cls, cl) {
+  var acc=tvAcc(t), textC=tvText(t), subC=tvSub(t), mutedC=tvMuted(t), borderC=tvBorder(t);
   var bigLines = cl.big.split('\n');
-
-  if (t===1) {
-    inner =
-      '<div style="position:absolute;width:500px;height:500px;border-radius:50%;background:rgba(59,110,245,.08);top:-80px;right:-80px;"></div>'+
-      '<div style="position:absolute;width:250px;height:250px;border-radius:50%;background:rgba(59,110,245,.05);bottom:-40px;left:-40px;"></div>'+
-      '<div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0 8%;">'+
-        '<div style="font-size:3.5em;margin-bottom:.3em;">🙏</div>'+
-        '<div class="closing-big">'+bigLines.join('<br>')+'</div>'+
-        '<div class="closing-sub">'+cl.sub+'</div>'+
-        '<div style="margin-top:1.5em;display:flex;gap:.5em;align-items:center;"><span style="width:30px;height:2px;background:rgba(96,165,250,.4);display:inline-block;"></span><span style="font-size:.9em;font-family:\'JetBrains Mono\',monospace;color:rgba(255,255,255,.3);letter-spacing:.15em;">FFI · GDSK · CIKARANG</span><span style="width:30px;height:2px;background:rgba(96,165,250,.4);display:inline-block;"></span></div>'+
-      '</div>';
-  } else if (t===2) {
-    inner =
-      '<div style="position:absolute;top:0;right:0;width:40%;height:100%;background:rgba(0,0,0,.12);clip-path:polygon(25% 0%,100% 0%,100% 100%,0% 100%);"></div>'+
-      '<div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0 10%;">'+
-        '<div style="font-size:3.5em;margin-bottom:.3em;">🍽️✨</div>'+
-        '<div class="closing-big">'+bigLines.join('<br>')+'</div>'+
-        '<div class="closing-sub">'+cl.sub+'</div>'+
-      '</div>';
-  } else if (t===3) {
-    inner =
-      '<div style="position:absolute;top:-20%;right:-10%;width:80%;height:160%;background:radial-gradient(circle,rgba(134,239,172,.07) 0%,transparent 70%);"></div>'+
-      '<div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0 8%;">'+
-        '<div style="font-size:3.5em;margin-bottom:.3em;">🌿🙏</div>'+
-        '<div class="closing-big">'+bigLines.join('<br>')+'</div>'+
-        '<div class="closing-sub">'+cl.sub+'</div>'+
-        '<div style="margin-top:1.5em;background:rgba(134,239,172,.1);border:1px solid rgba(134,239,172,.2);border-radius:100px;padding:.4em 2em;font-size:.9em;color:rgba(134,239,172,.7);font-family:\'JetBrains Mono\',monospace;">FFI · GDSK · CIKARANG</div>'+
-      '</div>';
-  } else {
-    inner =
-      '<div style="position:absolute;top:0;left:0;width:6px;height:100%;background:linear-gradient(180deg,#f59e0b,#ef4444);"></div>'+
-      '<div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0 9%;">'+
-        '<div style="font-size:3.5em;margin-bottom:.3em;">🙌</div>'+
-        '<div class="closing-big">'+bigLines.join('<br>')+'</div>'+
-        '<div style="margin-top:.6em;width:60px;height:3px;background:linear-gradient(90deg,#f59e0b,#ef4444);border-radius:3px;margin-left:auto;margin-right:auto;"></div>'+
-        '<div class="closing-sub" style="margin-top:.8em;">'+cl.sub+'</div>'+
-      '</div>';
-  }
-
-  return '<div class="tv-slide-canvas '+cls+'" style="'+bg+'">'+inner+'</div>';
+  var emojis = ['🙏','🍽️✨','🌿🙏','🙌'];
+  return '<div class="tv-slide-canvas '+cls+'" style="'+tvBg(t)+'">' + tvDeco(t) +
+    '<div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0 8%;">' +
+      '<div style="font-size:3.5em;margin-bottom:.2em;">'+emojis[t-1]+'</div>' +
+      '<div style="font-size:4em;font-weight:900;color:'+textC+';line-height:1.1;letter-spacing:-.03em;margin-bottom:.4em;">'+bigLines.map(function(l){return '<div>'+l+'</div>';}).join('')+'</div>'+
+      '<div style="width:60px;height:3px;background:'+acc+';border-radius:3px;margin:0 auto .8em;opacity:.7;"></div>' +
+      '<div style="font-size:1.3em;color:'+subC+';max-width:600px;line-height:1.6;">'+cl.sub+'</div>' +
+      '<div style="margin-top:1.5em;background:'+mutedC+';border:1px solid '+borderC+';border-radius:100px;padding:.35em 1.6em;font-size:.95em;font-family:\'JetBrains Mono\',monospace;color:'+acc+';opacity:.8;">FFI · GDSK · CIKARANG PLANT</div>' +
+    '</div>' +
+  '</div>';
 }
 
-// ── Background style per template ─────────────────────────────
-function tvBgStyle(t) {
-  var bgs = {
-    1: 'background:linear-gradient(145deg,#0a1628 0%,#0d2048 50%,#0a1628 100%);width:100%;height:100%;',
-    2: 'background:linear-gradient(160deg,#78350f 0%,#92400e 40%,#b45309 100%);width:100%;height:100%;',
-    3: 'background:linear-gradient(150deg,#052e16 0%,#14532d 50%,#166534 100%);width:100%;height:100%;',
-    4: 'background:#09090b;width:100%;height:100%;'
-  };
-  return bgs[t] || bgs[1];
-}
-
-// ── Launch slideshow ──────────────────────────────────────────
+// ── Slideshow controls ────────────────────────────────────────
 function tvLaunch() {
   if (!TV.wKey) { toast('Pilih minggu terlebih dahulu.','err'); return; }
   TV.slides = tvBuildSlides();
@@ -2415,7 +2447,6 @@ function tvLaunch() {
   modal.style.display = 'flex';
   tvShowSlide(0);
   tvShowControls();
-  // Prevent body scroll
   document.body.style.overflow = 'hidden';
 }
 
@@ -2429,100 +2460,345 @@ function tvClose() {
 function tvShowSlide(idx) {
   idx = ((idx % TV.slides.length) + TV.slides.length) % TV.slides.length;
   TV.slide = idx;
-  var container = document.getElementById('tvSlide');
-  container.innerHTML = TV.slides[idx];
-  // Scale the slide canvas to fit the viewport maintaining 16:9
+  var c = document.getElementById('tvSlide');
+  c.innerHTML = TV.slides[idx];
   tvScaleSlide();
   tvUpdateDots();
   document.getElementById('tvSlideInfo').textContent =
-    'Slide '+(idx+1)+' / '+TV.slides.length+' · Template '+TV.tpl+' · '+tvTemplateName(TV.tpl);
+    'Slide '+(idx+1)+' / '+TV.slides.length+' · '+tvTemplateName(TV.tpl)+' · '+TV.wKey;
 }
 
 function tvScaleSlide() {
   var canvas = document.getElementById('tvSlide').querySelector('.tv-slide-canvas');
   if (!canvas) return;
-  var vw = window.innerWidth, vh = window.innerHeight;
-  var targetW = Math.min(vw, vh * 16/9);
-  var targetH = targetW * 9/16;
-  if (targetH > vh) { targetH = vh; targetW = targetH * 16/9; }
-  // Use font-size scaling trick: base design is 1280px wide
-  var scale = targetW / 1280;
-  canvas.style.fontSize = (scale * 16) + 'px';
-  canvas.style.width  = targetW + 'px';
-  canvas.style.height = targetH + 'px';
+  var vw=window.innerWidth, vh=window.innerHeight;
+  var tw=Math.min(vw, vh*16/9), th=tw*9/16;
+  if(th>vh){th=vh;tw=th*16/9;}
+  canvas.style.fontSize=(tw/1280*16)+'px';
+  canvas.style.width=tw+'px'; canvas.style.height=th+'px';
 }
 
-window.addEventListener('resize', function() {
-  if (document.getElementById('tvModal').style.display !== 'none') tvScaleSlide();
-});
+window.addEventListener('resize',function(){if(document.getElementById('tvModal').style.display!=='none')tvScaleSlide();});
+function tvNext(){tvShowSlide(TV.slide+1);}
+function tvPrev(){tvShowSlide(TV.slide-1);}
 
-function tvNext() { tvShowSlide(TV.slide + 1); }
-function tvPrev() { tvShowSlide(TV.slide - 1); }
-
-function tvUpdateDots() {
-  var dots = document.getElementById('tvDots');
-  dots.innerHTML = TV.slides.map(function(_, i) {
-    return '<div onclick="tvShowSlide('+i+')" style="width:'+(i===TV.slide?'24':'8')+'px;height:8px;border-radius:4px;background:'+(i===TV.slide?'#fff':'rgba(255,255,255,.35)')+';cursor:pointer;transition:all .25s;"></div>';
+function tvUpdateDots(){
+  var dots=document.getElementById('tvDots');
+  dots.innerHTML=TV.slides.map(function(_,i){
+    var active=i===TV.slide;
+    return '<div onclick="tvShowSlide('+i+')" style="width:'+(active?'28':'8')+'px;height:8px;border-radius:4px;background:'+(active?'#fff':'rgba(255,255,255,.3)')+';cursor:pointer;transition:all .25s;"></div>';
   }).join('');
 }
 
-// ── Auto-advance ──────────────────────────────────────────────
-function tvToggleAuto() {
-  if (TV.autoTimer) { tvStopAuto(); }
-  else { tvStartAuto(); }
+function tvToggleAuto(){TV.autoTimer?tvStopAuto():tvStartAuto();}
+function tvStartAuto(){
+  TV.autoTimer=setInterval(function(){tvShowSlide(TV.slide+1);},TV.autoInterval);
+  var b=document.getElementById('tvAutoBtn');
+  if(b){b.textContent='⏸ Stop';b.style.background='rgba(239,68,68,.6)';b.style.borderColor='rgba(239,68,68,.8)';}
 }
-function tvStartAuto() {
-  TV.autoTimer = setInterval(function() { tvShowSlide(TV.slide + 1); }, TV.autoInterval);
-  var btn = document.getElementById('tvAutoBtn');
-  if (btn) { btn.textContent = '⏸ Stop'; btn.style.background = 'rgba(239,68,68,.6)'; btn.style.borderColor = 'rgba(239,68,68,.8)'; }
-}
-function tvStopAuto() {
-  if (TV.autoTimer) { clearInterval(TV.autoTimer); TV.autoTimer = null; }
-  var btn = document.getElementById('tvAutoBtn');
-  if (btn) { btn.textContent = '⏵ Auto'; btn.style.background = 'rgba(59,110,245,.6)'; btn.style.borderColor = 'rgba(59,110,245,.8)'; }
+function tvStopAuto(){
+  if(TV.autoTimer){clearInterval(TV.autoTimer);TV.autoTimer=null;}
+  var b=document.getElementById('tvAutoBtn');
+  if(b){b.textContent='⏵ Auto';b.style.background='rgba(59,110,245,.6)';b.style.borderColor='rgba(59,110,245,.8)';}
 }
 
-// ── Controls hover show/hide ──────────────────────────────────
-var tvHideTimer = null;
-function tvShowControls() {
-  var ctrl = document.getElementById('tvControls');
-  var dots = document.getElementById('tvDots');
-  if (ctrl) ctrl.style.opacity = '1';
-  if (dots) dots.style.opacity = '1';
-  if (tvHideTimer) clearTimeout(tvHideTimer);
-  tvHideTimer = setTimeout(function() {
-    if (ctrl) ctrl.style.opacity = '0';
-    if (dots) dots.style.opacity = '0';
-  }, 3000);
+var tvHideTimer=null;
+function tvShowControls(){
+  var c=document.getElementById('tvControls'),d=document.getElementById('tvDots');
+  if(c)c.style.opacity='1'; if(d)d.style.opacity='1';
+  if(tvHideTimer)clearTimeout(tvHideTimer);
+  tvHideTimer=setTimeout(function(){if(c)c.style.opacity='0';if(d)d.style.opacity='0';},3000);
 }
-
-document.addEventListener('mousemove', function() {
-  if (document.getElementById('tvModal').style.display !== 'none') tvShowControls();
+document.addEventListener('mousemove',function(){if(document.getElementById('tvModal').style.display!=='none')tvShowControls();});
+document.addEventListener('keydown',function(e){
+  if(document.getElementById('tvModal').style.display==='none')return;
+  if(e.key==='ArrowRight'||e.key==='ArrowDown')tvNext();
+  if(e.key==='ArrowLeft' ||e.key==='ArrowUp')  tvPrev();
+  if(e.key==='Escape') tvClose();
+  if(e.key==='f'||e.key==='F') tvFullscreen();
+  if(e.key===' '){e.preventDefault();tvToggleAuto();}
 });
 
-// Keyboard navigation
-document.addEventListener('keydown', function(e) {
-  if (document.getElementById('tvModal').style.display === 'none') return;
-  if (e.key === 'ArrowRight' || e.key === 'ArrowDown') tvNext();
-  if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   tvPrev();
-  if (e.key === 'Escape')  tvClose();
-  if (e.key === 'f' || e.key === 'F') tvFullscreen();
-  if (e.key === ' ') { e.preventDefault(); tvToggleAuto(); }
-});
+function tvFullscreen(){
+  var el=document.getElementById('tvModal');
+  if(!document.fullscreenElement) el.requestFullscreen().catch(function(){});
+  else document.exitFullscreen();
+}
+document.addEventListener('fullscreenchange',function(){setTimeout(tvScaleSlide,100);});
 
-// ── Fullscreen ────────────────────────────────────────────────
-function tvFullscreen() {
-  var el = document.getElementById('tvModal');
-  if (!document.fullscreenElement) {
-    el.requestFullscreen().catch(function(){});
-  } else {
-    document.exitFullscreen();
+// ── DOWNLOAD HTML ─────────────────────────────────────────────
+function tvDownloadHTML() {
+  if (!TV.wKey) { toast('Pilih minggu terlebih dahulu.','err'); return; }
+  TV.slides = tvBuildSlides();
+  var tmpl = TV_TEMPLATES[TV.tpl-1];
+  var cl = TV_CLOSING[(TV.tpl-1)%TV_CLOSING.length];
+
+  var slideNames = ['Cover','Snack','Meal','Penutup'];
+
+  // Build self-contained HTML with all 4 slides as pages + auto-advance
+  var html = '<!DOCTYPE html>\n<html lang="id">\n<head>\n<meta charset="UTF-8">\n' +
+    '<meta name="viewport" content="width=device-width,initial-scale=1">\n' +
+    '<title>Menu Kantin · '+TV.wKey+' · '+tmpl.name+'</title>\n' +
+    '<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">\n' +
+    '<style>\n' +
+    '*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}\n' +
+    'html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:\'Inter\',system-ui,sans-serif;-webkit-font-smoothing:antialiased;}\n' +
+    '.stage{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:#000;}\n' +
+    '.slide{position:absolute;inset:0;opacity:0;transition:opacity .6s ease;display:flex;align-items:center;justify-content:center;}\n' +
+    '.slide.active{opacity:1;}\n' +
+    '.canvas{position:relative;overflow:hidden;font-family:\'Inter\',system-ui,sans-serif;}\n' +
+    // Nav overlay
+    '.nav{position:fixed;bottom:0;left:0;right:0;height:50px;display:flex;align-items:center;justify-content:center;gap:12px;' +
+      'background:linear-gradient(transparent,rgba(0,0,0,.6));z-index:100;opacity:0;transition:opacity .3s;}\n' +
+    'body:hover .nav{opacity:1;}\n' +
+    '.nav button{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);color:#fff;' +
+      'border-radius:6px;padding:5px 14px;font-size:11px;font-weight:600;cursor:pointer;font-family:\'Inter\',sans-serif;}\n' +
+    '.nav button:hover{background:rgba(255,255,255,.28);}\n' +
+    '.dots{display:flex;gap:6px;align-items:center;}\n' +
+    '.dot{width:8px;height:8px;border-radius:4px;background:rgba(255,255,255,.3);cursor:pointer;transition:all .25s;}\n' +
+    '.dot.active{width:24px;background:#fff;}\n' +
+    '.slide-lbl{font-size:10px;font-family:\'JetBrains Mono\',monospace;color:rgba(255,255,255,.4);min-width:120px;text-align:center;}\n' +
+    '</style>\n</head>\n<body>\n<div class="stage" id="stage">\n';
+
+  TV.slides.forEach(function(s, i) {
+    html += '<div class="slide'+(i===0?' active':'')+'" id="sl'+i+'">' + s + '</div>\n';
+  });
+
+  html += '</div>\n' +
+    '<div class="nav">\n' +
+    '  <button onclick="tvGo(cur-1)">←</button>\n' +
+    '  <div class="dots" id="dots"></div>\n' +
+    '  <span class="slide-lbl" id="lbl"></span>\n' +
+    '  <button id="autoBtn" onclick="toggleAuto()">⏵ Auto</button>\n' +
+    '  <button onclick="tvGo(cur+1)">→</button>\n' +
+    '</div>\n' +
+    '<script>\n' +
+    'var total='+TV.slides.length+',cur=0,timer=null;\n' +
+    'var names='+JSON.stringify(slideNames)+';\n' +
+    'function tvGo(i){i=((i%total)+total)%total;document.getElementById("sl"+cur).classList.remove("active");cur=i;document.getElementById("sl"+cur).classList.add("active");render();}\n' +
+    'function render(){\n' +
+    '  document.getElementById("lbl").textContent=names[cur]+" · "+(cur+1)+"/"+total;\n' +
+    '  var d=document.getElementById("dots");d.innerHTML="";\n' +
+    '  for(var i=0;i<total;i++){var b=document.createElement("div");b.className="dot"+(i===cur?" active":"");(function(idx){b.onclick=function(){tvGo(idx);};})(i);d.appendChild(b);}\n' +
+    '}\n' +
+    'function scaleSlides(){\n' +
+    '  var vw=window.innerWidth,vh=window.innerHeight;\n' +
+    '  var tw=Math.min(vw,vh*16/9),th=tw*9/16;\n' +
+    '  if(th>vh){th=vh;tw=th*16/9;}\n' +
+    '  document.querySelectorAll(".canvas").forEach(function(c){c.style.fontSize=(tw/1280*16)+"px";c.style.width=tw+"px";c.style.height=th+"px";});\n' +
+    '}\n' +
+    'function toggleAuto(){\n' +
+    '  if(timer){clearInterval(timer);timer=null;document.getElementById("autoBtn").textContent="⏵ Auto";}\n' +
+    '  else{timer=setInterval(function(){tvGo(cur+1);},7000);document.getElementById("autoBtn").textContent="⏸ Stop";}\n' +
+    '}\n' +
+    'document.addEventListener("keydown",function(e){\n' +
+    '  if(e.key==="ArrowRight"||e.key==="ArrowDown")tvGo(cur+1);\n' +
+    '  if(e.key==="ArrowLeft"||e.key==="ArrowUp")tvGo(cur-1);\n' +
+    '  if(e.key===" "){e.preventDefault();toggleAuto();}\n' +
+    '});\n' +
+    'window.addEventListener("resize",scaleSlides);\n' +
+    'scaleSlides(); render();\n' +
+    '<\/script>\n</body>\n</html>';
+
+  // Trigger download
+  var blob = new Blob([html], {type:'text/html;charset=utf-8'});
+  var url  = URL.createObjectURL(blob);
+  var a    = document.createElement('a');
+  a.href   = url;
+  a.download = 'menu-kantin-'+TV.wKey+'-'+tmpl.name.toLowerCase().replace(/\s+/g,'-')+'.html';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  toast('File HTML berhasil didownload!','ok');
+}
+
+// ── DOWNLOAD MP4 — Canvas + MediaRecorder ────────────────────
+var MP4_CANCELLED = false;
+
+function tvDownloadMP4() {
+  if (!TV.wKey) { toast('Pilih minggu terlebih dahulu.','err'); return; }
+  if (typeof MediaRecorder === 'undefined') {
+    toast('Browser tidak mendukung rekam video. Gunakan Chrome/Edge.','err'); return;
   }
+  var mimeType = '';
+  ['video/webm;codecs=vp9','video/webm;codecs=vp8','video/webm','video/mp4'].forEach(function(m){
+    if(!mimeType && MediaRecorder.isTypeSupported(m)) mimeType=m;
+  });
+  if (!mimeType) { toast('Browser tidak mendukung video recording.','err'); return; }
+
+  TV.slides = tvBuildSlides();
+  MP4_CANCELLED = false;
+  mp4ShowOverlay();
+
+  var tmpl = TV_TEMPLATES[TV.tpl-1];
+  var ext = mimeType.includes('mp4')?'.mp4':'.webm';
+  var fileName = 'menu-kantin-'+TV.wKey+'-'+tmpl.name.toLowerCase().replace(/\s+/g,'-')+ext;
+
+  var W=1280, H=720, FPS=30, SLIDE_DUR=7;
+  var TRANS_FRAMES = Math.round(FPS*0.7);
+  var totalFrames  = TV.slides.length * FPS * SLIDE_DUR;
+
+  var canvas = document.createElement('canvas');
+  canvas.width=W; canvas.height=H;
+  var ctx = canvas.getContext('2d');
+  ctx.imageSmoothingEnabled=true; ctx.imageSmoothingQuality='high';
+
+  var chunks=[];
+  var stream=canvas.captureStream(FPS);
+  var recorder=new MediaRecorder(stream,{mimeType:mimeType,videoBitsPerSecond:8000000});
+  recorder.ondataavailable=function(e){if(e.data.size>0)chunks.push(e.data);};
+  recorder.onstop=function(){
+    mp4SetStatus('Menyiapkan file download…',99);
+    var blob=new Blob(chunks,{type:mimeType});
+    var url=URL.createObjectURL(blob);
+    var a=document.createElement('a'); a.href=url; a.download=fileName;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(function(){URL.revokeObjectURL(url);},3000);
+    mp4HideOverlay();
+    toast('Video '+fileName+' berhasil didownload!','ok');
+  };
+  recorder.start(200);
+
+  mp4SetStatus('Merender slide ke gambar…',2);
+  mp4RenderToImages(TV.slides, W, H, function(images){
+    if(MP4_CANCELLED){recorder.stop();mp4HideOverlay();return;}
+    mp4SetStatus('Encoding video…',10);
+    mp4EncodeFrames(ctx,images,W,H,FPS,SLIDE_DUR,TRANS_FRAMES,totalFrames,recorder);
+  });
 }
 
-document.addEventListener('fullscreenchange', function() {
-  setTimeout(tvScaleSlide, 100);
-});
+function mp4RenderToImages(slides,W,H,callback){
+  var images=[], idx=0;
+  var bgColors=['#020818','#1a0800','#011208','#0d0d0d'];
+
+  function next(){
+    if(MP4_CANCELLED||idx>=slides.length){callback(images);return;}
+    mp4SetStatus('Merender slide '+(idx+1)+'/'+slides.length+'…', Math.round(idx/slides.length*7)+2);
+
+    // Build minimal inline HTML — no external fonts to avoid CORS issues
+    var slideHtml = slides[idx];
+    var inlineDoc =
+      '<!DOCTYPE html><html><head><meta charset="UTF-8">'+
+      '<style>'+
+        '*{box-sizing:border-box;margin:0;padding:0;}'+
+        'html,body{width:'+W+'px;height:'+H+'px;overflow:hidden;background:#000;}'+
+        '.tv-slide-canvas{width:'+W+'px!important;height:'+H+'px!important;'+
+          'font-size:'+(W/1280*16)+'px!important;position:relative;overflow:hidden;display:block;}'+
+        // Embed generic fallback fonts
+        'body{font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;}'+
+        'code,pre,[style*="JetBrains"],[style*="monospace"]{font-family:"Courier New",Courier,monospace;}'+
+      '</style></head><body>'+slideHtml+'</body></html>';
+
+    // SVG foreignObject approach
+    var svgStr =
+      '<svg xmlns="http://www.w3.org/2000/svg" width="'+W+'" height="'+H+'">'+
+      '<foreignObject width="100%" height="100%">'+
+      '<div xmlns="http://www.w3.org/1999/xhtml">'+inlineDoc+'</div>'+
+      '</foreignObject></svg>';
+
+    var img=new Image();
+    img.onload=function(){
+      images.push(img);
+      idx++;
+      setTimeout(next,80);
+    };
+    img.onerror=function(){
+      // Fallback: draw colored rect with text
+      var fb=document.createElement('canvas'); fb.width=W; fb.height=H;
+      var fc=fb.getContext('2d');
+      fc.fillStyle=bgColors[(TV.tpl-1)%bgColors.length];
+      fc.fillRect(0,0,W,H);
+      fc.fillStyle='rgba(255,255,255,.8)';
+      fc.font='bold '+(H/12)+'px system-ui,sans-serif';
+      fc.textAlign='center'; fc.textBaseline='middle';
+      var labels=['MENU KANTIN','MENU SNACK','MENU MAKAN','TERIMA KASIH'];
+      fc.fillText(labels[idx]||'Slide '+(idx+1), W/2, H/2);
+      fc.font=(H/24)+'px system-ui,sans-serif';
+      fc.fillStyle='rgba(255,255,255,.45)';
+      fc.fillText(TV.wKey+' · '+TV.period, W/2, H/2+(H/9));
+      var fallbackImg=new Image();
+      fallbackImg.src=fb.toDataURL('image/png');
+      fallbackImg.onload=function(){images.push(fallbackImg);idx++;setTimeout(next,80);};
+    };
+    var blob=new Blob([svgStr],{type:'image/svg+xml;charset=utf-8'});
+    var url=URL.createObjectURL(blob);
+    img.src=url;
+    setTimeout(function(){URL.revokeObjectURL(url);},5000);
+  }
+  next();
+}
+
+function mp4EncodeFrames(ctx,images,W,H,FPS,slideDur,transFrames,totalFrames,recorder){
+  var slideCount=TV.slides.length;
+  var slideFrames=FPS*slideDur;
+  var frame=0;
+
+  function renderNext(){
+    if(MP4_CANCELLED){recorder.stop();mp4HideOverlay();return;}
+    if(frame>=totalFrames){recorder.stop();return;}
+
+    var slideIdx=Math.floor(frame/slideFrames)%slideCount;
+    var frameInSlide=frame%slideFrames;
+    var nextIdx=(slideIdx+1)%slideCount;
+
+    ctx.fillStyle='#000'; ctx.fillRect(0,0,W,H);
+
+    // Crossfade logic
+    if(frameInSlide<transFrames && frame>=slideFrames){
+      // Fading into current slide
+      var a=frameInSlide/transFrames;
+      if(images[nextIdx]) ctx.globalAlpha=1-a; else ctx.globalAlpha=1;
+      if(images[(slideIdx-1+slideCount)%slideCount]) ctx.drawImage(images[(slideIdx-1+slideCount)%slideCount],0,0,W,H);
+      ctx.globalAlpha=a;
+      if(images[slideIdx]) ctx.drawImage(images[slideIdx],0,0,W,H);
+    } else if(frameInSlide>=slideFrames-transFrames){
+      // Fading out of current slide
+      var a2=(frameInSlide-(slideFrames-transFrames))/transFrames;
+      ctx.globalAlpha=1;
+      if(images[slideIdx]) ctx.drawImage(images[slideIdx],0,0,W,H);
+      ctx.globalAlpha=a2;
+      ctx.fillStyle='#000'; ctx.fillRect(0,0,W,H);
+    } else {
+      ctx.globalAlpha=1;
+      if(images[slideIdx]) ctx.drawImage(images[slideIdx],0,0,W,H);
+    }
+    ctx.globalAlpha=1;
+
+    // Progress update every 30 frames
+    if(frame%30===0){
+      var pct=Math.round(frame/totalFrames*85)+13;
+      var elapsed=(frame/FPS).toFixed(0);
+      var remain=Math.max(0,(totalFrames-frame)/FPS).toFixed(0);
+      mp4SetStatus('Slide '+(slideIdx+1)+'/'+slideCount+' · '+elapsed+'s / '+(totalFrames/FPS).toFixed(0)+'s · ~'+remain+'s tersisa',pct);
+    }
+    frame++;
+    setTimeout(renderNext,0);
+  }
+  renderNext();
+}
+
+function mp4ShowOverlay(){
+  document.getElementById('mp4Overlay').classList.add('show');
+  mp4SetStatus('Initializing…',0);
+  document.getElementById('mp4CancelBtn').disabled=false;
+  document.getElementById('mp4SubTitle').textContent=
+    TV.wKey+' · '+(TV_TEMPLATES[TV.tpl-1]||{}).name+' · 4 slides · 1280×720';
+}
+function mp4HideOverlay(){ document.getElementById('mp4Overlay').classList.remove('show'); }
+function mp4SetStatus(txt,pct){
+  document.getElementById('mp4Status').textContent=txt;
+  document.getElementById('mp4Bar').style.width=pct+'%';
+  document.getElementById('mp4Pct').textContent=pct+'%';
+}
+function tvMP4Cancel(){
+  MP4_CANCELLED=true;
+  document.getElementById('mp4CancelBtn').disabled=true;
+  document.getElementById('mp4Status').textContent='Membatalkan…';
+  setTimeout(mp4HideOverlay,900);
+  toast('Download MP4 dibatalkan.','');
+}
+
 
 // ── Fill TV week selector ─────────────────────────────────────
 function tvFillWeekSel() {
@@ -2531,7 +2807,7 @@ function tvFillWeekSel() {
   var cur = sel.value;
   sel.innerHTML = '<option value="">-- Pilih Minggu --</option>';
   (DATA.availableWeeks||[]).filter(function(w){
-    return w.value && !w.value.includes('NaN') && /^W\d{4}-\d{2}$/.test(w.value);
+    return w.value&&!w.value.includes('NaN')&&/^W\d{4}-\d{2}$/.test(w.value);
   }).forEach(function(w){
     sel.innerHTML += '<option value="'+w.value+'"'+(w.value===cur?' selected':'')+'>'+w.value+' · '+(w.label||'')+'</option>';
   });
