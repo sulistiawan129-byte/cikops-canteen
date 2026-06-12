@@ -2681,10 +2681,11 @@ function tvDownloadHTML() {
   toast('File HTML berhasil didownload!','ok');
 }
 
-// ── DOWNLOAD JPG — Canvas render per slide ───────────────────
-// Renders each slide as a 1920×1080 JPG and downloads all 4.
+// ── DOWNLOAD JPG — Direct Canvas 2D rendering (no foreignObject) ──
+// Draws each slide directly to canvas using Canvas 2D API,
+// so there are no CORS / tainted-canvas issues at all.
 
-var MP4_CANCELLED = false;  // reuse cancel flag
+var MP4_CANCELLED = false;
 
 function tvDownloadJPG() {
   if (!TV.wKey) { toast('Pilih minggu terlebih dahulu.','err'); return; }
@@ -2699,117 +2700,490 @@ function tvDownloadJPG() {
   mp4ShowOverlay();
   document.getElementById('mp4SubTitle').textContent =
     TV.wKey+' · '+tmpl.name+' · 4 slide · 1920×1080px';
-  document.getElementById('mp4Pct').textContent = '';
-  mp4SetStatus('Menyiapkan render…', 3);
 
   var idx = 0;
 
   function renderNext() {
     if (MP4_CANCELLED) { mp4HideOverlay(); return; }
-    if (idx >= TV.slides.length) {
+    if (idx >= 4) {
       mp4HideOverlay();
-      toast('✅ '+TV.slides.length+' file JPG berhasil didownload!', 'ok');
+      toast('✅ 4 file JPG berhasil didownload!','ok');
       return;
     }
+    var pct = Math.round(idx / 4 * 90) + 5;
+    mp4SetStatus('Rendering slide '+(idx+1)+' / 4 …', pct);
 
-    var pct = Math.round(idx / TV.slides.length * 90) + 5;
-    mp4SetStatus('Rendering slide '+(idx+1)+' / '+TV.slides.length+' …', pct);
+    // Small timeout so UI updates
+    setTimeout(function() {
+      var slideIdx = idx;
+      var canvas = tvDrawSlideToCanvas(slideIdx, W, H);
+      var dataUrl = canvas.toDataURL('image/jpeg', 0.95);
 
-    tvRenderSlideToJPG(TV.slides[idx], W, H, function(dataUrl) {
-      if (MP4_CANCELLED) { mp4HideOverlay(); return; }
-
-      // Trigger download
       var a = document.createElement('a');
       a.href = dataUrl;
-      a.download = base+'-'+String(idx+1).padStart(2,'0')+'-'+labels[idx]+'.jpg';
+      a.download = base+'-'+String(slideIdx+1).padStart(2,'0')+'-'+labels[slideIdx]+'.jpg';
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
 
       idx++;
-      // Small delay so browser can process the download
-      setTimeout(renderNext, 600);
-    });
+      setTimeout(renderNext, 800);
+    }, 60);
   }
 
   renderNext();
 }
 
-// Render one slide HTML string to a JPG data URL at W×H
-function tvRenderSlideToJPG(slideHtml, W, H, callback) {
+// ── Draw a slide directly to canvas using Canvas 2D API ─────────────────
+// Each slide type has a dedicated draw function.
+function tvDrawSlideToCanvas(slideIdx, W, H) {
   var canvas = document.createElement('canvas');
-  canvas.width  = W;
-  canvas.height = H;
+  canvas.width = W; canvas.height = H;
   var ctx = canvas.getContext('2d');
   ctx.imageSmoothingEnabled = true;
   ctx.imageSmoothingQuality = 'high';
 
-  // Inline styles needed (no external fonts to avoid CORS)
-  var inlineCSS =
-    '*{box-sizing:border-box;margin:0;padding:0;}' +
-    'html,body{width:'+W+'px;height:'+H+'px;overflow:hidden;background:#000;}' +
-    '.tv-slide-canvas{width:'+W+'px!important;height:'+H+'px!important;' +
-      'font-size:'+(W/1280*16)+'px!important;' +
-      'position:relative;overflow:hidden;display:block;}' +
-    'body{font-family:system-ui,-apple-system,"Segoe UI",sans-serif;}' +
-    // inline monospace fallback
-    '[style*="JetBrains"]{font-family:"Courier New",Courier,monospace!important;}';
+  var t   = TV.tpl;
+  var acc = tvAcc(t), textC = tvText(t), subC = tvSub(t);
+  var bgColors = {
+    1: ['#020818','#0a1628','#0c1f45'],
+    2: ['#1a0800','#7c2d12','#c2410c'],
+    3: ['#011208','#052e16','#064e24'],
+    4: ['#0d0d0d','#1a0f2e','#0d0d0d']
+  }[t] || ['#020818','#0a1628','#0c1f45'];
 
-  var fullDoc =
-    '<!DOCTYPE html><html><head><meta charset="UTF-8">'+
-    '<style>'+inlineCSS+'</style>'+
-    '</head><body>'+slideHtml+'</body></html>';
+  var hdrBg   = ['','#0f2057','#6b1e07','#0a3d1f','#130d20'][t]||'#0f2057';
+  var hdrLine = ['','#3b82f6','#f97316','#22c55e','#a78bfa'][t]||'#3b82f6';
+  var tagBg   = ['','rgba(59,130,246,.25)','rgba(249,115,22,.25)','rgba(34,197,94,.22)','rgba(167,139,250,.22)'][t]||'rgba(59,130,246,.25)';
+  var mutedC  = tvMuted(t), borderC = tvBorder(t);
 
-  var svgStr =
-    '<svg xmlns="http://www.w3.org/2000/svg" width="'+W+'" height="'+H+'">'+
-    '<foreignObject width="100%" height="100%">'+
-      '<div xmlns="http://www.w3.org/1999/xhtml">'+fullDoc+'</div>'+
-    '</foreignObject></svg>';
+  // ── Draw gradient background ─────────────────────────────────
+  var grad = ctx.createLinearGradient(0,0,W,H);
+  if(t===4) {
+    grad = ctx.createRadialGradient(W*0.2,H*0.5,0,W*0.5,H*0.5,W*0.7);
+    grad.addColorStop(0, bgColors[1]);
+    grad.addColorStop(1, bgColors[0]);
+  } else {
+    grad.addColorStop(0, bgColors[0]);
+    grad.addColorStop(0.5, bgColors[1]);
+    grad.addColorStop(1, bgColors[2]);
+  }
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, W, H);
 
-  var img = new Image();
-  img.onload = function() {
-    ctx.drawImage(img, 0, 0, W, H);
-    URL.revokeObjectURL(img.src);
-    // Export as JPG quality 0.95
-    callback(canvas.toDataURL('image/jpeg', 0.95));
-  };
-  img.onerror = function() {
-    URL.revokeObjectURL(img.src);
-    // Fallback: plain colored canvas
-    var bg = ['#020818','#1a0800','#011208','#0d0d0d'][(TV.tpl-1)%4];
-    ctx.fillStyle = bg;
-    ctx.fillRect(0, 0, W, H);
-    ctx.fillStyle = '#fff';
-    ctx.font = 'bold 80px system-ui,sans-serif';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText('Slide render error', W/2, H/2);
-    callback(canvas.toDataURL('image/jpeg', 0.9));
-  };
-  var blob = new Blob([svgStr], {type:'image/svg+xml;charset=utf-8'});
-  img.src  = URL.createObjectURL(blob);
+  // ── Template-specific decorations ────────────────────────────
+  if (t===1) {
+    // Glowing circle top-right
+    var rg = ctx.createRadialGradient(W*0.85,H*0.15,0,W*0.85,H*0.15,W*0.35);
+    rg.addColorStop(0,'rgba(29,78,216,.3)'); rg.addColorStop(1,'rgba(29,78,216,0)');
+    ctx.fillStyle=rg; ctx.fillRect(0,0,W,H);
+    // Stars
+    var stars=[[80,60],[200,120],[420,45],[610,90],[800,30],[960,110],[1100,60],[1350,80],[1500,40],[1700,100],[1850,70],[300,200],[700,180],[1200,190],[1650,160]];
+    stars.forEach(function(s){
+      ctx.beginPath(); ctx.arc(s[0],s[1],Math.random()*2.5+1.5,0,Math.PI*2);
+      ctx.fillStyle='rgba(255,255,255,'+(Math.random()*0.4+0.3)+')'; ctx.fill();
+    });
+  } else if (t===2) {
+    // Top color band
+    var tg=ctx.createLinearGradient(0,0,W,0);
+    tg.addColorStop(0,'rgba(251,191,36,.5)'); tg.addColorStop(0.5,'rgba(249,115,22,.3)'); tg.addColorStop(1,'rgba(239,68,68,.2)');
+    ctx.fillStyle=tg; ctx.fillRect(0,0,W,8);
+    // Dark right panel
+    ctx.save(); ctx.beginPath();
+    ctx.moveTo(W*0.6,0); ctx.lineTo(W,0); ctx.lineTo(W,H); ctx.lineTo(W*0.45,H); ctx.closePath();
+    ctx.fillStyle='rgba(0,0,0,.2)'; ctx.fill(); ctx.restore();
+  } else if (t===3) {
+    var rg3=ctx.createRadialGradient(W*0.85,H*0.15,0,W*0.85,H*0.15,W*0.55);
+    rg3.addColorStop(0,'rgba(74,222,128,.12)'); rg3.addColorStop(1,'rgba(74,222,128,0)');
+    ctx.fillStyle=rg3; ctx.fillRect(0,0,W,H);
+  } else if (t===4) {
+    // Left gold/purple stripe
+    var sg=ctx.createLinearGradient(0,0,0,H);
+    sg.addColorStop(0,'#e9d5a1'); sg.addColorStop(0.5,'#d4a854'); sg.addColorStop(1,'#a78bfa');
+    ctx.fillStyle=sg; ctx.fillRect(0,0,10,H);
+    // Right circle glow
+    var rg4=ctx.createRadialGradient(W*0.88,H*0.5,0,W*0.88,H*0.5,W*0.2);
+    rg4.addColorStop(0,'rgba(167,139,250,.12)'); rg4.addColorStop(1,'rgba(167,139,250,0)');
+    ctx.fillStyle=rg4; ctx.fillRect(0,0,W,H);
+  }
+
+  // ── Per-slide content ─────────────────────────────────────────
+  var PX = t===4 ? W*0.072 : W*0.06; // left padding px
+  var SF = W/1280; // scale factor (design base = 1280)
+
+  if (slideIdx === 0) {
+    // COVER
+    tvDrawCover(ctx,W,H,PX,SF,t,textC,acc,subC,hdrLine,mutedC,borderC);
+  } else if (slideIdx === 1) {
+    // SNACK
+    tvDrawMenuGrid(ctx,W,H,PX,SF,t,'snack',textC,acc,subC,hdrBg,hdrLine,tagBg,mutedC,borderC);
+  } else if (slideIdx === 2) {
+    // MEAL
+    tvDrawMenuGrid(ctx,W,H,PX,SF,t,'meal',textC,acc,subC,hdrBg,hdrLine,tagBg,mutedC,borderC);
+  } else {
+    // CLOSING
+    tvDrawClosing(ctx,W,H,PX,SF,t,textC,acc,subC,mutedC,borderC);
+  }
+
+  return canvas;
+}
+
+// ── Helper: draw text with word-wrap ─────────────────────────
+function tvCtxText(ctx, text, x, y, maxW, lineH, maxLines) {
+  var words = String(text||'').split(' ');
+  var line = '', lines = [];
+  words.forEach(function(w) {
+    var test = line ? line+' '+w : w;
+    if (ctx.measureText(test).width > maxW && line) {
+      lines.push(line); line = w;
+    } else { line = test; }
+  });
+  if (line) lines.push(line);
+  if (maxLines) lines = lines.slice(0, maxLines);
+  lines.forEach(function(l, i) { ctx.fillText(l, x, y + i * lineH); });
+  return lines.length;
+}
+
+// ── Rounded rect helper ───────────────────────────────────────
+function tvRRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x+r,y); ctx.lineTo(x+w-r,y);
+  ctx.quadraticCurveTo(x+w,y,x+w,y+r);
+  ctx.lineTo(x+w,y+h-r); ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);
+  ctx.lineTo(x+r,y+h); ctx.quadraticCurveTo(x,y+h,x,y+h-r);
+  ctx.lineTo(x,y+r); ctx.quadraticCurveTo(x,y,x+r,y);
+  ctx.closePath();
+}
+
+// ── COVER slide ───────────────────────────────────────────────
+function tvDrawCover(ctx,W,H,PX,SF,t,textC,acc,subC,hdrLine,mutedC,borderC) {
+  var x = PX, y = H*0.28;
+
+  // Eyebrow
+  ctx.font = 'bold '+(14*SF)+'px "Courier New",monospace';
+  ctx.fillStyle = subC;
+  ctx.letterSpacing = (3*SF)+'px';
+  ctx.fillText('PT FRISIAN FLAG INDONESIA  ·  CIKARANG PLANT  ·  VENDOR GDSK', x, y);
+  ctx.letterSpacing = '0px';
+
+  // Main title
+  y += 30*SF;
+  ctx.font = '900 '+(108*SF)+'px system-ui,sans-serif';
+  ctx.fillStyle = textC;
+  ctx.fillText('MENU', x, y + 108*SF);
+  ctx.fillStyle = acc;
+  ctx.fillText('KANTIN', x, y + 220*SF);
+
+  // Period
+  y = H*0.72;
+  ctx.font = '500 '+(28*SF)+'px "Courier New",monospace';
+  ctx.fillStyle = subC;
+  ctx.fillText(TV.period, x, y);
+
+  // Week badge (pill)
+  y += 20*SF;
+  var badgeTxt = TV.wKey+'  ·  Senin – Minggu';
+  ctx.font = 'bold '+(18*SF)+'px "Courier New",monospace';
+  var bw = ctx.measureText(badgeTxt).width + 48*SF;
+  var bh = 40*SF, bx = x, by = y+10*SF;
+  ctx.fillStyle = 'rgba(255,255,255,.08)';
+  tvRRect(ctx, bx, by, bw, bh, 20*SF);
+  ctx.fill();
+  ctx.strokeStyle = borderC; ctx.lineWidth = 1.5;
+  tvRRect(ctx, bx, by, bw, bh, 20*SF); ctx.stroke();
+  // dot
+  ctx.beginPath(); ctx.arc(bx+20*SF, by+bh/2, 5*SF, 0, Math.PI*2);
+  ctx.fillStyle = acc; ctx.fill();
+  ctx.fillStyle = acc;
+  ctx.font = 'bold '+(17*SF)+'px "Courier New",monospace';
+  ctx.fillText(badgeTxt, bx+36*SF, by+bh/2+6*SF);
+}
+
+// ── MENU GRID slide (snack or meal) ──────────────────────────
+function tvDrawMenuGrid(ctx,W,H,PX,SF,t,type,textC,acc,subC,hdrBg,hdrLine,tagBg,mutedC,borderC) {
+  var isSnack = type==='snack';
+  var title   = isSnack?'MENU SNACK':'MENU MAKAN';
+  var subtitle= isSnack?'Lezat, Bergizi, Energi Positif Setiap Hari!':'Pilih Lauk Favoritmu, Nikmati Setiap Hari!';
+  var icon    = isSnack?'🥐':'🍱';
+
+  // ── Header ──────────────────────────────────────────────────
+  var hdrY = H*0.05;
+  // Separator line under header
+  ctx.strokeStyle = borderC; ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.moveTo(PX, hdrY+62*SF); ctx.lineTo(W-PX, hdrY+62*SF); ctx.stroke();
+
+  ctx.font = '900 '+(46*SF)+'px system-ui,sans-serif';
+  ctx.fillStyle = textC;
+  ctx.fillText(icon+'  '+title, PX, hdrY+50*SF);
+
+  ctx.font = (14*SF)+'px system-ui,sans-serif';
+  ctx.fillStyle = subC;
+  ctx.fillText(subtitle, PX, hdrY+72*SF);
+
+  // Week key top-right
+  ctx.font = 'bold '+(16*SF)+'px "Courier New",monospace';
+  ctx.fillStyle = acc;
+  ctx.textAlign = 'right';
+  ctx.fillText(TV.wKey, W-PX, hdrY+46*SF);
+  ctx.font = (13*SF)+'px "Courier New",monospace';
+  ctx.fillStyle = subC; ctx.globalAlpha=0.6;
+  ctx.fillText(TV.period, W-PX, hdrY+66*SF);
+  ctx.globalAlpha=1; ctx.textAlign='left';
+
+  // ── Day cards ────────────────────────────────────────────────
+  // Row 1: Mon–Thu (4 cards), Row 2: Fri–Sun (3 cards)
+  var dayEntries = [];
+  for (var di=0;di<7;di++) {
+    var dt=new Date(TV.mon); dt.setDate(TV.mon.getDate()+di);
+    var dk=dt.getFullYear()+'-'+String(dt.getMonth()+1).padStart(2,'0')+'-'+String(dt.getDate()).padStart(2,'0');
+    var d=TV.byDate[dk]||{snack:[],meal:[]};
+    dayEntries.push({di:di,dt:dt,entries:d[type]||[]});
+  }
+
+  var gridX = PX, gridW = W - PX*2;
+  var gap   = 12*SF;
+  var rowY1 = H*0.135, rowH1 = H*0.385;
+  var rowY2 = rowY1 + rowH1 + gap, rowH2 = H*0.36;
+
+  // Row 1: 4 cards
+  var cw1 = (gridW - gap*3) / 4;
+  for (var i=0;i<4;i++) {
+    var cx = gridX + i*(cw1+gap);
+    tvDrawDayCard(ctx, cx, rowY1, cw1, rowH1, SF, dayEntries[i], isSnack, hdrBg, hdrLine, tagBg, mutedC, borderC, textC, acc, subC, t);
+  }
+  // Row 2: 3 cards
+  var cw2 = (gridW - gap*2) / 3;
+  for (var j=0;j<3;j++) {
+    var cx2 = gridX + j*(cw2+gap);
+    tvDrawDayCard(ctx, cx2, rowY2, cw2, rowH2, SF, dayEntries[4+j], isSnack, hdrBg, hdrLine, tagBg, mutedC, borderC, textC, acc, subC, t);
+  }
+
+  // ── Bottom strip ─────────────────────────────────────────────
+  var stripY = rowY2 + rowH2 + gap;
+  var stripH = H - stripY - 18*SF;
+  if (stripH > 18*SF) {
+    var dotCol = tvAcc(t);
+    ctx.fillStyle = tagBg;
+    tvRRect(ctx, gridX, stripY, gridW, stripH, 8*SF); ctx.fill();
+    ctx.strokeStyle = borderC; ctx.lineWidth=1.5;
+    tvRRect(ctx, gridX, stripY, gridW, stripH, 8*SF); ctx.stroke();
+
+    ctx.font = 'bold '+(14*SF)+'px system-ui,sans-serif';
+    ctx.fillStyle = acc;
+    ctx.fillText(isSnack ? subtitle : 'SETIAP HARI', gridX+20*SF, stripY+stripH/2+5*SF);
+
+    if (!isSnack) {
+      // Collect week pelengkap
+      var weekPel={};
+      for (var wi=0;wi<7;wi++) {
+        (dayEntries[wi].entries||[]).forEach(function(e){
+          (e.components||[]).forEach(function(c){if(c.trim())weekPel[c.toLowerCase()]=cap(c.trim());});
+        });
+      }
+      var pList=Object.values(weekPel).slice(0,8);
+      var sepW = ctx.measureText('SETIAP HARI').width + 36*SF;
+      ctx.fillStyle = borderC; ctx.fillRect(gridX+20*SF+sepW, stripY+10*SF, 1.5, stripH-20*SF);
+      ctx.font = '600 '+(14*SF)+'px system-ui,sans-serif';
+      ctx.fillStyle = textC;
+      var px = gridX+20*SF+sepW+16*SF;
+      pList.forEach(function(p, pi) {
+        ctx.fillText(p, px, stripY+stripH/2+5*SF);
+        px += ctx.measureText(p).width;
+        if (pi < pList.length-1) {
+          ctx.fillStyle = subC; ctx.globalAlpha=0.5;
+          ctx.fillText('  ·  ', px, stripY+stripH/2+5*SF);
+          px += ctx.measureText('  ·  ').width;
+          ctx.globalAlpha=1; ctx.fillStyle=textC;
+        }
+      });
+    }
+  }
+}
+
+// ── Draw one day card ─────────────────────────────────────────
+function tvDrawDayCard(ctx, x, y, w, h, SF, dayData, isSnack, hdrBg, hdrLine, tagBg, mutedC, borderC, textC, acc, subC, t) {
+  var entries = dayData.entries || [];
+  var dayFull = TV_DAYS[dayData.di];
+  var dateStr = dayData.dt.toLocaleDateString('id-ID',{day:'2-digit',month:'short'});
+  var dotCol  = tvAcc(t);
+  var r = 8*SF;
+
+  // Card background
+  ctx.fillStyle = mutedC;
+  tvRRect(ctx, x, y, w, h, r); ctx.fill();
+  ctx.strokeStyle = borderC; ctx.lineWidth = 1.5;
+  tvRRect(ctx, x, y, w, h, r); ctx.stroke();
+
+  // Card header background
+  var hdrH = 38*SF;
+  ctx.fillStyle = hdrBg;
+  ctx.save(); ctx.beginPath();
+  ctx.moveTo(x+r,y); ctx.lineTo(x+w-r,y);
+  ctx.quadraticCurveTo(x+w,y,x+w,y+r);
+  ctx.lineTo(x+w,y+hdrH); ctx.lineTo(x,y+hdrH); ctx.lineTo(x,y+r);
+  ctx.quadraticCurveTo(x,y,x+r,y); ctx.closePath();
+  ctx.fill(); ctx.restore();
+
+  // Header bottom accent line
+  ctx.fillStyle = hdrLine; ctx.fillRect(x, y+hdrH-3, w, 3);
+
+  // Day dot
+  ctx.beginPath(); ctx.arc(x+12*SF, y+hdrH/2, 5*SF, 0, Math.PI*2);
+  ctx.fillStyle = dotCol; ctx.fill();
+
+  // Day name
+  ctx.font = 'bold '+(15*SF)+'px system-ui,sans-serif';
+  ctx.fillStyle = '#fff';
+  ctx.fillText(dayFull.toUpperCase(), x+22*SF, y+hdrH/2+5.5*SF);
+
+  // Date right-aligned
+  ctx.font = (12*SF)+'px "Courier New",monospace';
+  ctx.fillStyle = 'rgba(255,255,255,.55)';
+  ctx.textAlign = 'right';
+  ctx.fillText(dateStr, x+w-10*SF, y+hdrH/2+5*SF);
+  ctx.textAlign = 'left';
+
+  // Body content
+  var bx = x+10*SF, by = y+hdrH+12*SF;
+  var bw = w-20*SF;
+
+  if (!entries.length) {
+    ctx.font = 'italic '+(13*SF)+'px system-ui,sans-serif';
+    ctx.fillStyle = subC; ctx.globalAlpha=0.4;
+    ctx.fillText('—', bx+bw/2, by+h*0.3);
+    ctx.globalAlpha=1;
+    return;
+  }
+
+  if (isSnack) {
+    var e = entries[0];
+    // Menu name
+    ctx.font = 'bold '+(16*SF)+'px system-ui,sans-serif';
+    ctx.fillStyle = textC;
+    var nLines = tvCtxText(ctx, cap(e.menuName), bx, by+16*SF, bw, 20*SF, 2);
+    // Separator
+    var sepY = by + nLines*20*SF + 20*SF;
+    ctx.strokeStyle = borderC; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(bx,sepY); ctx.lineTo(bx+bw,sepY); ctx.stroke();
+    // Components
+    var cy = sepY+14*SF;
+    (e.components||[]).slice(0,4).forEach(function(c) {
+      if (cy > y+h-10*SF) return;
+      ctx.beginPath(); ctx.arc(bx+5*SF, cy-4*SF, 3*SF, 0, Math.PI*2);
+      ctx.fillStyle = dotCol; ctx.fill();
+      ctx.font = (12*SF)+'px system-ui,sans-serif';
+      ctx.fillStyle = subC;
+      tvCtxText(ctx, cap(c), bx+14*SF, cy, bw-14*SF, 16*SF, 1);
+      cy += 18*SF;
+    });
+  } else {
+    // Lauk numbered list
+    var ly = by+12*SF;
+    entries.forEach(function(e, i) {
+      if (ly > y+h-10*SF) return;
+      // Number badge
+      var numW = 22*SF, numH = 18*SF;
+      ctx.fillStyle = tagBg;
+      tvRRect(ctx, bx, ly-numH+4*SF, numW, numH, 4*SF); ctx.fill();
+      ctx.strokeStyle = borderC; ctx.lineWidth=1;
+      tvRRect(ctx, bx, ly-numH+4*SF, numW, numH, 4*SF); ctx.stroke();
+      ctx.font = 'bold '+(11*SF)+'px "Courier New",monospace';
+      ctx.fillStyle = acc;
+      ctx.textAlign='center';
+      ctx.fillText(i+1, bx+numW/2, ly);
+      ctx.textAlign='left';
+      // Lauk name
+      ctx.font = 'bold '+(14*SF)+'px system-ui,sans-serif';
+      ctx.fillStyle = textC;
+      var nl = tvCtxText(ctx, cap(e.menuName), bx+numW+8*SF, ly, bw-numW-8*SF, 17*SF, 2);
+      ly += nl*17*SF + 10*SF;
+    });
+    // Pelengkap
+    var allC={};
+    entries.forEach(function(e){(e.components||[]).forEach(function(c){if(c.trim())allC[c.toLowerCase()]=cap(c.trim());});});
+    var pL=Object.values(allC).slice(0,4);
+    if (pL.length && ly < y+h-20*SF) {
+      ctx.strokeStyle = borderC; ctx.lineWidth=1; ctx.setLineDash([4,3]);
+      ctx.beginPath(); ctx.moveTo(bx,ly+4*SF); ctx.lineTo(bx+bw,ly+4*SF); ctx.stroke();
+      ctx.setLineDash([]);
+      ly += 14*SF;
+      var px2=bx;
+      pL.forEach(function(p) {
+        if (px2 > bx+bw-20*SF) return;
+        ctx.font = (10*SF)+'px system-ui,sans-serif';
+        var pw = ctx.measureText(p).width+10*SF;
+        ctx.fillStyle = tagBg;
+        tvRRect(ctx,px2,ly,pw,14*SF,3*SF); ctx.fill();
+        ctx.fillStyle = subC;
+        ctx.fillText(p, px2+5*SF, ly+11*SF);
+        px2 += pw+4*SF;
+      });
+    }
+  }
+}
+
+// ── CLOSING slide ─────────────────────────────────────────────
+function tvDrawClosing(ctx,W,H,PX,SF,t,textC,acc,subC,mutedC,borderC) {
+  var cl = TV_CLOSING[(t-1)%TV_CLOSING.length];
+  var cx = W/2, cy = H*0.35;
+
+  // Emoji
+  var emojis=['🙏','🍽️','🌿','🙌'];
+  ctx.font = (60*SF)+'px serif';
+  ctx.textAlign='center';
+  ctx.fillText(emojis[t-1], cx, cy);
+
+  // Big closing text
+  var lines = cl.big.split('\n');
+  ctx.font = '900 '+(62*SF)+'px system-ui,sans-serif';
+  ctx.fillStyle = textC;
+  lines.forEach(function(l,i){ ctx.fillText(l, cx, cy+80*SF + i*75*SF); });
+
+  // Accent line
+  cy = cy + 80*SF + lines.length*75*SF + 20*SF;
+  ctx.fillStyle = acc;
+  tvRRect(ctx, cx-40*SF, cy, 80*SF, 4*SF, 2*SF); ctx.fill();
+  cy += 28*SF;
+
+  // Subtitle
+  ctx.font = (20*SF)+'px system-ui,sans-serif';
+  ctx.fillStyle = subC;
+  ctx.fillText(cl.sub, cx, cy);
+  cy += 44*SF;
+
+  // Footer badge
+  var badgeTxt = 'FFI  ·  GDSK  ·  CIKARANG PLANT';
+  ctx.font = 'bold '+(15*SF)+'px "Courier New",monospace';
+  var bw2 = ctx.measureText(badgeTxt).width+48*SF, bh2=36*SF;
+  ctx.fillStyle = mutedC;
+  tvRRect(ctx, cx-bw2/2, cy, bw2, bh2, 18*SF); ctx.fill();
+  ctx.strokeStyle = borderC; ctx.lineWidth=1.5;
+  tvRRect(ctx, cx-bw2/2, cy, bw2, bh2, 18*SF); ctx.stroke();
+  ctx.fillStyle = acc;
+  ctx.fillText(badgeTxt, cx, cy+bh2/2+5*SF);
+
+  ctx.textAlign='left';
 }
 
 function mp4ShowOverlay(){
   document.getElementById('mp4Overlay').classList.add('show');
   mp4SetStatus('Initializing…',0);
-  document.getElementById('mp4CancelBtn').disabled=false;
+  var btn=document.getElementById('mp4CancelBtn');
+  if(btn)btn.disabled=false;
   var sub=document.getElementById('mp4SubTitle');
-  if(sub) sub.textContent=TV.wKey+' · '+(TV_TEMPLATES[TV.tpl-1]||{}).name+' · 4 slides';
+  if(sub)sub.textContent=TV.wKey+' · '+(TV_TEMPLATES[TV.tpl-1]||{}).name+' · 4 slides · 1920×1080';
 }
 function mp4HideOverlay(){ document.getElementById('mp4Overlay').classList.remove('show'); }
 function mp4SetStatus(txt,pct){
-  var s=document.getElementById('mp4Status');
-  var b=document.getElementById('mp4Bar');
-  var p=document.getElementById('mp4Pct');
-  if(s) s.textContent=txt;
-  if(b) b.style.width=pct+'%';
-  if(p) p.textContent=pct+'%';
+  var s=document.getElementById('mp4Status'),b=document.getElementById('mp4Bar'),p=document.getElementById('mp4Pct');
+  if(s)s.textContent=txt;
+  if(b)b.style.width=pct+'%';
+  if(p)p.textContent=pct+'%';
 }
 function tvMP4Cancel(){
   MP4_CANCELLED=true;
   var btn=document.getElementById('mp4CancelBtn');
-  if(btn) btn.disabled=true;
+  if(btn)btn.disabled=true;
   mp4SetStatus('Membatalkan…',0);
   setTimeout(mp4HideOverlay,700);
   toast('Download dibatalkan.','');
