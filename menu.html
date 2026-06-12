@@ -355,6 +355,10 @@ select.inp{cursor:pointer;}
 .meal-lauk-comps{font-size:10px;color:var(--t3);font-family:var(--mono);margin-top:2px;line-height:1.5;}
 .meal-lauk-del{background:none;border:none;cursor:pointer;color:var(--t4);font-size:15px;padding:1px 4px;border-radius:4px;flex-shrink:0;transition:color .1s,background .1s;line-height:1;margin-top:0;}
 .meal-lauk-del:hover{color:var(--a-red);background:rgba(239,68,68,.1);}
+.meal-pelengkap{margin-top:8px;padding-top:8px;border-top:1px dashed rgba(29,78,216,.15);}
+.meal-pelengkap-lbl{font-family:var(--mono);font-size:8.5px;font-weight:700;letter-spacing:.12em;color:var(--meal);text-transform:uppercase;opacity:.7;margin-bottom:5px;}
+.meal-pelengkap-tags{display:flex;flex-wrap:wrap;gap:4px;}
+.meal-pel-tag{background:rgba(29,78,216,.08);border:1px solid rgba(29,78,216,.14);border-radius:var(--r-pill);padding:2px 9px;font-size:10px;color:var(--t2);font-family:var(--mono);}
 
 /* ══ ANALYSIS ══ */
 .analysis-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:18px;}
@@ -1069,20 +1073,9 @@ function renderCalWeek(){
     rows+='</div>';
     rows+='<div>';
     if(day&&day.meal&&day.meal.length){
-      rows+='<div class="meal-set">';
-      rows+='<div class="meal-lauk-list">';
-      day.meal.forEach(function(e,idx){
-        var comps=(e.components&&e.components.length)?e.components.join(' · '):'';
-        rows+='<div class="meal-lauk-row">'+
-          '<span class="meal-lauk-num">'+(idx+1)+'</span>'+
-          '<div class="meal-lauk-body">'+
-            '<div class="meal-lauk-name">'+cap(e.menuName)+'</div>'+
-            (comps?'<div class="meal-lauk-comps">'+comps+'</div>':'')+
-          '</div>'+
-          '<button class="meal-lauk-del" onclick="confirmDelete(\''+esc(e.date)+'\',\''+e.type+'\',\''+esc(e.menuName)+'\')" title="Hapus">×</button>'+
-          '</div>';
+      rows+=buildMealSetHtml(day.meal,function(e){
+        return "confirmDelete('"+esc(e.date)+"','"+e.type+"','"+esc(e.menuName)+"')";
       });
-      rows+='</div></div>';
     }else rows+='<span class="no-menu">—</span>';
     rows+='</div>';
     rows+='</div>';
@@ -1091,31 +1084,52 @@ function renderCalWeek(){
 }
 
 // ══ MEAL SET RENDERER ══
-// Renders all meal entries for one day as a single grouped card
-// entries = array of meal entry objects
-// onDel = string template for onclick, use %DATE% %MENUNAME% placeholders
-function renderMealSet(entries, onDelFn, compact){
+// Renders all meal entries for one day as one grouped card.
+// Lauk 1/2/3 = pilihan (orang ambil salah satu).
+// Komponen (pelengkap) = dikumpulkan dari semua entry, tampil sekali di bawah.
+function buildMealSetHtml(entries, onDelCallback){
   if(!entries||!entries.length) return '<span class="no-menu">—</span>';
-  var cls = compact ? 'meal-set' : 'meal-set meal-set-modal';
-  var html = '<div class="'+cls+'">';
-  html += '<div class="meal-set-hdr">'+
-    '<span class="meal-set-label">🍱 Menu Makan</span>'+
+
+  // Collect all unique components across all entries → shared pelengkap
+  var allComps=[], seen={};
+  entries.forEach(function(e){
+    (e.components||[]).forEach(function(c){
+      var k=c.trim().toLowerCase();
+      if(c.trim()&&!seen[k]){seen[k]=true;allComps.push(c.trim());}
+    });
+  });
+
+  var html='<div class="meal-set">';
+
+  // Header label + lauk count
+  html+='<div class="meal-set-hdr">'+
+    '<span class="meal-set-label">🍱 Pilih salah satu lauk</span>'+
     '</div>';
-  html += '<div class="meal-lauk-list">';
-  entries.forEach(function(e, idx){
-    var comps = (e.components&&e.components.length)
-      ? e.components.join(' · ')
-      : '';
-    html += '<div class="meal-lauk-row">'+
+
+  // Lauk rows — name only, no per-row components
+  html+='<div class="meal-lauk-list">';
+  entries.forEach(function(e,idx){
+    html+='<div class="meal-lauk-row">'+
       '<span class="meal-lauk-num">'+(idx+1)+'</span>'+
       '<div class="meal-lauk-body">'+
         '<div class="meal-lauk-name">'+cap(e.menuName)+'</div>'+
-        (comps?'<div class="meal-lauk-comps">'+comps+'</div>':'')+
       '</div>'+
-      '<button class="meal-lauk-del" onclick="'+onDelFn(e)+'" title="Hapus">×</button>'+
+      '<button class="meal-lauk-del" onclick="'+onDelCallback(e)+'" title="Hapus">×</button>'+
       '</div>';
   });
-  html += '</div></div>';
+  html+='</div>';
+
+  // Shared pelengkap — shown once below all lauk
+  if(allComps.length){
+    html+='<div class="meal-pelengkap">'+
+      '<div class="meal-pelengkap-lbl">Pelengkap (untuk semua lauk)</div>'+
+      '<div class="meal-pelengkap-tags">'+
+        allComps.map(function(c){return '<span class="meal-pel-tag">'+cap(c)+'</span>';}).join('')+
+      '</div>'+
+      '</div>';
+  }
+
+  html+='</div>';
   return html;
 }
 
@@ -1133,23 +1147,12 @@ function openDayModal(rawKey){
     html+='</div>';
   }
   if(day.meal&&day.meal.length){
-    // Group all meal lauk as one set card
-    html+='<div>';
+    html+='<div style="margin-bottom:14px">';
     html+='<div style="font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.12em;color:var(--meal);text-transform:uppercase;margin-bottom:10px">🍱 Meal</div>';
-    html+='<div class="meal-set">';
-    html+='<div class="meal-lauk-list">';
-    day.meal.forEach(function(e,idx){
-      var comps=(e.components&&e.components.length)?e.components.join(' · '):'';
-      html+='<div class="meal-lauk-row">'+
-        '<span class="meal-lauk-num">'+(idx+1)+'</span>'+
-        '<div class="meal-lauk-body">'+
-          '<div class="meal-lauk-name">'+cap(e.menuName)+'</div>'+
-          (comps?'<div class="meal-lauk-comps">'+comps+'</div>':'')+
-        '</div>'+
-        '<button class="meal-lauk-del" onclick="confirmDelete(\''+esc(e.date)+'\',\''+e.type+'\',\''+esc(e.menuName)+'\');closeDayModal()" title="Hapus">×</button>'+
-        '</div>';
+    html+=buildMealSetHtml(day.meal,function(e){
+      return "confirmDelete('"+esc(e.date)+"','"+e.type+"','"+esc(e.menuName)+"');closeDayModal()";
     });
-    html+='</div></div></div>';
+    html+='</div>';
   }
   if(!html)html='<div style="color:var(--t3);font-size:12px;padding:12px 0">No menu data for this day.</div>';
   document.getElementById('modalBody').innerHTML=html;
@@ -1185,22 +1188,11 @@ function renderWeekly(){
           '<div><div style="font-size:12px;font-weight:600;color:var(--a-amber)">🥐 '+cap(e.menuName)+'</div>'+(e.components&&e.components.length?'<div style="font-size:10px;color:var(--t3);font-family:var(--mono)">'+e.components.slice(0,4).join(' · ')+'</div>':'')+'</div>'+
           '<button class="btn-del" onclick="confirmDelete(\''+esc(e.date)+'\',\''+e.type+'\',\''+esc(e.menuName)+'\')">🗑</button></div>';
       }).join(''):'<span class="no-menu">No snack</span>';
-      var mlH='';
-      if(day.meal.length){
-        mlH='<div class="meal-set"><div class="meal-lauk-list">';
-        day.meal.forEach(function(e,idx){
-          var comps=(e.components&&e.components.length)?e.components.join(' · '):'';
-          mlH+='<div class="meal-lauk-row">'+
-            '<span class="meal-lauk-num">'+(idx+1)+'</span>'+
-            '<div class="meal-lauk-body">'+
-              '<div class="meal-lauk-name">'+cap(e.menuName)+'</div>'+
-              (comps?'<div class="meal-lauk-comps">'+comps+'</div>':'')+
-            '</div>'+
-            '<button class="meal-lauk-del" onclick="confirmDelete(\''+esc(e.date)+'\',\''+e.type+'\',\''+esc(e.menuName)+'\')" title="Hapus">×</button>'+
-            '</div>';
-        });
-        mlH+='</div></div>';
-      } else { mlH='<span class="no-menu">No meal</span>'; }
+      var mlH=day.meal.length
+        ? buildMealSetHtml(day.meal,function(e){
+            return "confirmDelete('"+esc(e.date)+"','"+e.type+"','"+esc(e.menuName)+"')";
+          })
+        : '<span class="no-menu">No meal</span>';
       return '<div class="day-row">'+
         '<div><div class="day-label">'+day.dateStr+'</div></div>'+
         '<div>'+snH+'</div><div>'+mlH+'</div></div>';
