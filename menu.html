@@ -2368,60 +2368,134 @@ function tvMakeSlide1(t, cls) {
   '</div>';
 }
 
-// ── SLIDE 2 & 3: Menu per Hari ────────────────────────────────
+// ── SLIDE 2 & 3: Menu per Hari — Grid Card Layout ─────────────
 function tvMakeSlideMenu(t, cls, type, dayEntries) {
   var isSnack = type==='snack';
   var icon    = isSnack?'🥐':'🍱';
   var title   = isSnack?'MENU SNACK':'MENU MAKAN';
+  var subtitle= isSnack?'Lezat, Bergizi, Energi Positif Setiap Hari!':'Pilih Lauk Favoritmu, Nikmati Setiap Hari!';
   var acc = tvAcc(t), textC = tvText(t), subC = tvSub(t), mutedC = tvMuted(t), borderC = tvBorder(t);
-  var pad = t===4?'2.5% 4% 2.5% 6%':'2.5% 4% 2.5% 5%';
+  var hdrBg  = ['','#0f2057','#6b1e07','#0a3d1f','#130d20'][t]||'#0f2057';
+  var hdrLine= ['','#3b82f6','#f97316','#22c55e','#a78bfa'][t]||'#3b82f6';
+  var dotCol = tvAcc(t);
+  var tagBg  = ['','rgba(59,130,246,.2)','rgba(249,115,22,.2)','rgba(34,197,94,.18)','rgba(167,139,250,.18)'][t]||'rgba(59,130,246,.2)';
 
-  var cols = dayEntries.map(function(d) {
+  // Build one day card
+  function makeCard(d, pct) {
     var entries = d[type];
-    var dayLbl  = TV_SHORTS[d.di];
-    var dateNum = d.dt.getDate()+' '+ d.dt.toLocaleDateString('id-ID',{month:'short'});
+    var dayFull = TV_DAYS[d.di];
+    var dateStr = d.dt.toLocaleDateString('id-ID',{day:'2-digit',month:'short'});
     var isEmpty = !entries.length;
 
-    var menuHtml = '';
+    var cardHdr =
+      '<div style="background:'+hdrBg+';border-bottom:2.5px solid '+hdrLine+';padding:.38em .65em;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">' +
+        '<div style="display:flex;align-items:center;gap:.32em;">' +
+          '<div style="width:.48em;height:.48em;border-radius:50%;background:'+dotCol+';flex-shrink:0;"></div>' +
+          '<span style="font-size:.9em;font-weight:800;color:#fff;letter-spacing:.04em;">'+dayFull.toUpperCase()+'</span>' +
+        '</div>' +
+        '<span style="font-size:.68em;font-family:\'JetBrains Mono\',monospace;color:rgba(255,255,255,.5);">'+dateStr+'</span>' +
+      '</div>';
+
+    var body = '';
     if (isEmpty) {
-      menuHtml = '<div style="font-size:.75em;color:'+subC+';opacity:.4;font-style:italic;padding-top:.2em;">—</div>';
+      body = '<div style="flex:1;display:flex;align-items:center;justify-content:center;font-size:.7em;color:'+subC+';opacity:.4;font-style:italic;padding:.5em 0;">—</div>';
     } else if (isSnack) {
-      menuHtml = entries.map(function(e) {
-        var c=(e.components||[]).slice(0,2).map(function(x){return cap(x);}).join(' · ');
-        return '<div style="font-size:.92em;font-weight:700;color:'+textC+';line-height:1.25;text-transform:capitalize;margin-bottom:.15em;">'+cap(e.menuName)+'</div>'+
-               (c?'<div style="font-size:.72em;color:'+subC+';line-height:1.3;font-family:\'JetBrains Mono\',monospace;">'+c+'</div>':'');
-      }).join('');
+      var e = entries[0];
+      var comps = (e.components||[]).slice(0,5);
+      body =
+        '<div style="font-size:1em;font-weight:800;color:'+textC+';text-transform:capitalize;line-height:1.2;margin-bottom:.32em;border-bottom:1px solid '+borderC+';padding-bottom:.28em;">'+cap(e.menuName)+'</div>' +
+        (comps.length ?
+          comps.map(function(c){
+            return '<div style="display:flex;align-items:baseline;gap:.28em;margin-bottom:.1em;">' +
+              '<span style="color:'+dotCol+';font-size:.88em;flex-shrink:0;line-height:1;">•</span>' +
+              '<span style="font-size:.72em;color:'+subC+';text-transform:capitalize;line-height:1.25;">'+cap(c)+'</span>' +
+            '</div>';
+          }).join('') : '');
     } else {
-      menuHtml = entries.map(function(e,i) {
-        return '<div style="display:flex;align-items:baseline;gap:.3em;margin-bottom:.12em;">'+
-          '<span style="font-size:.68em;font-weight:800;color:'+acc+';background:'+mutedC+';border-radius:3px;padding:.05em .3em;flex-shrink:0;font-family:\'JetBrains Mono\',monospace;">'+(i+1)+'</span>'+
-          '<span style="font-size:.87em;font-weight:700;color:'+textC+';text-transform:capitalize;line-height:1.2;">'+cap(e.menuName)+'</span>'+
+      // Meal: numbered lauk
+      var laukHtml = entries.map(function(e,i){
+        return '<div style="display:flex;align-items:flex-start;gap:.28em;margin-bottom:.22em;">' +
+          '<span style="font-size:.7em;font-weight:800;color:'+acc+';background:'+tagBg+';border:1px solid '+borderC+';border-radius:.22em;padding:.04em .3em;flex-shrink:0;font-family:\'JetBrains Mono\',monospace;line-height:1.4;">'+(i+1)+'</span>' +
+          '<span style="font-size:.82em;font-weight:700;color:'+textC+';text-transform:capitalize;line-height:1.2;">'+cap(e.menuName)+'</span>' +
         '</div>';
       }).join('');
-      var allC={};entries.forEach(function(e){(e.components||[]).forEach(function(c){if(c.trim())allC[c.toLowerCase()]=cap(c.trim());});});
-      var sc=Object.values(allC).slice(0,3).join(' · ');
-      if(sc) menuHtml += '<div style="font-size:.68em;color:'+subC+';margin-top:.2em;font-family:\'JetBrains Mono\',monospace;opacity:.7;">'+sc+'</div>';
+      // shared pelengkap
+      var allC={};
+      entries.forEach(function(e){(e.components||[]).forEach(function(c){if(c.trim())allC[c.toLowerCase()]=cap(c.trim());});});
+      var pelList = Object.values(allC).slice(0,4);
+      var pelHtml = pelList.length ?
+        '<div style="margin-top:.28em;padding-top:.24em;border-top:1px dashed '+borderC+'">' +
+          pelList.map(function(p){
+            return '<span style="font-size:.62em;background:'+tagBg+';border-radius:.2em;padding:.05em .28em;color:'+subC+';display:inline-block;margin:1px;">'+p+'</span>';
+          }).join('') +
+        '</div>' : '';
+      body = laukHtml + pelHtml;
     }
 
-    return '<div style="flex:1;min-width:0;background:'+mutedC+';border:1px solid '+borderC+';border-radius:.45em;padding:.55em .65em;display:flex;flex-direction:column;">' +
-      '<div style="font-family:\'JetBrains Mono\',monospace;font-size:.82em;font-weight:800;color:'+acc+';letter-spacing:.05em;margin-bottom:.08em;">'+dayLbl+'</div>' +
-      '<div style="font-size:.68em;color:'+subC+';margin-bottom:.3em;opacity:.6;">'+dateNum+'</div>' +
-      menuHtml +
+    return '<div style="width:'+pct+'%;flex-shrink:0;background:'+mutedC+';border:1px solid '+borderC+';border-radius:.42em;overflow:hidden;display:flex;flex-direction:column;">' +
+      cardHdr +
+      '<div style="padding:.4em .58em .45em;flex:1;display:flex;flex-direction:column;">'+body+'</div>' +
     '</div>';
-  }).join('');
+  }
 
+  // Row 1: Mon–Thu (4 cards ~24.5% each), Row 2: Fri–Sun (3 cards ~32% each)
+  var gap = 0.45; // em gap — approximate, cards use % width
+  var row1 = dayEntries.slice(0,4).map(function(d){ return makeCard(d, 24.5); }).join('');
+  var row2 = dayEntries.slice(4,7).map(function(d){ return makeCard(d, 32.5); }).join('');
+
+  // Bottom strip
+  var bottomStrip = '';
+  if (!isSnack) {
+    var weekPel={};
+    dayEntries.forEach(function(d){
+      (d.meal||[]).forEach(function(e){(e.components||[]).forEach(function(c){if(c.trim())weekPel[c.toLowerCase()]=cap(c.trim());});});
+    });
+    var wPL = Object.values(weekPel).slice(0,7);
+    if (wPL.length) {
+      bottomStrip =
+        '<div style="margin-top:.4em;flex-shrink:0;background:'+tagBg+';border:1px solid '+borderC+';border-radius:.38em;padding:.3em .7em;display:flex;align-items:center;gap:.5em;flex-wrap:wrap;">' +
+          '<span style="font-size:.75em;font-weight:800;color:'+acc+';letter-spacing:.08em;text-transform:uppercase;white-space:nowrap;flex-shrink:0;">Setiap Hari</span>' +
+          '<span style="width:1px;height:.9em;background:'+borderC+';flex-shrink:0;"></span>' +
+          wPL.map(function(p){return '<span style="font-size:.72em;font-weight:600;color:'+textC+';">'+p+'</span>';})
+             .join('<span style="font-size:.68em;color:'+subC+';padding:0 .12em;opacity:.6;">·</span>') +
+        '</div>';
+    }
+  } else {
+    bottomStrip =
+      '<div style="margin-top:.4em;flex-shrink:0;background:'+tagBg+';border:1px solid '+borderC+';border-radius:.38em;padding:.3em .8em;display:flex;align-items:center;justify-content:center;">' +
+        '<span style="font-size:.78em;font-weight:700;color:'+acc+';letter-spacing:.04em;">'+subtitle+'</span>' +
+      '</div>';
+  }
+
+  var lp = t===4?'6%':'5%';
   return '<div class="tv-slide-canvas '+cls+'" style="'+tvBg(t)+'">' + tvDeco(t) +
-    '<div style="position:absolute;inset:0;display:flex;flex-direction:column;padding:'+pad+'">' +
-      '<div style="display:flex;align-items:center;gap:.5em;margin-bottom:.9em;flex-shrink:0;">' +
-        '<span style="font-size:2.2em;">'+icon+'</span>' +
-        '<span style="font-size:2.8em;font-weight:900;color:'+textC+';letter-spacing:-.04em;line-height:1;">'+title+'</span>' +
-        '<span style="margin-left:auto;font-size:.85em;font-family:\'JetBrains Mono\',monospace;color:'+subC+';opacity:.6;">'+TV.wKey+'</span>' +
+    '<div style="position:absolute;inset:0;display:flex;flex-direction:column;padding:2% '+lp+' 1.6% '+lp+'">' +
+
+      // Header row
+      '<div style="display:flex;align-items:center;gap:.5em;margin-bottom:.65em;flex-shrink:0;">' +
+        '<span style="font-size:1.9em;line-height:1;">'+icon+'</span>' +
+        '<div>' +
+          '<div style="font-size:2.5em;font-weight:900;color:'+textC+';letter-spacing:-.04em;line-height:1;">'+title+'</div>' +
+          '<div style="font-size:.85em;color:'+subC+';margin-top:.04em;opacity:.8;">'+subtitle+'</div>' +
+        '</div>' +
+        '<div style="margin-left:auto;text-align:right;flex-shrink:0;">' +
+          '<div style="font-size:.82em;font-family:\'JetBrains Mono\',monospace;color:'+acc+';font-weight:700;">'+TV.wKey+'</div>' +
+          '<div style="font-size:.68em;font-family:\'JetBrains Mono\',monospace;color:'+subC+';opacity:.55;margin-top:.08em;">'+TV.period+'</div>' +
+        '</div>' +
       '</div>' +
-      '<div style="display:flex;gap:.5em;flex:1;min-height:0;">'+cols+'</div>' +
+
+      // Row 1: Mon–Thu
+      '<div style="display:flex;gap:.45em;flex:1;min-height:0;">'+row1+'</div>' +
+
+      // Row 2: Fri–Sun
+      '<div style="display:flex;gap:.45em;flex:1;min-height:0;margin-top:.4em;">'+row2+'</div>' +
+
+      // Bottom strip
+      bottomStrip +
+
     '</div>' +
   '</div>';
 }
-
 // ── SLIDE 4: Closing ──────────────────────────────────────────
 function tvMakeSlide4(t, cls, cl) {
   var acc=tvAcc(t), textC=tvText(t), subC=tvSub(t), mutedC=tvMuted(t), borderC=tvBorder(t);
