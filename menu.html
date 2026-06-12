@@ -341,6 +341,21 @@ select.inp{cursor:pointer;}
 }
 .btn-del:hover{background:rgba(239,68,68,.08);border-color:var(--a-red);}
 
+/* ══ MEAL SET CARD ══ */
+.meal-set{background:var(--meal-lt);border:1px solid var(--meal-border);border-radius:var(--r-sm);padding:10px 12px;margin-bottom:6px;}
+.meal-set:last-child{margin-bottom:0;}
+.meal-set-hdr{display:flex;align-items:center;justify-content:space-between;gap:6px;margin-bottom:8px;}
+.meal-set-label{font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.1em;color:var(--meal);text-transform:uppercase;}
+.meal-lauk-list{display:flex;flex-direction:column;gap:5px;}
+.meal-lauk-row{display:flex;align-items:flex-start;gap:8px;padding:4px 0;border-bottom:1px solid rgba(29,78,216,.08);}
+.meal-lauk-row:last-child{border-bottom:none;padding-bottom:0;}
+.meal-lauk-num{font-family:var(--mono);font-size:9px;font-weight:700;color:var(--meal);background:rgba(29,78,216,.12);border-radius:3px;padding:2px 5px;flex-shrink:0;margin-top:1px;min-width:18px;text-align:center;line-height:1.4;}
+.meal-lauk-body{flex:1;min-width:0;}
+.meal-lauk-name{font-size:12px;font-weight:700;color:var(--t1);text-transform:capitalize;line-height:1.3;}
+.meal-lauk-comps{font-size:10px;color:var(--t3);font-family:var(--mono);margin-top:2px;line-height:1.5;}
+.meal-lauk-del{background:none;border:none;cursor:pointer;color:var(--t4);font-size:15px;padding:1px 4px;border-radius:4px;flex-shrink:0;transition:color .1s,background .1s;line-height:1;margin-top:0;}
+.meal-lauk-del:hover{color:var(--a-red);background:rgba(239,68,68,.1);}
+
 /* ══ ANALYSIS ══ */
 .analysis-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:18px;}
 @media(max-width:900px){.analysis-grid{grid-template-columns:repeat(2,1fr);}}
@@ -1054,16 +1069,54 @@ function renderCalWeek(){
     rows+='</div>';
     rows+='<div>';
     if(day&&day.meal&&day.meal.length){
-      day.meal.forEach(function(e){
-        rows+='<div style="font-size:12px;font-weight:600;color:var(--meal);margin-bottom:3px">🍱 '+cap(e.menuName)+'</div>';
-        rows+='<button class="btn-del" onclick="confirmDelete(\''+esc(e.date)+'\',\''+e.type+'\',\''+esc(e.menuName)+'\')">🗑 Delete</button>';
+      rows+='<div class="meal-set">';
+      rows+='<div class="meal-lauk-list">';
+      day.meal.forEach(function(e,idx){
+        var comps=(e.components&&e.components.length)?e.components.join(' · '):'';
+        rows+='<div class="meal-lauk-row">'+
+          '<span class="meal-lauk-num">'+(idx+1)+'</span>'+
+          '<div class="meal-lauk-body">'+
+            '<div class="meal-lauk-name">'+cap(e.menuName)+'</div>'+
+            (comps?'<div class="meal-lauk-comps">'+comps+'</div>':'')+
+          '</div>'+
+          '<button class="meal-lauk-del" onclick="confirmDelete(\''+esc(e.date)+'\',\''+e.type+'\',\''+esc(e.menuName)+'\')" title="Hapus">×</button>'+
+          '</div>';
       });
-      if(day.meal[0]&&day.meal[0].components&&day.meal[0].components.length)rows+='<div style="font-size:10px;color:var(--t3);font-family:var(--mono)">'+day.meal[0].components.slice(0,4).join(' · ')+'</div>';
+      rows+='</div></div>';
     }else rows+='<span class="no-menu">—</span>';
     rows+='</div>';
     rows+='</div>';
   }
   document.getElementById('calWeekGrid').innerHTML=hdrs+rows;
+}
+
+// ══ MEAL SET RENDERER ══
+// Renders all meal entries for one day as a single grouped card
+// entries = array of meal entry objects
+// onDel = string template for onclick, use %DATE% %MENUNAME% placeholders
+function renderMealSet(entries, onDelFn, compact){
+  if(!entries||!entries.length) return '<span class="no-menu">—</span>';
+  var cls = compact ? 'meal-set' : 'meal-set meal-set-modal';
+  var html = '<div class="'+cls+'">';
+  html += '<div class="meal-set-hdr">'+
+    '<span class="meal-set-label">🍱 Menu Makan</span>'+
+    '</div>';
+  html += '<div class="meal-lauk-list">';
+  entries.forEach(function(e, idx){
+    var comps = (e.components&&e.components.length)
+      ? e.components.join(' · ')
+      : '';
+    html += '<div class="meal-lauk-row">'+
+      '<span class="meal-lauk-num">'+(idx+1)+'</span>'+
+      '<div class="meal-lauk-body">'+
+        '<div class="meal-lauk-name">'+cap(e.menuName)+'</div>'+
+        (comps?'<div class="meal-lauk-comps">'+comps+'</div>':'')+
+      '</div>'+
+      '<button class="meal-lauk-del" onclick="'+onDelFn(e)+'" title="Hapus">×</button>'+
+      '</div>';
+  });
+  html += '</div></div>';
+  return html;
 }
 
 // ══ DAY MODAL ══
@@ -1080,9 +1133,23 @@ function openDayModal(rawKey){
     html+='</div>';
   }
   if(day.meal&&day.meal.length){
-    html+='<div><div style="font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.12em;color:var(--meal);text-transform:uppercase;margin-bottom:10px">🍱 Meal</div>';
-    day.meal.forEach(function(e){html+='<div class="modal-item"><div><div class="modal-item-name">'+cap(e.menuName)+'</div>'+(e.components&&e.components.length?'<div class="modal-item-comps">'+e.components.join(', ')+'</div>':'')+'</div><button class="btn-del" onclick="confirmDelete(\''+esc(e.date)+'\',\''+e.type+'\',\''+esc(e.menuName)+'\');closeDayModal()">🗑 Delete</button></div>';});
-    html+='</div>';
+    // Group all meal lauk as one set card
+    html+='<div>';
+    html+='<div style="font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.12em;color:var(--meal);text-transform:uppercase;margin-bottom:10px">🍱 Meal</div>';
+    html+='<div class="meal-set">';
+    html+='<div class="meal-lauk-list">';
+    day.meal.forEach(function(e,idx){
+      var comps=(e.components&&e.components.length)?e.components.join(' · '):'';
+      html+='<div class="meal-lauk-row">'+
+        '<span class="meal-lauk-num">'+(idx+1)+'</span>'+
+        '<div class="meal-lauk-body">'+
+          '<div class="meal-lauk-name">'+cap(e.menuName)+'</div>'+
+          (comps?'<div class="meal-lauk-comps">'+comps+'</div>':'')+
+        '</div>'+
+        '<button class="meal-lauk-del" onclick="confirmDelete(\''+esc(e.date)+'\',\''+e.type+'\',\''+esc(e.menuName)+'\');closeDayModal()" title="Hapus">×</button>'+
+        '</div>';
+    });
+    html+='</div></div></div>';
   }
   if(!html)html='<div style="color:var(--t3);font-size:12px;padding:12px 0">No menu data for this day.</div>';
   document.getElementById('modalBody').innerHTML=html;
@@ -1118,11 +1185,22 @@ function renderWeekly(){
           '<div><div style="font-size:12px;font-weight:600;color:var(--a-amber)">🥐 '+cap(e.menuName)+'</div>'+(e.components&&e.components.length?'<div style="font-size:10px;color:var(--t3);font-family:var(--mono)">'+e.components.slice(0,4).join(' · ')+'</div>':'')+'</div>'+
           '<button class="btn-del" onclick="confirmDelete(\''+esc(e.date)+'\',\''+e.type+'\',\''+esc(e.menuName)+'\')">🗑</button></div>';
       }).join(''):'<span class="no-menu">No snack</span>';
-      var mlH=day.meal.length?day.meal.map(function(e){
-        return '<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:6px;margin-bottom:5px">'+
-          '<div><div style="font-size:12px;font-weight:600;color:var(--meal)">🍱 '+cap(e.menuName)+'</div>'+(e.components&&e.components.length?'<div style="font-size:10px;color:var(--t3);font-family:var(--mono)">'+e.components.slice(0,3).join(' · ')+'</div>':'')+'</div>'+
-          '<button class="btn-del" onclick="confirmDelete(\''+esc(e.date)+'\',\''+e.type+'\',\''+esc(e.menuName)+'\')">🗑</button></div>';
-      }).join(''):'<span class="no-menu">No meal</span>';
+      var mlH='';
+      if(day.meal.length){
+        mlH='<div class="meal-set"><div class="meal-lauk-list">';
+        day.meal.forEach(function(e,idx){
+          var comps=(e.components&&e.components.length)?e.components.join(' · '):'';
+          mlH+='<div class="meal-lauk-row">'+
+            '<span class="meal-lauk-num">'+(idx+1)+'</span>'+
+            '<div class="meal-lauk-body">'+
+              '<div class="meal-lauk-name">'+cap(e.menuName)+'</div>'+
+              (comps?'<div class="meal-lauk-comps">'+comps+'</div>':'')+
+            '</div>'+
+            '<button class="meal-lauk-del" onclick="confirmDelete(\''+esc(e.date)+'\',\''+e.type+'\',\''+esc(e.menuName)+'\')" title="Hapus">×</button>'+
+            '</div>';
+        });
+        mlH+='</div></div>';
+      } else { mlH='<span class="no-menu">No meal</span>'; }
       return '<div class="day-row">'+
         '<div><div class="day-label">'+day.dateStr+'</div></div>'+
         '<div>'+snH+'</div><div>'+mlH+'</div></div>';
