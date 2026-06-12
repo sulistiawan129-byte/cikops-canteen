@@ -462,6 +462,107 @@ select.inp{cursor:pointer;}
 ::-webkit-scrollbar-track{background:transparent;}
 ::-webkit-scrollbar-thumb{background:var(--border);border-radius:5px;}
 
+
+/* ══ REPORT TAB ══ */
+.rpt-toolbar{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:16px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:12px 16px;box-shadow:var(--shadow);}
+.rpt-mode-grp{display:flex;gap:4px;background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r-sm);padding:3px;}
+.rpt-mode-btn{padding:6px 14px;border:none;border-radius:6px;font-size:11.5px;font-weight:600;font-family:var(--font);cursor:pointer;background:none;color:var(--t3);transition:all .15s;}
+.rpt-mode-btn.active{background:var(--navy);color:#fff;box-shadow:0 1px 4px rgba(0,0,0,.15);}
+.rpt-selectors{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.rpt-sel{border:1.5px solid var(--border);border-radius:var(--r-sm);padding:6px 10px;font-size:11px;font-family:var(--font);background:var(--surface-2);color:var(--t1);cursor:pointer;min-width:180px;}
+.rpt-sel:focus{outline:none;border-color:var(--navy-3);}
+.rpt-print-btn{display:flex;align-items:center;gap:5px;padding:6px 13px;background:var(--surface-2);border:1.5px solid var(--border);border-radius:var(--r-sm);font-size:11px;font-weight:600;font-family:var(--font);color:var(--t2);cursor:pointer;transition:background .12s;}
+.rpt-print-btn:hover{background:var(--border);}
+
+/* Report document */
+.rpt-doc{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--shadow);overflow:hidden;}
+.rpt-cover{background:linear-gradient(135deg,var(--navy) 0%,#1d4ed8 100%);padding:28px 32px;color:#fff;}
+.rpt-cover-eyebrow{font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.18em;color:rgba(255,255,255,.45);text-transform:uppercase;margin-bottom:6px;}
+.rpt-cover-title{font-size:22px;font-weight:800;letter-spacing:-.4px;margin-bottom:4px;}
+.rpt-cover-sub{font-size:13px;color:rgba(255,255,255,.65);margin-bottom:16px;}
+.rpt-cover-meta{display:flex;gap:16px;flex-wrap:wrap;}
+.rpt-meta-chip{display:flex;align-items:center;gap:6px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);border-radius:var(--r-pill);padding:4px 12px;font-size:10.5px;font-family:var(--mono);color:rgba(255,255,255,.75);}
+
+/* Section headers inside report */
+.rpt-section{padding:20px 24px;border-bottom:1px solid var(--border);}
+.rpt-section:last-child{border-bottom:none;}
+.rpt-sec-hdr{display:flex;align-items:center;gap:10px;margin-bottom:14px;}
+.rpt-sec-icon{font-size:16px;}
+.rpt-sec-title{font-size:14px;font-weight:700;color:var(--t1);letter-spacing:-.2px;}
+.rpt-sec-badge{font-family:var(--mono);font-size:9px;font-weight:700;padding:2px 8px;border-radius:var(--r-pill);}
+
+/* KPI row in report */
+.rpt-kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px;}
+@media(max-width:900px){.rpt-kpi-row{grid-template-columns:repeat(2,1fr);}}
+.rpt-kpi{background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r-sm);padding:12px 14px;position:relative;overflow:hidden;}
+.rpt-kpi::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--rpt-acc,var(--navy-3));}
+.rpt-kpi-lbl{font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.1em;color:var(--t3);text-transform:uppercase;margin-bottom:6px;}
+.rpt-kpi-val{font-size:22px;font-weight:800;color:var(--t1);letter-spacing:-.4px;font-variant-numeric:tabular-nums;}
+.rpt-kpi-sub{font-size:10px;color:var(--t4);margin-top:3px;}
+
+/* Status pill */
+.rpt-status{display:inline-flex;align-items:center;gap:5px;border-radius:var(--r-pill);padding:3px 10px;font-size:10.5px;font-weight:700;font-family:var(--mono);}
+.rpt-status.excellent{background:#dcfce7;color:#15803d;}
+.rpt-status.good{background:#dbeafe;color:#1d4ed8;}
+.rpt-status.warning{background:#fef3c7;color:#b45309;}
+.rpt-status.danger{background:#fee2e2;color:#dc2626;}
+[data-theme="dark"] .rpt-status.excellent{background:#052e16;color:#4ade80;}
+[data-theme="dark"] .rpt-status.good{background:#1e3a8a22;color:#93c5fd;}
+[data-theme="dark"] .rpt-status.warning{background:#1a0d00;color:#fbbf24;}
+[data-theme="dark"] .rpt-status.danger{background:#1a0000;color:#f87171;}
+
+/* Menu table in report */
+.rpt-table{width:100%;border-collapse:collapse;font-size:12px;}
+.rpt-table th{padding:8px 12px;text-align:left;font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.1em;color:rgba(255,255,255,.85);text-transform:uppercase;background:var(--navy);}
+.rpt-table td{padding:9px 12px;border-bottom:1px solid var(--border-light);color:var(--t2);vertical-align:top;}
+.rpt-table tr:last-child td{border-bottom:none;}
+.rpt-table tr:hover td{background:var(--surface-2);}
+.rpt-table td.date-col{font-family:var(--mono);font-size:11px;color:var(--t3);white-space:nowrap;}
+.rpt-table td.num-col{font-family:var(--mono);font-size:11px;text-align:center;}
+
+/* Meal set inside table */
+.rpt-meal-set{display:flex;flex-direction:column;gap:2px;}
+.rpt-lauk{display:flex;align-items:baseline;gap:6px;}
+.rpt-lauk-num{font-family:var(--mono);font-size:9px;font-weight:700;color:var(--meal);background:rgba(29,78,216,.1);border-radius:3px;padding:1px 4px;flex-shrink:0;}
+.rpt-lauk-name{font-size:12px;font-weight:600;color:var(--t1);text-transform:capitalize;}
+.rpt-pelengkap{margin-top:4px;font-size:10px;color:var(--t4);font-family:var(--mono);}
+
+/* Snack pill inside table */
+.rpt-snack-name{font-size:12px;font-weight:600;color:#92400e;}
+[data-theme="dark"] .rpt-snack-name{color:#fcd34d;}
+
+/* Analysis insight box */
+.rpt-insight{background:var(--surface-2);border:1px solid var(--border);border-left:3px solid var(--navy-3);border-radius:var(--r-sm);padding:12px 14px;margin-bottom:10px;}
+.rpt-insight.warn{border-left-color:var(--a-amber);}
+.rpt-insight.ok  {border-left-color:var(--a-green);}
+.rpt-insight.bad {border-left-color:var(--a-red);}
+.rpt-insight-hdr{font-size:12px;font-weight:700;color:var(--t1);margin-bottom:4px;}
+.rpt-insight-txt{font-size:11px;color:var(--t2);line-height:1.6;}
+
+/* Variety bar */
+.rpt-variety-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+.rpt-variety-lbl{font-size:11px;color:var(--t2);min-width:130px;text-transform:capitalize;}
+.rpt-variety-bar-bg{flex:1;height:6px;background:var(--surface-3);border-radius:6px;overflow:hidden;border:1px solid var(--border);}
+.rpt-variety-bar-fill{height:100%;border-radius:6px;transition:width .4s;}
+.rpt-variety-count{font-family:var(--mono);font-size:10px;color:var(--t4);min-width:28px;text-align:right;}
+
+/* Monthly summary table */
+.rpt-month-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+@media(max-width:800px){.rpt-month-grid{grid-template-columns:1fr 1fr;}}
+.rpt-month-card{background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r-sm);padding:12px 14px;}
+.rpt-month-wk{font-family:var(--mono);font-size:9px;font-weight:700;color:var(--t4);text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px;}
+.rpt-month-days{font-size:11px;color:var(--t3);margin-bottom:8px;}
+.rpt-month-row{display:flex;justify-content:space-between;font-size:11px;color:var(--t2);padding:2px 0;}
+.rpt-month-row span:last-child{font-weight:700;color:var(--t1);font-family:var(--mono);}
+
+@media print{
+  .left-rail,.topbar,.rpt-toolbar,.toast,.modal-overlay{display:none!important;}
+  .main-content{margin:0!important;}
+  .page-area{padding:0!important;}
+  #pane-analysis,#pane-calendar,#pane-weekly,#pane-input{display:none!important;}
+  #pane-report{display:block!important;}
+  .rpt-doc{box-shadow:none;border:none;}
+}
 </style>
 </head>
 <body>
@@ -502,6 +603,9 @@ select.inp{cursor:pointer;}
     </button>
     <button class="rail-tab" id="tab-input" onclick="openTab('input')">
       <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Input Menu
+    </button>
+    <button class="rail-tab" id="tab-report" onclick="openTab('report')">
+      <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>Report
     </button>
 
   </nav>
@@ -725,7 +829,38 @@ select.inp{cursor:pointer;}
       </div>
     </div>
 
+    <!-- ══ TAB: REPORT ══ -->
+    <div id="pane-report" style="display:none">
 
+      <!-- Report Header Controls -->
+      <div class="rpt-toolbar">
+        <div class="rpt-mode-grp">
+          <button class="rpt-mode-btn active" id="rptBtnWeekly"  onclick="rptSetMode('weekly')">📅 Weekly Report</button>
+          <button class="rpt-mode-btn"         id="rptBtnMonthly" onclick="rptSetMode('monthly')">📆 Monthly Report</button>
+        </div>
+        <div class="rpt-selectors">
+          <select class="rpt-sel" id="rptWeekSel"  onchange="rptRender()" style="display:none">
+            <option value="">-- Pilih Minggu --</option>
+          </select>
+          <select class="rpt-sel" id="rptMonthSel" onchange="rptRender()" style="display:none">
+            <option value="">-- Pilih Bulan --</option>
+          </select>
+          <button class="rpt-print-btn" onclick="rptPrint()">
+            <svg viewBox="0 0 24 24" style="width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+            Print / PDF
+          </button>
+        </div>
+      </div>
+
+      <!-- Report body renders here -->
+      <div id="rptBody">
+        <div class="empty" style="padding:60px">
+          <span class="empty-icon">📋</span>
+          Pilih mode report dan periode di atas untuk melihat laporan.
+        </div>
+      </div>
+
+    </div><!-- /pane-report -->
 
   </div>
 </div>
@@ -763,6 +898,7 @@ window.onload=function(){
   calWeekKey=isoKey(now);
   setParseMode('auto');
   updateDateBarRight();
+  rptSetMode('weekly');
   loadData();
 };
 
@@ -780,7 +916,7 @@ function toggleTheme(){
 
 // ══ TABS ══
 function openTab(name){
-  ['analysis','calendar','weekly','input'].forEach(function(t){
+  ['analysis','calendar','weekly','input','report'].forEach(function(t){
     var pane=document.getElementById('pane-'+t);
     if(pane) pane.style.display=t===name?'':'none';
     var btn=document.getElementById('tab-'+t);
@@ -791,6 +927,7 @@ function openTab(name){
     if(DATA)renderCalendar();
   }
   if(name==='weekly'&&DATA)renderWeekly();
+  if(name==='report'){rptFillSelectors();if(RPT.mode==='weekly')rptSetMode('weekly');else rptRender();}
   // Update viewing period label
   var vp=document.getElementById('viewingPeriod');
   if(vp)vp.textContent=selWeek?(DATA&&DATA.byWeek&&DATA.byWeek[selWeek]&&DATA.byWeek[selWeek].label)||selWeek:'All Data';
@@ -845,6 +982,7 @@ function loadData(){
       fillWeekSelector(data.availableWeeks||[]);
       loader.style.display='none';document.getElementById('analysisContent').style.display='';
       applyWeekFilter();
+      rptFillSelectors();
     })
     .catch(function(e){
       var msg=e.message==='timeout'?'Request took too long (>25s). Try again.':e.message;
@@ -1271,6 +1409,537 @@ function saveEntries(entries,cb){
   sendChunk(0);
 }
 
+
+
+// ══════════════════════════════════════════════════════════════
+// REPORT ENGINE
+// ══════════════════════════════════════════════════════════════
+var RPT = { mode: 'weekly' };
+
+function rptSetMode(m){
+  RPT.mode = m;
+  document.getElementById('rptBtnWeekly').classList.toggle('active',  m==='weekly');
+  document.getElementById('rptBtnMonthly').classList.toggle('active', m==='monthly');
+  document.getElementById('rptWeekSel').style.display  = m==='weekly'  ? '' : 'none';
+  document.getElementById('rptMonthSel').style.display = m==='monthly' ? '' : 'none';
+  rptRender();
+}
+
+function rptFillSelectors(){
+  if(!DATA) return;
+  // Weeks
+  var ws = document.getElementById('rptWeekSel');
+  var cur = ws.value;
+  ws.innerHTML = '<option value="">-- Pilih Minggu --</option>';
+  (DATA.availableWeeks||[]).filter(function(w){
+    return w.value&&!w.value.includes('NaN')&&/^W\d{4}-\d{2}$/.test(w.value);
+  }).forEach(function(w){
+    ws.innerHTML += '<option value="'+w.value+'"'+(w.value===cur?' selected':'')+'>'+w.value+' · '+(w.label||'')+'</option>';
+  });
+  if(!cur && ws.options.length > 1) ws.selectedIndex = ws.options.length - 1;
+
+  // Months
+  var ms = document.getElementById('rptMonthSel');
+  var curM = ms.value;
+  ms.innerHTML = '<option value="">-- Pilih Bulan --</option>';
+  (DATA.availableWeeks||[]).reduce(function(acc, w){
+    // derive month key from week key e.g. W2026-22
+    var mon = isoWeekToMonday(w.value);
+    var mk = mon.getFullYear()+'-'+String(mon.getMonth()+1).padStart(2,'0');
+    var ml = mon.toLocaleDateString('en-GB',{month:'long',year:'numeric'});
+    if(!acc[mk]){acc[mk]=ml;}
+    return acc;
+  }, {});
+  // Use availableWeeks to build months
+  var monthMap2 = {};
+  (DATA.availableWeeks||[]).forEach(function(w){
+    var mon = isoWeekToMonday(w.value);
+    var mk = mon.getFullYear()+'-'+String(mon.getMonth()+1).padStart(2,'0');
+    var ml = mon.toLocaleDateString('id-ID',{month:'long',year:'numeric'});
+    if(!monthMap2[mk]) monthMap2[mk] = ml;
+  });
+  // Also from allEntries
+  (DATA.allEntries||[]).forEach(function(e){
+    if(!e.rawDate) return;
+    var d = new Date(e.rawDate+'T00:00:00');
+    var mk = d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
+    var ml = d.toLocaleDateString('id-ID',{month:'long',year:'numeric'});
+    if(!monthMap2[mk]) monthMap2[mk]=ml;
+  });
+  Object.keys(monthMap2).sort().forEach(function(mk){
+    ms.innerHTML += '<option value="'+mk+'"'+(mk===curM?' selected':'')+'>'+monthMap2[mk]+'</option>';
+  });
+  if(!curM && ms.options.length > 1) ms.selectedIndex = ms.options.length - 1;
+}
+
+function rptRender(){
+  if(!DATA){ document.getElementById('rptBody').innerHTML='<div class="loading"><div class="spin"></div><span class="load-txt">Menunggu data…</span></div>'; return; }
+  rptFillSelectors();
+  if(RPT.mode==='weekly') rptRenderWeekly();
+  else rptRenderMonthly();
+}
+
+// ── WEEKLY REPORT ─────────────────────────────────────────────
+function rptRenderWeekly(){
+  var wKey = document.getElementById('rptWeekSel').value;
+  if(!wKey){ document.getElementById('rptBody').innerHTML='<div class="empty" style="padding:48px"><span class="empty-icon">📅</span>Pilih minggu dari dropdown di atas.</div>'; return; }
+
+  var wData = DATA.byWeek && DATA.byWeek[wKey];
+  if(!wData){ document.getElementById('rptBody').innerHTML='<div class="empty" style="padding:48px"><span class="empty-icon">⚠️</span>Data tidak ditemukan untuk '+wKey+'.</div>'; return; }
+
+  var entries = (wData.snack||[]).concat(wData.meal||[]);
+  var byDate  = {};
+  entries.forEach(function(e){
+    var dk=e.rawDate||e.date;
+    if(!byDate[dk]) byDate[dk]={snack:[],meal:[],displayDate:e.date};
+    if(e.type.toLowerCase()==='snack') byDate[dk].snack.push(e);
+    else byDate[dk].meal.push(e);
+  });
+  var dayKeys = Object.keys(byDate).sort();
+
+  // Stats
+  var totalSnack=(wData.snack||[]).length;
+  var totalMeal=(wData.meal||[]).length;
+  var uniqueSnack={}, uniqueMeal={};
+  (wData.snack||[]).forEach(function(e){uniqueSnack[e.menuName.toLowerCase()]=true;});
+  (wData.meal||[]).forEach(function(e){uniqueMeal[e.menuName.toLowerCase()]=true;});
+  var uSnackCnt=Object.keys(uniqueSnack).length, uMealCnt=Object.keys(uniqueMeal).length;
+
+  // Collect all pelengkap from this week's meal data
+  var allPelengkap={};
+  (wData.meal||[]).forEach(function(e){
+    (e.components||[]).forEach(function(c){if(c.trim())allPelengkap[c.trim().toLowerCase()]=c.trim();});
+  });
+  var pelengkapList=Object.values(allPelengkap);
+
+  // Variety analysis
+  var mealNames={};
+  (wData.meal||[]).forEach(function(e){var k=e.menuName.toLowerCase();mealNames[k]=(mealNames[k]||0)+1;});
+  var snackNames={};
+  (wData.snack||[]).forEach(function(e){var k=e.menuName.toLowerCase();snackNames[k]=(snackNames[k]||0)+1;});
+
+  // Rotation score: unique/total
+  var snackScore = totalSnack>0 ? Math.round(uSnackCnt/totalSnack*100) : 0;
+  var mealScore  = totalMeal >0 ? Math.round(uMealCnt /totalMeal *100) : 0;
+
+  function statusClass(pct){ return pct>=80?'excellent':pct>=60?'good':pct>=40?'warning':'danger'; }
+  function statusLabel(pct){ return pct>=80?'Excellent':pct>=60?'Good':pct>=40?'Perlu Variasi':'Monoton'; }
+
+  // Generate insights
+  var insights = rptGenerateWeeklyInsights(wData, mealNames, snackNames, dayKeys.length);
+
+  var mon = isoWeekToMonday(wKey);
+  var sun = new Date(mon); sun.setDate(mon.getDate()+6);
+  var fmtD = function(d){return d.toLocaleDateString('id-ID',{day:'2-digit',month:'long',year:'numeric'});};
+
+  var html = '<div class="rpt-doc">';
+
+  // Cover
+  html += '<div class="rpt-cover">' +
+    '<div class="rpt-cover-eyebrow">Menu Weekly Report · PT Frisian Flag Indonesia</div>' +
+    '<div class="rpt-cover-title">Laporan Menu Mingguan</div>' +
+    '<div class="rpt-cover-sub">'+wKey+' &nbsp;·&nbsp; '+fmtD(mon)+' – '+fmtD(sun)+'</div>' +
+    '<div class="rpt-cover-meta">' +
+      '<span class="rpt-meta-chip">🏭 Cikarang Plant</span>' +
+      '<span class="rpt-meta-chip">🍽️ Vendor: GDSK</span>' +
+      '<span class="rpt-meta-chip">📅 '+dayKeys.length+' hari tercatat</span>' +
+      '<span class="rpt-meta-chip">🕐 '+new Date().toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric'})+'</span>' +
+    '</div>' +
+  '</div>';
+
+  // KPI
+  html += '<div class="rpt-section">' +
+    '<div class="rpt-sec-hdr"><span class="rpt-sec-icon">📊</span><span class="rpt-sec-title">Ringkasan Mingguan</span></div>' +
+    '<div class="rpt-kpi-row">' +
+      rptKpi('Total Snack',    totalSnack,  'menu disajikan',       '#f59e0b') +
+      rptKpi('Total Lauk',     totalMeal,   'pilihan lauk tersedia','#1d4ed8') +
+      rptKpi('Hari Tercatat',  dayKeys.length, 'dari 5 hari kerja', '#7c5ef5') +
+      rptKpi('Pelengkap',      pelengkapList.length, 'jenis pelengkap', '#16a34a') +
+    '</div>' +
+    '<div style="display:flex;gap:10px;flex-wrap:wrap">' +
+      '<div style="flex:1;min-width:180px;background:var(--snack-lt);border:1px solid var(--snack-border);border-radius:var(--r-sm);padding:12px 14px;">' +
+        '<div style="font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.1em;color:var(--snack);text-transform:uppercase;margin-bottom:6px">Variasi Snack</div>' +
+        '<div style="font-size:20px;font-weight:800;color:var(--t1)">'+uSnackCnt+' <span style="font-size:12px;font-weight:400;color:var(--t3)">dari '+totalSnack+' entri</span></div>' +
+        '<div style="margin-top:6px"><span class="rpt-status '+statusClass(snackScore)+'">'+snackScore+'% · '+statusLabel(snackScore)+'</span></div>' +
+      '</div>' +
+      '<div style="flex:1;min-width:180px;background:var(--meal-lt);border:1px solid var(--meal-border);border-radius:var(--r-sm);padding:12px 14px;">' +
+        '<div style="font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.1em;color:var(--meal);text-transform:uppercase;margin-bottom:6px">Variasi Lauk</div>' +
+        '<div style="font-size:20px;font-weight:800;color:var(--t1)">'+uMealCnt+' <span style="font-size:12px;font-weight:400;color:var(--t3)">dari '+totalMeal+' entri</span></div>' +
+        '<div style="margin-top:6px"><span class="rpt-status '+statusClass(mealScore)+'">'+mealScore+'% · '+statusLabel(mealScore)+'</span></div>' +
+      '</div>' +
+    '</div>' +
+  '</div>';
+
+  // Menu table per hari
+  html += '<div class="rpt-section">' +
+    '<div class="rpt-sec-hdr"><span class="rpt-sec-icon">📋</span><span class="rpt-sec-title">Detail Menu Per Hari</span>' +
+    '<span class="rpt-sec-badge" style="background:var(--meal-lt);color:var(--meal)">'+dayKeys.length+' hari</span></div>' +
+    '<table class="rpt-table">' +
+    '<thead><tr>' +
+      '<th style="width:100px">Tanggal</th>' +
+      '<th style="width:40%">🥐 Snack</th>' +
+      '<th>🍱 Menu Makan</th>' +
+    '</tr></thead><tbody>';
+
+  dayKeys.forEach(function(dk){
+    var day = byDate[dk];
+    // snack cell
+    var snackCell = day.snack.length
+      ? day.snack.map(function(e){
+          var comps=(e.components&&e.components.length)?e.components.join(' · '):'';
+          return '<div class="rpt-snack-name">'+cap(e.menuName)+'</div>'+(comps?'<div style="font-size:10px;color:var(--t4);font-family:var(--mono)">'+comps+'</div>':'');
+        }).join('')
+      : '<span style="color:var(--t4);font-size:11px;font-style:italic">—</span>';
+
+    // meal cell — group lauk + shared pelengkap
+    var allComps={};
+    day.meal.forEach(function(e){(e.components||[]).forEach(function(c){if(c.trim())allComps[c.trim().toLowerCase()]=c.trim();});});
+    var sharedComps = Object.values(allComps);
+    var mealCell = day.meal.length
+      ? '<div class="rpt-meal-set">'+
+          day.meal.map(function(e,i){
+            return '<div class="rpt-lauk"><span class="rpt-lauk-num">'+(i+1)+'</span><span class="rpt-lauk-name">'+cap(e.menuName)+'</span></div>';
+          }).join('')+
+          (sharedComps.length?'<div class="rpt-pelengkap">Pelengkap: '+sharedComps.map(cap).join(' · ')+'</div>':'')+
+        '</div>'
+      : '<span style="color:var(--t4);font-size:11px;font-style:italic">—</span>';
+
+    var dt = new Date(dk+'T00:00:00');
+    var dtStr = dt.toLocaleDateString('id-ID',{weekday:'short',day:'2-digit',month:'short'});
+    html += '<tr><td class="date-col">'+dtStr+'</td><td>'+snackCell+'</td><td>'+mealCell+'</td></tr>';
+  });
+
+  html += '</tbody></table></div>';
+
+  // Frequency analysis
+  var topMeals = Object.keys(mealNames).sort(function(a,b){return mealNames[b]-mealNames[a];}).slice(0,8);
+  var topSnacks = Object.keys(snackNames).sort(function(a,b){return snackNames[b]-snackNames[a];}).slice(0,5);
+  var maxMC = topMeals.length ? mealNames[topMeals[0]] : 1;
+  var maxSC = topSnacks.length ? snackNames[topSnacks[0]] : 1;
+
+  html += '<div class="rpt-section">' +
+    '<div class="rpt-sec-hdr"><span class="rpt-sec-icon">📈</span><span class="rpt-sec-title">Frekuensi Menu Minggu Ini</span></div>' +
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;flex-wrap:wrap">' +
+    '<div><div style="font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.1em;color:var(--a-amber);text-transform:uppercase;margin-bottom:10px">🥐 Snack</div>';
+  if(topSnacks.length){
+    topSnacks.forEach(function(nm){
+      var pct=Math.round(snackNames[nm]/maxSC*100);
+      html+='<div class="rpt-variety-row"><span class="rpt-variety-lbl">'+cap(nm)+'</span><div class="rpt-variety-bar-bg"><div class="rpt-variety-bar-fill" style="width:'+pct+'%;background:#f59e0b"></div></div><span class="rpt-variety-count">'+snackNames[nm]+'×</span></div>';
+    });
+  } else html+='<div style="color:var(--t4);font-size:11px">—</div>';
+  html += '</div><div><div style="font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.1em;color:var(--meal);text-transform:uppercase;margin-bottom:10px">🍱 Lauk</div>';
+  if(topMeals.length){
+    topMeals.forEach(function(nm){
+      var pct=Math.round(mealNames[nm]/maxMC*100);
+      html+='<div class="rpt-variety-row"><span class="rpt-variety-lbl">'+cap(nm)+'</span><div class="rpt-variety-bar-bg"><div class="rpt-variety-bar-fill" style="width:'+pct+'%;background:#1d4ed8"></div></div><span class="rpt-variety-count">'+mealNames[nm]+'×</span></div>';
+    });
+  } else html+='<div style="color:var(--t4);font-size:11px">—</div>';
+  html += '</div></div></div>';
+
+  // Insights
+  html += '<div class="rpt-section">' +
+    '<div class="rpt-sec-hdr"><span class="rpt-sec-icon">💡</span><span class="rpt-sec-title">Analisis & Rekomendasi</span></div>' +
+    insights +
+  '</div>';
+
+  html += '</div>'; // close rpt-doc
+  document.getElementById('rptBody').innerHTML = html;
+}
+
+function rptGenerateWeeklyInsights(wData, mealNames, snackNames, dayCount){
+  var ins = '';
+  var meals = wData.meal||[], snacks = wData.snack||[];
+
+  // 1. Coverage
+  if(dayCount < 5){
+    ins += rptInsight('warn','⚠️ Data Tidak Lengkap','Hanya '+dayCount+' dari 5 hari kerja yang memiliki data menu. Pastikan input dilakukan setiap hari agar laporan lebih akurat.');
+  } else {
+    ins += rptInsight('ok','✅ Kelengkapan Data Baik','Semua 5 hari kerja memiliki data menu yang tercatat.');
+  }
+
+  // 2. Meal repetition
+  var repeatedLauk = Object.keys(mealNames).filter(function(k){return mealNames[k]>1;});
+  if(repeatedLauk.length){
+    ins += rptInsight('warn','🔄 Lauk Berulang Dalam Minggu Ini',
+      repeatedLauk.slice(0,4).map(function(k){return '"'+cap(k)+'" ('+mealNames[k]+'×)';}).join(', ')+
+      ' muncul lebih dari sekali. Pertimbangkan untuk merotasi agar karyawan tidak bosan.');
+  } else {
+    ins += rptInsight('ok','🌟 Lauk Tidak Ada yang Berulang','Setiap lauk dalam minggu ini berbeda. Variasi sudah bagus!');
+  }
+
+  // 3. No snack days
+  var byDate2 = {};
+  meals.concat(snacks).forEach(function(e){var dk=e.rawDate||'';if(!byDate2[dk])byDate2[dk]={s:0,m:0};if(e.type.toLowerCase()==='snack')byDate2[dk].s++;else byDate2[dk].m++;});
+  var noSnackDays=Object.keys(byDate2).filter(function(k){return byDate2[k].s===0;});
+  var noMealDays =Object.keys(byDate2).filter(function(k){return byDate2[k].m===0;});
+  if(noSnackDays.length) ins+=rptInsight('warn','🥐 Hari Tanpa Snack',noSnackDays.length+' hari tidak ada data snack. Cek apakah ada yang terlewat input.');
+  if(noMealDays.length)  ins+=rptInsight('bad','🍱 Hari Tanpa Lauk',noMealDays.length+' hari tidak ada data lauk sama sekali. Perlu dicek segera.');
+
+  // 4. Pelengkap consistency
+  var allC={};
+  meals.forEach(function(e){(e.components||[]).forEach(function(c){if(c.trim()){var k=c.trim().toLowerCase();allC[k]=(allC[k]||0)+1;}});});
+  var topC=Object.keys(allC).sort(function(a,b){return allC[b]-allC[a];}).slice(0,3);
+  if(topC.length){
+    ins+=rptInsight('ok','🍚 Pelengkap Dominan Minggu Ini',
+      'Pelengkap yang paling sering muncul: '+topC.map(function(k){return cap(k)+' ('+allC[k]+'×)';}).join(', ')+'. Ini wajar sebagai pelengkap standar.');
+  }
+
+  // 5. Nutrition tip
+  var hasProtein = meals.some(function(e){return /ayam|daging|ikan|telur|tahu|tempe|udang|sapi/i.test(e.menuName);});
+  var hasVeg = Object.keys(allC).some(function(k){return /sayur|kangkung|bayam|wortel|buncis/i.test(k);});
+  if(!hasVeg) ins+=rptInsight('warn','🥦 Perhatikan Sayuran','Tidak terdeteksi sayuran dalam pelengkap minggu ini. Pertimbangkan menambah sayuran untuk keseimbangan gizi.');
+
+  if(!ins) ins=rptInsight('ok','✅ Tidak Ada Catatan Khusus','Menu minggu ini berjalan dengan baik tanpa catatan signifikan.');
+  return ins;
+}
+
+// ── MONTHLY REPORT ────────────────────────────────────────────
+function rptRenderMonthly(){
+  var mKey = document.getElementById('rptMonthSel').value;
+  if(!mKey){ document.getElementById('rptBody').innerHTML='<div class="empty" style="padding:48px"><span class="empty-icon">📆</span>Pilih bulan dari dropdown di atas.</div>'; return; }
+
+  // Filter entries for this month
+  var allE = DATA.allEntries||[];
+  var mEntries = allE.filter(function(e){
+    if(!e.rawDate) return false;
+    var d=new Date(e.rawDate+'T00:00:00');
+    var mk=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
+    return mk===mKey;
+  });
+
+  var mSnack = mEntries.filter(function(e){return e.type.toLowerCase()==='snack';});
+  var mMeal  = mEntries.filter(function(e){return e.type.toLowerCase()!=='snack';});
+
+  // By week within this month
+  var byWeekM = {};
+  mEntries.forEach(function(e){
+    var wk=e.weekKey||'';
+    if(!wk||wk.includes('NaN')) return;
+    if(!byWeekM[wk]) byWeekM[wk]={snack:[],meal:[],key:wk};
+    if(e.type.toLowerCase()==='snack') byWeekM[wk].snack.push(e);
+    else byWeekM[wk].meal.push(e);
+  });
+  var weekKeys = Object.keys(byWeekM).sort();
+
+  // Frequency tables
+  var mealFreq={}, snackFreq={};
+  mMeal.forEach(function(e){var k=e.menuName.toLowerCase();mealFreq[k]=(mealFreq[k]||0)+1;});
+  mSnack.forEach(function(e){var k=e.menuName.toLowerCase();snackFreq[k]=(snackFreq[k]||0)+1;});
+
+  // Unique counts
+  var uMeal=Object.keys(mealFreq).length, uSnack=Object.keys(snackFreq).length;
+  var snackScore=mSnack.length>0?Math.round(uSnack/mSnack.length*100):0;
+  var mealScore =mMeal.length >0?Math.round(uMeal /mMeal.length *100):0;
+
+  // Top menu per week
+  var topMealList = Object.keys(mealFreq).sort(function(a,b){return mealFreq[b]-mealFreq[a];}).slice(0,10);
+  var topSnackList= Object.keys(snackFreq).sort(function(a,b){return snackFreq[b]-snackFreq[a];}).slice(0,6);
+  var maxM = topMealList.length?mealFreq[topMealList[0]]:1;
+  var maxS = topSnackList.length?snackFreq[topSnackList[0]]:1;
+
+  // Repeated (appears in 2+ weeks)
+  var wkMealMap={}, wkSnackMap={};
+  mMeal.forEach(function(e){var k=e.menuName.toLowerCase(),w=e.weekKey||'';if(!wkMealMap[k])wkMealMap[k]=[];if(wkMealMap[k].indexOf(w)<0)wkMealMap[k].push(w);});
+  mSnack.forEach(function(e){var k=e.menuName.toLowerCase(),w=e.weekKey||'';if(!wkSnackMap[k])wkSnackMap[k]=[];if(wkSnackMap[k].indexOf(w)<0)wkSnackMap[k].push(w);});
+  var repeatedMeal  = Object.keys(wkMealMap).filter(function(k){return wkMealMap[k].length>=2;}).sort(function(a,b){return wkMealMap[b].length-wkMealMap[a].length;});
+  var repeatedSnack = Object.keys(wkSnackMap).filter(function(k){return wkSnackMap[k].length>=2;}).sort(function(a,b){return wkSnackMap[b].length-wkSnackMap[a].length;});
+
+  // Pelengkap frequency
+  var pelFreq={};
+  mMeal.forEach(function(e){(e.components||[]).forEach(function(c){if(c.trim()){var k=c.trim().toLowerCase();pelFreq[k]=(pelFreq[k]||0)+1;}});});
+  var topPel=Object.keys(pelFreq).sort(function(a,b){return pelFreq[b]-pelFreq[a];}).slice(0,8);
+
+  // Date coverage
+  var daySet={};
+  mEntries.forEach(function(e){if(e.rawDate)daySet[e.rawDate]=true;});
+  var totalDays=Object.keys(daySet).length;
+
+  var d0=new Date(mKey+'-01'), mName=d0.toLocaleDateString('id-ID',{month:'long',year:'numeric'});
+
+  function statusClass(p){return p>=80?'excellent':p>=60?'good':p>=40?'warning':'danger';}
+  function statusLabel(p){return p>=80?'Sangat Variatif':p>=60?'Variatif':p>=40?'Perlu Variasi':'Monoton';}
+
+  var html='<div class="rpt-doc">';
+
+  // Cover
+  html+='<div class="rpt-cover">'+
+    '<div class="rpt-cover-eyebrow">Menu Monthly Report · PT Frisian Flag Indonesia</div>'+
+    '<div class="rpt-cover-title">Laporan Menu Bulanan</div>'+
+    '<div class="rpt-cover-sub">'+mName+' &nbsp;·&nbsp; '+weekKeys.length+' minggu &nbsp;·&nbsp; '+totalDays+' hari tercatat</div>'+
+    '<div class="rpt-cover-meta">'+
+      '<span class="rpt-meta-chip">🏭 Cikarang Plant</span>'+
+      '<span class="rpt-meta-chip">🍽️ Vendor: GDSK</span>'+
+      '<span class="rpt-meta-chip">📅 '+totalDays+' hari data</span>'+
+      '<span class="rpt-meta-chip">🕐 '+new Date().toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric'})+'</span>'+
+    '</div>'+
+  '</div>';
+
+  // KPI
+  html+='<div class="rpt-section">'+
+    '<div class="rpt-sec-hdr"><span class="rpt-sec-icon">📊</span><span class="rpt-sec-title">Ringkasan Bulanan</span></div>'+
+    '<div class="rpt-kpi-row">'+
+      rptKpi('Total Snack', mSnack.length, 'entri snack bulan ini', '#f59e0b')+
+      rptKpi('Total Lauk',  mMeal.length,  'entri lauk bulan ini',  '#1d4ed8')+
+      rptKpi('Varian Snack', uSnack, 'menu berbeda', '#16a34a')+
+      rptKpi('Varian Lauk',  uMeal,  'menu berbeda', '#7c5ef5')+
+    '</div>'+
+    '<div style="display:flex;gap:10px;flex-wrap:wrap">'+
+      '<div style="flex:1;min-width:180px;background:var(--snack-lt);border:1px solid var(--snack-border);border-radius:var(--r-sm);padding:12px 14px;">'+
+        '<div style="font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.1em;color:var(--snack);text-transform:uppercase;margin-bottom:6px">Rotation Score Snack</div>'+
+        '<div style="font-size:20px;font-weight:800;color:var(--t1)">'+snackScore+'%</div>'+
+        '<div style="margin-top:6px"><span class="rpt-status '+statusClass(snackScore)+'">'+statusLabel(snackScore)+'</span></div>'+
+      '</div>'+
+      '<div style="flex:1;min-width:180px;background:var(--meal-lt);border:1px solid var(--meal-border);border-radius:var(--r-sm);padding:12px 14px;">'+
+        '<div style="font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.1em;color:var(--meal);text-transform:uppercase;margin-bottom:6px">Rotation Score Meal</div>'+
+        '<div style="font-size:20px;font-weight:800;color:var(--t1)">'+mealScore+'%</div>'+
+        '<div style="margin-top:6px"><span class="rpt-status '+statusClass(mealScore)+'">'+statusLabel(mealScore)+'</span></div>'+
+      '</div>'+
+      '<div style="flex:1;min-width:180px;background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r-sm);padding:12px 14px;">'+
+        '<div style="font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.1em;color:var(--a-purple);text-transform:uppercase;margin-bottom:6px">Menu Berulang</div>'+
+        '<div style="font-size:20px;font-weight:800;color:var(--t1)">'+(repeatedMeal.length+repeatedSnack.length)+'</div>'+
+        '<div style="font-size:10px;color:var(--t4);margin-top:3px">'+repeatedSnack.length+' snack · '+repeatedMeal.length+' lauk muncul 2+ minggu</div>'+
+      '</div>'+
+    '</div>'+
+  '</div>';
+
+  // Week-by-week breakdown
+  html+='<div class="rpt-section">'+
+    '<div class="rpt-sec-hdr"><span class="rpt-sec-icon">🗓</span><span class="rpt-sec-title">Rekap Per Minggu</span></div>'+
+    '<div class="rpt-month-grid">';
+  weekKeys.forEach(function(wk){
+    var w=byWeekM[wk];
+    var wDays={};
+    w.snack.concat(w.meal).forEach(function(e){if(e.rawDate)wDays[e.rawDate]=true;});
+    var uSW={}; w.snack.forEach(function(e){uSW[e.menuName.toLowerCase()]=true;});
+    var uMW={}; w.meal.forEach(function(e){uMW[e.menuName.toLowerCase()]=true;});
+    var mon=isoWeekToMonday(wk), sun=new Date(mon); sun.setDate(mon.getDate()+6);
+    var rangeStr=mon.toLocaleDateString('id-ID',{day:'2-digit',month:'short'})+' – '+sun.toLocaleDateString('id-ID',{day:'2-digit',month:'short'});
+    html+='<div class="rpt-month-card">'+
+      '<div class="rpt-month-wk">'+wk+' · '+rangeStr+'</div>'+
+      '<div class="rpt-month-days">'+Object.keys(wDays).length+' hari · '+w.snack.length+' snack · '+w.meal.length+' lauk</div>'+
+      '<div class="rpt-month-row"><span>Varian snack</span><span>'+Object.keys(uSW).length+'</span></div>'+
+      '<div class="rpt-month-row"><span>Varian lauk</span><span>'+Object.keys(uMW).length+'</span></div>'+
+    '</div>';
+  });
+  if(!weekKeys.length) html+='<div style="color:var(--t4);font-size:11px;padding:12px">Tidak ada data minggu.</div>';
+  html+='</div></div>';
+
+  // Top menus
+  html+='<div class="rpt-section">'+
+    '<div class="rpt-sec-hdr"><span class="rpt-sec-icon">🏆</span><span class="rpt-sec-title">Ranking Menu Bulan Ini</span></div>'+
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">'+
+    '<div>'+
+      '<div style="font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.1em;color:var(--a-amber);text-transform:uppercase;margin-bottom:10px">🥐 TOP SNACK</div>';
+  topSnackList.forEach(function(nm,i){
+    var pct=Math.round(snackFreq[nm]/maxS*100);
+    html+='<div class="rpt-variety-row">'+
+      '<span class="rpt-variety-lbl"><span style="font-family:var(--mono);font-size:9px;color:var(--t4);margin-right:4px">'+(i+1)+'.</span>'+cap(nm)+'</span>'+
+      '<div class="rpt-variety-bar-bg"><div class="rpt-variety-bar-fill" style="width:'+pct+'%;background:#f59e0b"></div></div>'+
+      '<span class="rpt-variety-count">'+snackFreq[nm]+'×</span>'+
+    '</div>';
+  });
+  html+='</div><div>'+
+    '<div style="font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.1em;color:var(--meal);text-transform:uppercase;margin-bottom:10px">🍱 TOP LAUK</div>';
+  topMealList.forEach(function(nm,i){
+    var pct=Math.round(mealFreq[nm]/maxM*100);
+    var repFlag=wkMealMap[nm]&&wkMealMap[nm].length>=2?' <span style="font-size:9px;color:var(--a-red);font-weight:700">⚠</span>':'';
+    html+='<div class="rpt-variety-row">'+
+      '<span class="rpt-variety-lbl"><span style="font-family:var(--mono);font-size:9px;color:var(--t4);margin-right:4px">'+(i+1)+'.</span>'+cap(nm)+repFlag+'</span>'+
+      '<div class="rpt-variety-bar-bg"><div class="rpt-variety-bar-fill" style="width:'+pct+'%;background:#1d4ed8"></div></div>'+
+      '<span class="rpt-variety-count">'+mealFreq[nm]+'×</span>'+
+    '</div>';
+  });
+  html+='</div></div>';
+  if(repeatedMeal.length||repeatedSnack.length){
+    html+='<div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--border)">'+
+      '<div style="font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.1em;color:var(--a-red);text-transform:uppercase;margin-bottom:8px">⚠ Menu Berulang Lintas Minggu</div>'+
+      (repeatedMeal.length?repeatedMeal.slice(0,5).map(function(k){return '<span style="display:inline-flex;align-items:center;gap:4px;background:rgba(239,68,68,.07);border:1px solid rgba(239,68,68,.18);border-radius:var(--r-pill);padding:2px 9px;font-size:10px;margin:2px;font-family:var(--mono)">🍱 '+cap(k)+' ('+wkMealMap[k].length+'minggu)</span>';}).join(''):'')+
+      (repeatedSnack.length?repeatedSnack.slice(0,3).map(function(k){return '<span style="display:inline-flex;align-items:center;gap:4px;background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.18);border-radius:var(--r-pill);padding:2px 9px;font-size:10px;margin:2px;font-family:var(--mono)">🥐 '+cap(k)+' ('+wkSnackMap[k].length+'minggu)</span>';}).join(''):'')+
+    '</div>';
+  }
+  html+='</div>';
+
+  // Pelengkap analysis
+  if(topPel.length){
+    html+='<div class="rpt-section">'+
+      '<div class="rpt-sec-hdr"><span class="rpt-sec-icon">🍚</span><span class="rpt-sec-title">Analisis Pelengkap Bulanan</span></div>'+
+      '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px">';
+    topPel.forEach(function(k){
+      var pct=Math.min(100,Math.round(pelFreq[k]/totalDays*100));
+      html+='<div style="background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r-sm);padding:8px 12px;min-width:120px;text-align:center">'+
+        '<div style="font-size:13px;font-weight:700;color:var(--t1);text-transform:capitalize">'+cap(k)+'</div>'+
+        '<div style="font-family:var(--mono);font-size:10px;color:var(--t3)">'+pelFreq[k]+'× ('+pct+'% hari)</div>'+
+      '</div>';
+    });
+    html+='</div></div>';
+  }
+
+  // Monthly insights
+  html+='<div class="rpt-section">'+
+    '<div class="rpt-sec-hdr"><span class="rpt-sec-icon">💡</span><span class="rpt-sec-title">Analisis & Rekomendasi Bulanan</span></div>'+
+    rptGenerateMonthlyInsights(mealScore,snackScore,repeatedMeal,repeatedSnack,weekKeys.length,totalDays,uMeal,uSnack)+
+  '</div>';
+
+  html+='</div>';
+  document.getElementById('rptBody').innerHTML=html;
+}
+
+function rptGenerateMonthlyInsights(mealScore,snackScore,repMeal,repSnack,weekCount,dayCount,uMeal,uSnack){
+  var ins='';
+  // Overall score
+  var avg=Math.round((mealScore+snackScore)/2);
+  var avgCls=avg>=80?'ok':avg>=60?'ok':avg>=40?'warn':'bad';
+  ins+=rptInsight(avgCls,
+    (avg>=80?'🌟':'avg>=60?👍':'⚠️')+' Rotation Score Keseluruhan: '+avg+'%',
+    avg>=80?'Variasi menu bulan ini sangat baik. Karyawan mendapatkan pengalaman makan yang beragam.'
+    :avg>=60?'Variasi menu cukup baik namun masih bisa ditingkatkan. Target ideal di atas 80%.'
+    :avg>=40?'Variasi menu perlu perhatian. Banyak menu yang berulang dalam bulan ini.'
+    :'Variasi menu sangat rendah. Menu terlalu monoton — perlu segera diversifikasi pilihan.'
+  );
+  // Repeated items
+  if(repMeal.length>3){
+    ins+=rptInsight('warn','🔄 '+repMeal.length+' Lauk Muncul di 2+ Minggu',
+      'Lauk yang sering berulang: '+repMeal.slice(0,4).map(function(k){return cap(k);}).join(', ')+'. Pertimbangkan mengganti dengan protein berbeda agar lebih bervariasi.');
+  }
+  if(repSnack.length>2){
+    ins+=rptInsight('warn','🥐 Snack Berulang Lintas Minggu',
+      repSnack.slice(0,3).map(function(k){return cap(k);}).join(', ')+' muncul di beberapa minggu. Rotasi snack lebih sering akan meningkatkan kepuasan karyawan.');
+  }
+  // Coverage
+  var expDays=weekCount*5;
+  if(dayCount<expDays*0.8){
+    ins+=rptInsight('bad','📋 Data Tidak Lengkap',
+      'Hanya '+dayCount+' hari tercatat dari estimasi '+expDays+' hari kerja. Pastikan admin input data setiap hari agar laporan bulanan akurat.');
+  } else {
+    ins+=rptInsight('ok','✅ Kelengkapan Data Baik',''+dayCount+' hari data tercatat dalam bulan ini.');
+  }
+  // Diversity tip
+  if(uMeal<10&&weekCount>=4){
+    ins+=rptInsight('warn','🍽️ Diversifikasi Protein',
+      'Hanya '+uMeal+' varian lauk dalam sebulan. Idealnya 15–20+ varian untuk menjaga semangat makan karyawan. Coba rotasi: ayam → ikan → daging → telur/tahu/tempe.');
+  }
+  // Positive note
+  if(avg>=70&&repMeal.length<=2&&dayCount>=expDays*0.85){
+    ins+=rptInsight('ok','🏆 Performa Menu Bulan Ini Bagus','Secara keseluruhan menu bulan ini sudah dikelola dengan baik. Pertahankan variasi dan konsistensi input data.');
+  }
+  return ins||rptInsight('ok','✅ Tidak Ada Catatan Khusus','Tidak ada masalah signifikan yang terdeteksi pada bulan ini.');
+}
+
+// ── Helpers ───────────────────────────────────────────────────
+function rptKpi(lbl,val,sub,col){
+  return '<div class="rpt-kpi" style="--rpt-acc:'+col+'">'+
+    '<div class="rpt-kpi-lbl">'+lbl+'</div>'+
+    '<div class="rpt-kpi-val">'+val+'</div>'+
+    '<div class="rpt-kpi-sub">'+sub+'</div>'+
+  '</div>';
+}
+function rptInsight(type,hdr,txt){
+  return '<div class="rpt-insight '+type+'">'+
+    '<div class="rpt-insight-hdr">'+hdr+'</div>'+
+    '<div class="rpt-insight-txt">'+txt+'</div>'+
+  '</div>';
+}
+function rptPrint(){ window.print(); }
 
 
 // ══ UTILS ══
