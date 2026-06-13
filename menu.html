@@ -1205,6 +1205,37 @@ select.inp{cursor:pointer;}
 .dist-comp-table tr:last-child td{border-bottom:none;}
 .dist-comp-table tr:hover td{background:var(--surface-2);}
 
+
+/* ══ STAT CARD — CLICKABLE DETAIL ══ */
+.stat-card.clickable{cursor:pointer;transition:transform .12s,box-shadow .12s,border-color .12s;}
+.stat-card.clickable:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(13,19,48,.12);}
+.stat-card.clickable::after{content:'↗';position:absolute;top:8px;right:10px;font-size:10px;color:var(--t4);font-family:var(--mono);}
+.stat-card-hint{font-size:9px;color:var(--t4);margin-top:4px;font-family:var(--mono);}
+
+/* ══ ANALYSIS DETAIL MODAL ══ */
+.adm-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:250;align-items:center;justify-content:center;}
+.adm-overlay.show{display:flex;}
+.adm-box{background:var(--surface);border-radius:var(--r-lg);width:90%;max-width:560px;max-height:82vh;display:flex;flex-direction:column;box-shadow:0 24px 64px rgba(0,0,0,.25);overflow:hidden;}
+.adm-hdr{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.adm-title{font-size:14px;font-weight:700;color:var(--t1);}
+.adm-count{font-family:var(--mono);font-size:11px;color:var(--t3);margin-left:8px;}
+.adm-close{background:none;border:none;font-size:20px;color:var(--t3);cursor:pointer;width:28px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:6px;transition:background .1s;}
+.adm-close:hover{background:var(--surface-2);}
+.adm-search{padding:10px 16px;border-bottom:1px solid var(--border);flex-shrink:0;}
+.adm-search-inp{width:100%;border:1.5px solid var(--border);border-radius:var(--r-sm);padding:7px 12px 7px 32px;font-size:12px;font-family:var(--font);background:var(--surface-2);color:var(--t1);background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='13' height='13' viewBox='0 0 24 24' fill='none' stroke='%239ba3be' stroke-width='2' stroke-linecap='round'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:10px center;}
+.adm-search-inp:focus{outline:none;border-color:var(--a-blue);}
+.adm-body{overflow-y:auto;padding:12px 16px;flex:1;}
+.adm-item{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:var(--r-sm);transition:background .1s;}
+.adm-item:hover{background:var(--surface-2);}
+.adm-item-rank{font-family:var(--mono);font-size:10px;color:var(--t4);min-width:22px;text-align:right;flex-shrink:0;}
+.adm-item-name{font-size:12px;font-weight:600;color:var(--t1);text-transform:capitalize;flex:1;}
+.adm-item-weeks{font-size:10px;color:var(--t3);font-family:var(--mono);}
+.adm-item-bar{flex:0 0 80px;height:4px;background:var(--surface-3);border-radius:4px;overflow:hidden;}
+.adm-item-bar-fill{height:100%;border-radius:4px;}
+.adm-item-count{font-family:var(--mono);font-size:11px;font-weight:700;color:var(--t2);min-width:32px;text-align:right;}
+.adm-empty{padding:24px;text-align:center;color:var(--t4);font-size:12px;font-style:italic;}
+@media(max-width:768px){.adm-box{width:100%;max-width:100%;border-radius:20px 20px 0 0;}.adm-overlay.show{align-items:flex-end;}}
+
 </style>
 </head>
 <body>
@@ -1781,18 +1812,36 @@ function loadData(){
 function renderAnalysisFromRows(rows,label){
   var a=buildAnalysis(rows,DATA?DATA.allEntries:rows);
   var uniqueDates={};rows.forEach(function(e){uniqueDates[e.rawDate||e.date]=true;});
+  // Build stat cards — clickable ones show detail modal
+  // Store detail data on window for modal access
+  window._admData = {
+    uniqueSnack: Object.keys(a.uniqueSnack_map||{}).length ? a.uniqueSnack_map : null,
+    uniqueMeal:  Object.keys(a.uniqueMeal_map||{}).length  ? a.uniqueMeal_map  : null,
+    repSnack:    a.repeatedSnack||[],
+    repMeal:     a.repeatedMeal||[],
+    topSnack:    a.topSnack||[],
+    topMeal:     a.topMeal||[]
+  };
+  var rotVal=(function(){var rs=a.rotationScore||{};var s=rs.snack||0,m=rs.meal||0;if(!s)return m+'%';if(!m)return s+'%';return Math.round((s+m)/2)+'%';}());
   document.getElementById('statsGrid').innerHTML=[
-    {icon:'🥐',val:a.uniqueSnack||0,lbl:'Unique Snacks',sub:'Different menus',ac:'ac-amber'},
-    {icon:'🍱',val:a.uniqueMeal||0,lbl:'Unique Meals',sub:'Different dishes',ac:'ac-navy'},
-    {icon:'📅',val:Object.keys(uniqueDates).length,lbl:'Days Recorded',sub:'With menu data',ac:'ac-green'},
-    {icon:'⚠️',val:(a.repeatedSnack||[]).length,lbl:'Repeated Snacks',sub:'Multi-week menus',ac:'ac-amber'},
-    {icon:'⚠️',val:(a.repeatedMeal||[]).length,lbl:'Repeated Meals',sub:'Multi-week menus',ac:'ac-red'},
-    {icon:'✅',val:(function(){var rs=a.rotationScore||{};var s=rs.snack||0,m=rs.meal||0;if(!s)return m+'%';if(!m)return s+'%';return Math.round((s+m)/2)+'%';}())+'',lbl:'Rotation Score',sub:'Variasi per minggu',ac:'ac-blue'}
+    {icon:'🥐',val:a.uniqueSnack||0,lbl:'Unique Snacks',sub:'Tap untuk lihat daftar',ac:'ac-amber',
+     click:'admShow(\'snack-unique\')'},
+    {icon:'🍱',val:a.uniqueMeal||0,lbl:'Unique Meals',sub:'Tap untuk lihat daftar',ac:'ac-navy',
+     click:'admShow(\'meal-unique\')'},
+    {icon:'📅',val:Object.keys(uniqueDates).length,lbl:'Days Recorded',sub:'With menu data',ac:'ac-green',click:''},
+    {icon:'⚠️',val:(a.repeatedSnack||[]).length,lbl:'Repeated Snacks',sub:'Tap untuk lihat detail',ac:'ac-amber',
+     click:(a.repeatedSnack||[]).length?'admShow(\'snack-repeat\')':''},
+    {icon:'⚠️',val:(a.repeatedMeal||[]).length,lbl:'Repeated Meals',sub:'Tap untuk lihat detail',ac:'ac-red',
+     click:(a.repeatedMeal||[]).length?'admShow(\'meal-repeat\')':''},
+    {icon:'✅',val:rotVal,lbl:'Rotation Score',sub:'Variasi per minggu',ac:'ac-blue',click:''}
   ].map(function(s){
-    return '<div class="stat-card '+s.ac+'"><span class="stat-icon">'+s.icon+'</span>'+
+    var clickable = s.click ? ' clickable" onclick="'+s.click+'"' : '"';
+    return '<div class="stat-card '+s.ac+clickable+'><span class="stat-icon">'+s.icon+'</span>'+
       '<div class="stat-val">'+s.val+'</div>'+
       '<div class="stat-lbl">'+s.lbl+'</div>'+
-      '<div class="stat-sub">'+s.sub+'</div></div>';
+      '<div class="stat-sub">'+s.sub+'</div>'+
+      (s.click?'<div class="stat-card-hint">klik untuk detail</div>':'')+
+    '</div>';
   }).join('');
   renderScoreRings(a.rotationScore||{snack:0,meal:0});
   renderSuggestions(a);
@@ -1868,12 +1917,22 @@ function buildAnalysis(filtered,all){
     mealRotScore=Math.round(mealSum/mealWeekKeys.length/5*100);
   }
 
+  // Build full unique menu maps for detail modal
+  var uSnackMap={}, uMealMap={};
+  Object.keys(wkSnack).forEach(function(k){
+    uSnackMap[k]={name:k,weekCount:wkSnack[k].length,totalCount:snackFreq[k]||0,weeks:wkSnack[k].slice()};
+  });
+  Object.keys(wkMeal).forEach(function(k){
+    uMealMap[k]={name:k,weekCount:wkMeal[k].length,totalCount:mealFreq[k]||0,weeks:wkMeal[k].slice()};
+  });
+
   return{
     repeatedSnack:repSnack,repeatedMeal:repMeal,
     topSnack:topN(snackFreq,5),topMeal:topN(mealFreq,8),
     uniqueSnack:uSnack,uniqueMeal:uMeal,totalSnack:tSnack,totalMeal:tMeal,
     totalWeeks:totalWeeks,
-    rotationScore:{snack:snackRotScore,meal:mealRotScore}
+    rotationScore:{snack:snackRotScore,meal:mealRotScore},
+    uniqueSnack_map:uSnackMap, uniqueMeal_map:uMealMap
   };
 }
 
@@ -4568,6 +4627,95 @@ onWeekChange = function(val) {
 window.addEventListener('DOMContentLoaded', mobInit);
 window.addEventListener('resize', mobInit);
 
+// ══ ANALYSIS DETAIL MODAL ══════════════════════════════════════
+// Types: 'snack-unique', 'meal-unique', 'snack-repeat', 'meal-repeat'
+var _admCurrent = [];
+
+function admShow(type) {
+  var d = window._admData || {};
+  var items = [], title = '', color = '';
+
+  if (type === 'snack-unique') {
+    title = '🥐 Semua Snack Unik';
+    color = '#f59e0b';
+    // Sort by frequency descending
+    items = Object.values(d.uniqueSnack || {}).sort(function(a,b){return b.totalCount-a.totalCount;});
+  } else if (type === 'meal-unique') {
+    title = '🍱 Semua Lauk Unik';
+    color = '#1d4ed8';
+    items = Object.values(d.uniqueMeal || {}).sort(function(a,b){return b.totalCount-a.totalCount;});
+  } else if (type === 'snack-repeat') {
+    title = '⚠️ Snack Berulang (2+ minggu)';
+    color = '#f59e0b';
+    items = (d.repSnack || []).map(function(r){
+      return {name:r.name, totalCount:r.count, weekCount:r.count, weeks:r.weeks};
+    });
+  } else if (type === 'meal-repeat') {
+    title = '⚠️ Lauk Berulang (2+ minggu)';
+    color = '#ef4444';
+    items = (d.repMeal || []).map(function(r){
+      return {name:r.name, totalCount:r.count, weekCount:r.count, weeks:r.weeks};
+    });
+  }
+
+  _admCurrent = items;
+  var maxCount = items.length ? Math.max.apply(null, items.map(function(i){return i.totalCount||1;})) : 1;
+  window._admColor = color;
+  window._admMax = maxCount;
+
+  document.getElementById('admTitle').textContent = title;
+  document.getElementById('admCount').textContent = '(' + items.length + ')';
+  document.getElementById('admSearch').value = '';
+  admRenderItems(items, color, maxCount);
+  document.getElementById('admOverlay').classList.add('show');
+  document.body.style.overflow = 'hidden';
+  // Focus search
+  setTimeout(function(){ var s=document.getElementById('admSearch'); if(s) s.focus(); }, 120);
+}
+
+function admRenderItems(items, color, maxCount) {
+  var body = document.getElementById('admBody');
+  if (!items.length) {
+    body.innerHTML = '<div class="adm-empty">Tidak ada item ditemukan.</div>';
+    return;
+  }
+  body.innerHTML = items.map(function(item, i) {
+    var pct = maxCount ? Math.round((item.totalCount||1) / maxCount * 100) : 0;
+    var weekTxt = item.weeks && item.weeks.length
+      ? 'W' + item.weeks.slice().sort(function(a,b){return a-b;}).slice(0,5).join(', W') +
+        (item.weeks.length > 5 ? '…' : '')
+      : '';
+    return '<div class="adm-item">' +
+      '<span class="adm-item-rank">' + (i+1) + '</span>' +
+      '<div style="flex:1;min-width:0;">' +
+        '<div class="adm-item-name">' + cap(item.name) + '</div>' +
+        (weekTxt ? '<div class="adm-item-weeks">' + weekTxt + '</div>' : '') +
+      '</div>' +
+      '<div class="adm-item-bar"><div class="adm-item-bar-fill" style="width:'+pct+'%;background:'+color+'"></div></div>' +
+      '<span class="adm-item-count">' + (item.totalCount||item.weekCount||0) + '×</span>' +
+    '</div>';
+  }).join('');
+}
+
+function admFilter() {
+  var q = (document.getElementById('admSearch').value || '').trim().toLowerCase();
+  var filtered = q
+    ? _admCurrent.filter(function(i){ return i.name.toLowerCase().indexOf(q) >= 0; })
+    : _admCurrent;
+  admRenderItems(filtered, window._admColor||'var(--a-blue)', window._admMax||1);
+  document.getElementById('admCount').textContent = '(' + filtered.length + (q?' dari '+_admCurrent.length:'') + ')';
+}
+
+function admClose() {
+  document.getElementById('admOverlay').classList.remove('show');
+  document.body.style.overflow = '';
+}
+
+// Close on Escape
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape' && document.getElementById('admOverlay').classList.contains('show')) admClose();
+});
+
 // ══ UTILS ══
 function tryParseDate(str){
   if(!str)return null;str=str.trim();
@@ -4587,6 +4735,23 @@ function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').
 function toast(msg,type){var t=document.getElementById('toast');if(!t)return;t.textContent=msg;t.className='toast '+(type||'');t.classList.add('show');setTimeout(function(){t.classList.remove('show');},3200);}
 
 </script>
+<!-- ══ ANALYSIS DETAIL MODAL ══ -->
+<div class="adm-overlay" id="admOverlay" onclick="if(event.target===this)admClose()">
+  <div class="adm-box">
+    <div class="adm-hdr">
+      <div style="display:flex;align-items:center;">
+        <span class="adm-title" id="admTitle">—</span>
+        <span class="adm-count" id="admCount"></span>
+      </div>
+      <button class="adm-close" onclick="admClose()">×</button>
+    </div>
+    <div class="adm-search">
+      <input type="text" class="adm-search-inp" id="admSearch" placeholder="Filter menu…" oninput="admFilter()">
+    </div>
+    <div class="adm-body" id="admBody"></div>
+  </div>
+</div>
+
 <!-- ══ MOBILE BOTTOM NAVIGATION ══════════════════════════════════
      Hidden on desktop (display:none), shown on mobile via CSS.
      ══════════════════════════════════════════════════════════ -->
