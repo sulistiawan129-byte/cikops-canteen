@@ -1795,7 +1795,7 @@ function loadData(){
     .then(function(r){var ct=r.headers.get('content-type')||'';if(!ct.includes('json'))return r.text().then(function(){throw new Error('Non-JSON response. Try reloading.');});return r.json();})
     .then(function(data){
       if(!data.success)throw new Error(data.message||'API error');
-      DATA=data;DATA.allEntries=data.entries||[];
+      DATA=data;DATA.allEntries=data.entries||[];normalizeAllEntries(DATA.allEntries);
       fillWeekSelector(data.availableWeeks||[]);
       loader.style.display='none';document.getElementById('analysisContent').style.display='';
       applyWeekFilter();
@@ -4715,6 +4715,66 @@ function admClose() {
 document.addEventListener('keydown', function(e) {
   if (e.key === 'Escape' && document.getElementById('admOverlay').classList.contains('show')) admClose();
 });
+
+// ══ MENU NAME NORMALIZER ══════════════════════════════════════════════════
+// Aturan:
+//  1. Strip angka/nomor di akhir nama: "Bakso 1", "Bakso 2" → "Bakso"
+//  2. Strip suffix kosong: "Soto  " → "Soto"
+//  3. KECUALI "nasi goreng ..." → biarkan, karena itu beda varian
+//     (nasi goreng ayam ≠ nasi goreng kampung)
+//  4. Juga kecuali "mie goreng ..." (sama logika)
+//  5. Normalisasi: trim + lowercase untuk perbandingan, display pakai cap()
+//
+// Contoh:
+//  "Bakso 1"         → "Bakso"
+//  "Bakso 2"         → "Bakso"
+//  "Soto Ayam 3"     → "Soto Ayam"
+//  "Nasi Goreng Ayam"→ "Nasi Goreng Ayam"  (tidak diubah)
+//  "Nasi Goreng 1"   → "Nasi Goreng 1"     (tidak diubah — mungkin varian)
+//  "Mie Goreng Spesial" → "Mie Goreng Spesial" (tidak diubah)
+
+var NORM_EXCEPTIONS = [
+  /^nasi\s+goreng\b/i,   // nasi goreng + apapun
+  /^mie\s+goreng\b/i,    // mie goreng + apapun
+  /^bihun\s+goreng\b/i,  // bihun goreng
+  /^kwetiau\s+goreng\b/i,// kwetiau goreng
+  /^kwetiaw\s+goreng\b/i,
+  /^mi\s+goreng\b/i,
+];
+
+function normalizeMenuName(name) {
+  if (!name) return name;
+  var trimmed = name.trim();
+
+  // Check if this is an exception (varian goreng — keep as-is)
+  for (var i = 0; i < NORM_EXCEPTIONS.length; i++) {
+    if (NORM_EXCEPTIONS[i].test(trimmed)) return trimmed;
+  }
+
+  // Strip trailing: number, roman numeral, or letter suffix
+  // Patterns: "Bakso 1", "Bakso 2", "Soto A", "Soto I", "Soto II"
+  // But NOT "Ayam Goreng" (word in middle), only at end
+  var normalized = trimmed
+    .replace(/\s+\d+\s*$/,'')          // trailing digits: "Bakso 1" → "Bakso"
+    .replace(/\s+[ivxIVX]+\s*$/,'')    // trailing roman: "Soto III" → "Soto"
+    .replace(/\s+[A-Z]\s*$/,'')        // trailing single capital: "Soto A" → "Soto"
+    .trim();
+
+  return normalized || trimmed; // fallback to original if result empty
+}
+
+// Apply normalization to all entries in DATA
+// Called once after data loads — mutates menuName in-place
+function normalizeAllEntries(entries) {
+  if (!entries || !entries.length) return entries;
+  entries.forEach(function(e) {
+    if (e.menuName) {
+      e._rawMenuName = e.menuName; // preserve original
+      e.menuName = normalizeMenuName(e.menuName);
+    }
+  });
+  return entries;
+}
 
 // ══ UTILS ══
 function tryParseDate(str){
