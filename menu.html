@@ -1717,23 +1717,7 @@ function toggleTheme(){
 }
 
 // ══ TABS ══
-function openTab(name){
-  ['analysis','calendar','weekly','input','report'].forEach(function(t){
-    var pane=document.getElementById('pane-'+t);
-    if(pane) pane.style.display=t===name?'':'none';
-    var btn=document.getElementById('tab-'+t);
-    if(btn)btn.classList.toggle('active',t===name);
-  });
-  if(name==='calendar'){
-    if(selWeek){calWeekKey=selWeek;var m=isoWeekToMonday(selWeek);calYear=m.getFullYear();calMonth=m.getMonth();}
-    if(DATA)renderCalendar();
-  }
-  if(name==='weekly'&&DATA)renderWeekly();
-  if(name==='report'){rptFillSelectors();tvFillWeekSel();if(RPT.mode==='weekly')rptSetMode('weekly');else rptRender();}
-  // Update viewing period label
-  var vp=document.getElementById('viewingPeriod');
-  if(vp)vp.textContent=selWeek?(DATA&&DATA.byWeek&&DATA.byWeek[selWeek]&&DATA.byWeek[selWeek].label)||selWeek:'All Data';
-}
+// openTab defined below with full 7-tab support
 
 // ══ WEEK FILTER ══
 function onWeekChange(val){selWeek=val;applyWeekFilter();}
@@ -1803,7 +1787,7 @@ function renderAnalysisFromRows(rows,label){
     {icon:'📅',val:Object.keys(uniqueDates).length,lbl:'Days Recorded',sub:'With menu data',ac:'ac-green'},
     {icon:'⚠️',val:(a.repeatedSnack||[]).length,lbl:'Repeated Snacks',sub:'Multi-week menus',ac:'ac-amber'},
     {icon:'⚠️',val:(a.repeatedMeal||[]).length,lbl:'Repeated Meals',sub:'Multi-week menus',ac:'ac-red'},
-    {icon:'✅',val:Math.round(((a.rotationScore||{}).snack||0)+((a.rotationScore||{}).meal||0))/2+'%',lbl:'Avg Rotation',sub:'Variety score',ac:'ac-blue'}
+    {icon:'✅',val:(function(){var rs=a.rotationScore||{};var s=rs.snack||0,m=rs.meal||0;if(!s)return m+'%';if(!m)return s+'%';return Math.round((s+m)/2)+'%';}())+'',lbl:'Rotation Score',sub:'Variasi per minggu',ac:'ac-blue'}
   ].map(function(s){
     return '<div class="stat-card '+s.ac+'"><span class="stat-icon">'+s.icon+'</span>'+
       '<div class="stat-val">'+s.val+'</div>'+
@@ -1835,11 +1819,61 @@ function buildAnalysis(filtered,all){
   var uSnack=Object.keys(wkSnack).length,uMeal=Object.keys(wkMeal).length;
   var tSnack=filtered.filter(function(e){return e.type.toLowerCase()==='snack';}).length;
   var tMeal=filtered.filter(function(e){return e.type.toLowerCase()!=='snack';}).length;
+
+  // ── Rotation Score yang benar: per-minggu variety ──────────────────
+  // Hitung berapa persen minggu yang punya menu BERBEDA dari minggu sebelumnya.
+  // Makin banyak menu beda tiap minggu = score tinggi.
+  // Logic: kumpulkan set menu per minggu, hitung berapa minggu punya menu unik.
+  var weekNums=Object.keys(wkSnack).reduce(function(a,k){wkSnack[k].forEach(function(w){a[w]=true;});return a;},{});
+  Object.keys(wkMeal).forEach(function(k){wkMeal[k].forEach(function(w){weekNums[w]=true;});});
+  var totalWeeks=Object.keys(weekNums).length||1;
+
+  // Snack: rata-rata jumlah varian snack berbeda per minggu / total snack per minggu
+  var snackByWeek={};
+  filtered.filter(function(e){return e.type.toLowerCase()==='snack';}).forEach(function(e){
+    var w=e.week||0;
+    if(!snackByWeek[w]) snackByWeek[w]={total:0,unique:{}};
+    snackByWeek[w].total++;
+    snackByWeek[w].unique[e.menuName.toLowerCase()]=true;
+  });
+  var snackWeekKeys=Object.keys(snackByWeek);
+  var snackRotScore=0;
+  if(snackWeekKeys.length){
+    // Score = rata-rata (menu unik per minggu / hari kerja seminggu)
+    // Ideal: tiap hari beda menu = 5 unique per week = 100%
+    // Cap at 5 unique per week as 100%
+    var snackSum=snackWeekKeys.reduce(function(a,wk){
+      var u=Object.keys(snackByWeek[wk].unique).length;
+      return a+Math.min(u,5);
+    },0);
+    snackRotScore=Math.round(snackSum/snackWeekKeys.length/5*100);
+  }
+
+  var mealByWeek={};
+  filtered.filter(function(e){return e.type.toLowerCase()!=='snack';}).forEach(function(e){
+    var w=e.week||0;
+    if(!mealByWeek[w]) mealByWeek[w]={total:0,unique:{}};
+    mealByWeek[w].total++;
+    mealByWeek[w].unique[e.menuName.toLowerCase()]=true;
+  });
+  var mealWeekKeys=Object.keys(mealByWeek);
+  var mealRotScore=0;
+  if(mealWeekKeys.length){
+    // Meal: ideal 3 lauk per hari x 5 hari = 15 unique per week = 100%
+    // realistically cap at 5 unique lauk per week
+    var mealSum=mealWeekKeys.reduce(function(a,wk){
+      var u=Object.keys(mealByWeek[wk].unique).length;
+      return a+Math.min(u,5);
+    },0);
+    mealRotScore=Math.round(mealSum/mealWeekKeys.length/5*100);
+  }
+
   return{
     repeatedSnack:repSnack,repeatedMeal:repMeal,
     topSnack:topN(snackFreq,5),topMeal:topN(mealFreq,8),
     uniqueSnack:uSnack,uniqueMeal:uMeal,totalSnack:tSnack,totalMeal:tMeal,
-    rotationScore:{snack:tSnack>0?Math.round(uSnack/tSnack*100):0,meal:tMeal>0?Math.round(uMeal/tMeal*100):0}
+    totalWeeks:totalWeeks,
+    rotationScore:{snack:snackRotScore,meal:mealRotScore}
   };
 }
 
@@ -2223,7 +2257,8 @@ function rptSetMode(m){
   RPT.mode = m;
   document.getElementById('rptBtnWeekly').classList.toggle('active',  m==='weekly');
   document.getElementById('rptBtnMonthly').classList.toggle('active', m==='monthly');
-  document.getElementById('rptBtnTV').classList.toggle('active',      m==='tv');
+  var rptBtnTV=document.getElementById('rptBtnTV');
+  if(rptBtnTV) rptBtnTV.classList.toggle('active', m==='tv');
   document.getElementById('rptWeekSel').style.display    = m==='weekly'  ? '' : 'none';
   document.getElementById('rptMonthSel').style.display   = m==='monthly' ? '' : 'none';
   document.getElementById('rptTVWeekSel').style.display  = m==='tv' ? '' : 'none';
@@ -3998,6 +4033,8 @@ function mfSearch(){
     if(rd>grouped[k].latestDate) grouped[k].latestDate=rd;
     if(e.type.toLowerCase()==='snack') grouped[k].snackCount++;
     else grouped[k].mealCount++;
+    // Keep type as dominant (most frequent)
+    grouped[k].type = grouped[k].snackCount >= grouped[k].mealCount ? 'snack' : 'meal';
     var mk=rd.substring(0,7);
     grouped[k].monthCount[mk]=(grouped[k].monthCount[mk]||0)+1;
   });
@@ -4259,6 +4296,9 @@ function distGenerate(){
 
   var pool=distGetPool(type,src);
   if(!pool.snack.length&&!pool.meal.length){toast('Tidak ada data menu dalam histori yang dipilih.','err');return;}
+  // Extra guard: type-specific pool empty
+  if(type==='snack'&&!pool.snack.length){toast('Tidak ada data snack dalam histori yang dipilih.','err');return;}
+  if(type==='meal' &&!pool.meal.length) {toast('Tidak ada data meal dalam histori yang dipilih.','err');return;}
 
   var y=parseInt(monthKey.split('-')[0]),m=parseInt(monthKey.split('-')[1])-1;
   var weeks=distGetWeeks(monthKey);
@@ -4271,16 +4311,17 @@ function distGenerate(){
       return Object.assign({},x,{catId:distGetMenuCat(t,x.name)});
     });
   }
-  var snackPool=attachCats(pool.snack,'snack');
-  var mealPool =attachCats(pool.meal,'meal');
+  // ── Apply type filter: only generate the requested type ──────
+  // Bug fix: previously always generated both and ignored type selector
+  var snackPool = (type==='meal') ? [] : attachCats(pool.snack,'snack');
+  var mealPool  = (type==='snack')? [] : attachCats(pool.meal, 'meal');
 
   // ── Algorithm: Smart Weekly-Varied Scheduling ──────────────
   // Rules:
   //   1. Full Mon–Sun displayed per week
   //   2. Each week's snack lineup ≠ previous week (no same menu same weekday)
   //   3. Within a week: no two consecutive days in same category (e.g. no nasi twice in a row)
-  //   4. Each week: try to cover ≥3 different categories
-  //   5. Menus rotated least-used first
+  //   4. Menus rotated least-used first
 
   function buildWeeklySchedule(poolItems, nWeeks) {
     if(!poolItems.length) return weeks.map(function(){return {mon:null,tue:null,wed:null,thu:null,fri:null,sat:null,sun:null};});
@@ -4344,8 +4385,8 @@ function distGenerate(){
     return weekSchedules;
   }
 
-  var snackWeeks=buildWeeklySchedule(snackPool,weeks.length);
-  var mealWeeks =buildWeeklySchedule(mealPool, weeks.length);
+  var snackWeeks=snackPool.length ? buildWeeklySchedule(snackPool,weeks.length) : weeks.map(function(){return Array(7).fill({name:'',catId:'other'});});
+  var mealWeeks =mealPool.length  ? buildWeeklySchedule(mealPool, weeks.length) : weeks.map(function(){return Array(7).fill({name:'',catId:'other'});});
 
   distRenderWeeklyCalendar(y,m,weeks,today,snackWeeks,mealWeeks,type,monthKey);
   distUpdateStats();
@@ -4504,21 +4545,7 @@ function syncMobWeekPill() {
   mob.value = desk.value;
 }
 
-// Sync mobile bottom nav active state with desktop tabs
-var _origOpenTabMob = openTab;
-openTab = function(name) {
-  _origOpenTabMob(name);
-  // Sync mobile bottom nav
-  ['analysis','calendar','weekly','input','report'].forEach(function(t) {
-    var mbtn = document.getElementById('mobtab-'+t);
-    if (mbtn) mbtn.classList.toggle('active', t === name);
-  });
-  // Scroll page area back to top on tab change (native feel)
-  if (isMobile()) {
-    var pa = document.querySelector('.page-area');
-    if (pa) pa.scrollTop = 0;
-  }
-};
+// openTab already handles mob tab sync and scroll — no override needed
 
 // Sync mobile week filter pill after data loads
 var _origFillWeekSel = fillWeekSelector;
@@ -4555,8 +4582,8 @@ function tryParseDate(str){
   return null;
 }
 function toYMD(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
-function cap(s){if(!s)return'';return s.charAt(0).toUpperCase()+s.slice(1).toLowerCase();}
-function esc(s){return String(s||'').replace(/'/g,'&apos;').replace(/"/g,'&quot;');}
+function cap(s){if(!s)return'';s=String(s);return s.charAt(0).toUpperCase()+s.slice(1).toLowerCase();}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/'/g,'&apos;').replace(/"/g,'&quot;');}
 function toast(msg,type){var t=document.getElementById('toast');if(!t)return;t.textContent=msg;t.className='toast '+(type||'');t.classList.add('show');setTimeout(function(){t.classList.remove('show');},3200);}
 
 </script>
