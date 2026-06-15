@@ -4330,106 +4330,195 @@ function distRenderCatSummary(){
 }
 
 // ── Main Generate ──────────────────────────────────────────────
+// ── Menu tag classifier — used by scheduler AND validator ───────────────
+function getMenuTag(name){
+  var n=String(name||'').toLowerCase();
+  if(/sambal\s+kacang/.test(n)) return 'sambal_kacang';
+  if(/nasi/.test(n)||/^nasi/.test(n)) return 'nasi';
+  if(/mie|mi|bihun|kwetiau|kwetiaw/.test(n)) return 'mie';
+  return '';
+}
+
 function distGenerate(){
   if(!DATA){toast('Data belum dimuat.','err');return;}
-  var type=(document.getElementById('distType').value)||'both';
-  var src=parseInt(document.getElementById('distSource').value)||3;
-  var monthKey=(document.getElementById('distMonth').value)||'';
+  var type    = (document.getElementById('distType').value)||'both';
+  var src     = parseInt(document.getElementById('distSource').value)||3;
+  var monthKey= (document.getElementById('distMonth').value)||'';
   if(!monthKey){toast('Pilih bulan target terlebih dahulu.','err');return;}
 
   var pool=distGetPool(type,src);
-  if(!pool.snack.length&&!pool.meal.length){toast('Tidak ada data menu dalam histori yang dipilih.','err');return;}
-  // Extra guard: type-specific pool empty
-  if(type==='snack'&&!pool.snack.length){toast('Tidak ada data snack dalam histori yang dipilih.','err');return;}
-  if(type==='meal' &&!pool.meal.length) {toast('Tidak ada data meal dalam histori yang dipilih.','err');return;}
+  if(!pool.snack.length&&!pool.meal.length){toast('Tidak ada data menu dalam histori.','err');return;}
+  if(type==='snack'&&!pool.snack.length){toast('Tidak ada data snack dalam histori.','err');return;}
+  if(type==='meal' &&!pool.meal.length) {toast('Tidak ada data meal dalam histori.','err');return;}
 
   var y=parseInt(monthKey.split('-')[0]),m=parseInt(monthKey.split('-')[1])-1;
   var weeks=distGetWeeks(monthKey);
   var today=new Date();
-  var cats=distLoadCats();
 
-  // Attach category to each pool item
   function attachCats(items,t){
-    return items.map(function(x){
-      return Object.assign({},x,{catId:distGetMenuCat(t,x.name)});
-    });
+    return items.map(function(x){return Object.assign({},x,{catId:distGetMenuCat(t,x.name)});});
   }
-  // ── Apply type filter: only generate the requested type ──────
-  // Bug fix: previously always generated both and ignored type selector
-  var snackPool = (type==='meal') ? [] : attachCats(pool.snack,'snack');
-  var mealPool  = (type==='snack')? [] : attachCats(pool.meal, 'meal');
+  var snackPool=(type==='meal') ? [] : attachCats(pool.snack,'snack');
+  var mealPool =(type==='snack')? [] : attachCats(pool.meal, 'meal');
 
-  // ── Algorithm: Smart Weekly-Varied Scheduling ──────────────
-  // Rules:
-  //   1. Full Mon–Sun displayed per week
-  //   2. Each week's snack lineup ≠ previous week (no same menu same weekday)
-  //   3. Within a week: no two consecutive days in same category (e.g. no nasi twice in a row)
-  //   4. Menus rotated least-used first
+  // ════════════════════════════════════════════════════════════════
+  // SMART SCHEDULE BUILDER v2
+  // Rules (all applied in priority order):
+  //  R1. Nasi max 1x per minggu (any menu with "nasi" in name)
+  //  R2. Santan max 1x per minggu (category=berkuahsantan)
+  //  R3. Menu "nasi" tidak boleh berurutan antar hari
+  //  R4. Menu "mie" tidak boleh berurutan antar hari
+  //  R5. Menu "sambal kacang" tidak boleh berurutan antar hari
+  //  R6. Rotasi semua menu minimal 2 minggu sekali (no repeat same menu in consecutive weeks same slot)
+  //  R7. Menu favorit (freq tertinggi) muncul max 1x per 2 minggu
+  // ════════════════════════════════════════════════════════════════
 
-  function buildWeeklySchedule(poolItems, nWeeks) {
-    if(!poolItems.length) return weeks.map(function(){return {mon:null,tue:null,wed:null,thu:null,fri:null,sat:null,sun:null};});
-    // Sort: least frequent first
-    var sorted=poolItems.slice().sort(function(a,b){return a.freq-b.freq;});
-    var names=sorted.map(function(x){return {name:x.name,catId:x.catId};});
+  function getMenuTag(name){
+    // Returns which special tag a menu has: 'nasi','mie','sambal_kacang', or ''
+    var n=name.toLowerCase();
+    if(/\bsambal\s+kacang\b/.test(n)) return 'sambal_kacang';
+    if(/\bnasi\b/.test(n)||/^nasi/.test(n)) return 'nasi';
+    if(/\bmie\b/.test(n)||/\bmi\b/.test(n)||/\bmie\b/.test(n)||/bihun/.test(n)||/kwetiau/.test(n)||/kwetiaw/.test(n)) return 'mie';
+    return '';
+  }
 
-    var weekSchedules=[]; // array of {day0..day6: name}
-    var usedInPrevWeek=[]; // names used last week (to avoid same slot)
-    var globalPtr=0;
+  function buildSmartSchedule(poolItems, nWeeks) {
+    if(!poolItems.length) return weeks.map(function(){return Array(7).fill({name:'',catId:'other',tag:'',score:0});});
 
-    for(var wi=0;wi<nWeeks;wi++){
-      var week=[];
-      var usedThisWeek=[];
-      var lastCat='';
+    // ── Classify each pool item ──────────────────────────────────
+    var items = poolItems.map(function(x){
+      return {
+        name:    x.name,
+        catId:   x.catId,
+        freq:    x.freq||1,
+        tag:     getMenuTag(x.name),
+        isFav:   false   // marked below
+      };
+    });
 
-      for(var di=0;di<7;di++){
-        // Pick a menu:
-        // - Not same as what was on this day-of-week last week
-        // - Not same cat as yesterday (within week)
-        // - Not already used this week if pool is big enough
-        var prevWeekDay=(usedInPrevWeek[di]||'').toLowerCase();
-        var attempts=0;
-        var picked=null, pickedCat='';
-        var ptr2=globalPtr;
-        while(attempts<names.length*2){
-          var idx=ptr2%names.length;
-          var candidate=names[idx];
-          var cname=candidate.name.toLowerCase();
-          var ccat=candidate.catId;
-          var sameAsLastWeekDay=cname===prevWeekDay;
-          var sameCatAsYesterday=ccat===lastCat&&ccat!=='other';
-          var alreadyThisWeek=usedThisWeek.indexOf(cname)>=0&&poolItems.length>7;
-          if(!sameAsLastWeekDay&&!sameCatAsYesterday&&!alreadyThisWeek){
-            picked=candidate.name; pickedCat=ccat;
-            globalPtr=idx+1;
-            break;
-          }
-          ptr2++; attempts++;
+    // Mark favorites: top 20% by frequency
+    var freqs = items.map(function(x){return x.freq;}).sort(function(a,b){return b-a;});
+    var favThreshold = freqs[Math.max(0, Math.floor(freqs.length*0.2)-1)] || 999;
+    items.forEach(function(x){ x.isFav = x.freq >= favThreshold && favThreshold < 999; });
+
+    // Sort pool: least-freq first (so rare menus fill slots first)
+    items.sort(function(a,b){return a.freq-b.freq;});
+
+    // ── Per-week state ───────────────────────────────────────────
+    var weekSchedules = [];
+    // Track usage across weeks for R6 (2-week rotation) and R7 (fav cooldown)
+    var usedInPrevWeek   = [];  // [slot0..slot6] name used last week
+    var usedPrev2Weeks   = {};  // name → last weekIdx it was used
+    var favLastUsedWeek  = {};  // name → last weekIdx for favorites
+
+    for(var wi=0; wi<nWeeks; wi++){
+      var week = [];
+      var nasiCountThisWeek    = 0;  // R1: max 1 nasi per week
+      var santanCountThisWeek  = 0;  // R2: max 1 santan per week
+      var lastTag              = ''; // R3/R4/R5: track yesterday's tag
+
+      for(var di=0; di<7; di++){
+        var prevSlotName = (usedInPrevWeek[di]||'').toLowerCase();
+
+        // Score every candidate — lower score = better pick
+        function scoreCandidate(item){
+          var score = 0;
+          var n  = item.name.toLowerCase();
+          var tag = item.tag;
+          var cat = item.catId;
+
+          // HARD blocks (return Infinity if violated)
+          // R1: nasi max 1x per week
+          if(tag==='nasi' && nasiCountThisWeek >= 1) return Infinity;
+          // R2: santan max 1x per week
+          if(cat==='berkuahsantan' && santanCountThisWeek >= 1) return Infinity;
+          // R3: nasi not consecutive days
+          if(tag==='nasi' && lastTag==='nasi') return Infinity;
+          // R4: mie not consecutive days
+          if(tag==='mie'  && lastTag==='mie')  return Infinity;
+          // R5: sambal kacang not consecutive days
+          if(tag==='sambal_kacang' && lastTag==='sambal_kacang') return Infinity;
+          // R6: same menu 2-week rotation (not in same slot last week)
+          if(n === prevSlotName) return Infinity;
+
+          // SOFT penalties (prefer avoid but not hard block)
+          // R6 soft: not used in ANY slot last week if possible
+          if(usedPrev2Weeks[n] !== undefined && (wi - usedPrev2Weeks[n]) < 2) score += 100;
+          // R7: favorite cooldown — not used in last 2 weeks
+          if(item.isFav && favLastUsedWeek[n] !== undefined && (wi - favLastUsedWeek[n]) < 2) score += 200;
+          // Prefer less-used menus (lower freq = lower score)
+          score += item.freq * 2;
+          // Avoid same category as yesterday
+          if(cat === (week[di-1]||{}).catId && cat !== 'other') score += 30;
+          // Avoid already used in same week
+          var usedThisWeek = week.map(function(x){return x.name.toLowerCase();});
+          if(usedThisWeek.indexOf(n) >= 0 && items.length > 7) score += 50;
+
+          return score;
         }
-        if(!picked){
-          // Fallback: relax alreadyThisWeek constraint
-          for(var fb=0;fb<names.length;fb++){
-            var idx2=(globalPtr+fb)%names.length;
-            var c2=names[idx2];
-            if(c2.name.toLowerCase()!==prevWeekDay){
-              picked=c2.name; pickedCat=c2.catId;
-              globalPtr=idx2+1;
-              break;
-            }
-          }
-          if(!picked){picked=names[globalPtr%names.length].name;pickedCat=names[globalPtr%names.length].catId;globalPtr++;}
+
+        // Pick best candidate
+        var best = null, bestScore = Infinity;
+        for(var ci=0; ci<items.length; ci++){
+          var sc = scoreCandidate(items[ci]);
+          if(sc < bestScore){ bestScore = sc; best = items[ci]; }
         }
-        week.push({name:picked,catId:pickedCat});
-        usedThisWeek.push(picked.toLowerCase());
-        lastCat=pickedCat;
+
+        // Fallback: if all Infinity, relax R6 soft constraints and retry
+        if(!best || bestScore === Infinity){
+          var bestRelax = null, bestRelaxScore = Infinity;
+          for(var ci2=0; ci2<items.length; ci2++){
+            var item2 = items[ci2];
+            var n2 = item2.name.toLowerCase();
+            var tag2 = item2.tag, cat2 = item2.catId;
+            // Only keep hard day-consecutive blocks, relax week-level
+            if(tag2==='nasi'&&nasiCountThisWeek>=1) continue;
+            if(cat2==='berkuahsantan'&&santanCountThisWeek>=1) continue;
+            if(tag2==='nasi'&&lastTag==='nasi') continue;
+            if(tag2==='mie' &&lastTag==='mie')  continue;
+            if(tag2==='sambal_kacang'&&lastTag==='sambal_kacang') continue;
+            var rs = item2.freq;
+            if(rs < bestRelaxScore){ bestRelaxScore=rs; bestRelax=item2; }
+          }
+          best = bestRelax;
+        }
+
+        // Last resort: any menu that doesn't violate consecutive-day rule
+        if(!best){
+          for(var ci3=0; ci3<items.length; ci3++){
+            var it3 = items[ci3];
+            var t3  = it3.tag;
+            if(t3==='nasi'&&lastTag==='nasi') continue;
+            if(t3==='mie' &&lastTag==='mie')  continue;
+            if(t3==='sambal_kacang'&&lastTag==='sambal_kacang') continue;
+            best = it3; break;
+          }
+        }
+        // Absolute last resort
+        if(!best) best = items[0];
+
+        // Apply pick
+        var slot = {name: best.name, catId: best.catId, tag: best.tag, score: bestScore};
+        week.push(slot);
+        lastTag = best.tag;
+        if(best.tag==='nasi')           nasiCountThisWeek++;
+        if(best.catId==='berkuahsantan')santanCountThisWeek++;
+        usedPrev2Weeks[best.name.toLowerCase()] = wi;
+        if(best.isFav) favLastUsedWeek[best.name.toLowerCase()] = wi;
       }
+
       weekSchedules.push(week);
-      usedInPrevWeek=week.map(function(x){return x.name;});
+      usedInPrevWeek = week.map(function(x){return x.name;});
     }
     return weekSchedules;
   }
 
-  var snackWeeks=snackPool.length ? buildWeeklySchedule(snackPool,weeks.length) : weeks.map(function(){return Array(7).fill({name:'',catId:'other'});});
-  var mealWeeks =mealPool.length  ? buildWeeklySchedule(mealPool, weeks.length) : weeks.map(function(){return Array(7).fill({name:'',catId:'other'});});
+  var snackWeeks = snackPool.length
+    ? buildSmartSchedule(snackPool, weeks.length)
+    : weeks.map(function(){return Array(7).fill({name:'',catId:'other',tag:'',score:0});});
+  var mealWeeks  = mealPool.length
+    ? buildSmartSchedule(mealPool,  weeks.length)
+    : weeks.map(function(){return Array(7).fill({name:'',catId:'other',tag:'',score:0});});
 
   distRenderWeeklyCalendar(y,m,weeks,today,snackWeeks,mealWeeks,type,monthKey);
   distUpdateStats();
@@ -4449,7 +4538,7 @@ function distRenderWeeklyCalendar(y,m,weeks,today,snackWeeks,mealWeeks,type,mont
     '<div class="dist-cal-hdr">'+
       '<div>'+
         '<div class="dist-cal-title">📅 Jadwal Distribusi Menu — '+monthLabel+'</div>'+
-        '<div class="dist-cal-sub">'+weeks.length+' minggu · Senin–Minggu · '+totalSnack+' slot snack · '+totalMeal+' slot meal · Rotasi variatif antar minggu</div>'+
+        '<div class="dist-cal-sub">'+weeks.length+' minggu · Senin–Minggu · '+totalSnack+' slot snack · '+totalMeal+' slot meal</div>'+
       '</div>'+
     '</div>'+
     // Category legend
@@ -4468,15 +4557,28 @@ function distRenderWeeklyCalendar(y,m,weeks,today,snackWeeks,mealWeeks,type,mont
     var wkLabel='Minggu '+(wi+1);
     var wkRange=monFmt+' – '+sunFmt;
 
-    // Check: any same-category 2 days in a row? (validation)
+    // ── Validate all 7 rules for this week ──────────────────────────
     var conflicts=[];
-    var prevCat='';
+    var prevMealTag='', prevSnackTag='';
+    var nasiCount=0, santanCount=0;
     for(var di=0;di<7;di++){
       var ms=mealWeeks[wi]&&mealWeeks[wi][di];
-      if(ms&&ms.catId&&ms.catId===prevCat&&prevCat!=='other'){
-        conflicts.push('Hari '+(di+1)+': "'+cap(ms.name)+'" – kategori sama dua hari berturut');
+      var ss=snackWeeks[wi]&&snackWeeks[wi][di];
+      // Meal checks
+      if(ms&&ms.name){
+        var mtag=ms.tag||getMenuTag(ms.name);
+        var mcat=ms.catId||'';
+        if(mtag==='nasi'){
+          nasiCount++;
+          if(nasiCount>1) conflicts.push('⚠ Nasi muncul '+nasiCount+'× minggu ini (max 1×)');
+          if(prevMealTag==='nasi') conflicts.push('⚠ '+cap(ms.name)+': nasi berurutan hari ke-'+(di+1));
+        }
+        if(mtag==='mie'&&prevMealTag==='mie') conflicts.push('⚠ '+cap(ms.name)+': mie berurutan hari ke-'+(di+1));
+        if(mtag==='sambal_kacang'&&prevMealTag==='sambal_kacang') conflicts.push('⚠ Sambal kacang berurutan hari ke-'+(di+1));
+        if(mcat==='berkuahsantan') santanCount++;
+        if(santanCount>1) conflicts.push('⚠ Santan muncul '+santanCount+'× minggu ini (max 1×)');
+        prevMealTag=mtag;
       }
-      if(ms) prevCat=ms.catId||'';
     }
 
     var dayHeaders=DAY_LABELS.map(function(d,i){
