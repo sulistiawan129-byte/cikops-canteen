@@ -1366,39 +1366,20 @@ select.inp{cursor:pointer;}
         <div class="g2">
           <div class="card mb">
             <div class="card-title">🔄 Menu Rotation Score</div>
-            <div class="card-sub">Higher score = more variety. Target: above 70%</div>
+            <div class="card-sub">Semakin tinggi = semakin variatif. Target di atas 70%</div>
             <div class="score-ring" id="scoreRing"></div>
           </div>
           <div class="card mb">
             <div class="card-title">💡 Smart Suggestions</div>
-            <div class="card-sub">Based on your menu history this period</div>
+            <div class="card-sub">Berdasarkan histori menu periode ini</div>
             <div class="suggestion-list" id="suggestionList"></div>
           </div>
         </div>
-        <div class="g2">
-          <div class="card mb">
-            <div class="card-title">⚠️ Repeated Snack Menus</div>
-            <div class="card-sub">Same snack appearing in multiple weeks</div>
-            <div id="repeatedSnack"></div>
-          </div>
-          <div class="card mb">
-            <div class="card-title">⚠️ Repeated Meal Menus</div>
-            <div class="card-sub">Same meal appearing in multiple weeks</div>
-            <div id="repeatedMeal"></div>
-          </div>
-        </div>
-        <div class="g2">
-          <div class="card">
-            <div class="card-title">🏆 Most Frequent Snack</div>
-            <div class="card-sub">All-time ranking by frequency</div>
-            <div class="top-list" id="topSnack"></div>
-          </div>
-          <div class="card">
-            <div class="card-title">🏆 Most Frequent Meal</div>
-            <div class="card-sub">All-time ranking by frequency</div>
-            <div class="top-list" id="topMeal"></div>
-          </div>
-        </div>
+        <!-- Top menu rankings — still rendered by JS, shown inside admShow -->
+        <div style="display:none" id="repeatedSnack"></div>
+        <div style="display:none" id="repeatedMeal"></div>
+        <div style="display:none" id="topSnack"></div>
+        <div style="display:none" id="topMeal"></div>
       </div>
     </div>
 
@@ -1824,16 +1805,19 @@ function renderAnalysisFromRows(rows,label){
   };
   var rotVal=(function(){var rs=a.rotationScore||{};var s=rs.snack||0,m=rs.meal||0;if(!s)return m+'%';if(!m)return s+'%';return Math.round((s+m)/2)+'%';}());
   document.getElementById('statsGrid').innerHTML=[
-    {icon:'🥐',val:a.uniqueSnack||0,lbl:'Unique Snacks',sub:'Tap untuk lihat daftar',ac:'ac-amber',
+    {icon:'🥐',val:a.uniqueSnack||0,   lbl:'Unique Snacks',   sub:(a.uniqueSnack||0)+' menu berbeda', ac:'ac-amber',
      click:'admShow(\'snack-unique\')'},
-    {icon:'🍱',val:a.uniqueMeal||0,lbl:'Unique Meals',sub:'Tap untuk lihat daftar',ac:'ac-navy',
+    {icon:'🍱',val:a.uniqueMeal||0,    lbl:'Unique Meals',    sub:(a.uniqueMeal||0)+' lauk berbeda',  ac:'ac-navy',
      click:'admShow(\'meal-unique\')'},
-    {icon:'📅',val:Object.keys(uniqueDates).length,lbl:'Days Recorded',sub:'With menu data',ac:'ac-green',click:''},
-    {icon:'⚠️',val:(a.repeatedSnack||[]).length,lbl:'Repeated Snacks',sub:'Tap untuk lihat detail',ac:'ac-amber',
+    {icon:'📅',val:Object.keys(uniqueDates).length,lbl:'Hari Tercatat',sub:'Dengan data menu',ac:'ac-green',click:''},
+    {icon:'🔄',val:(a.repeatedSnack||[]).length,lbl:'Snack Berulang',
+     sub:(a.repeatedSnack||[]).length?'Muncul 2+ minggu':'Tidak ada',ac:'ac-amber',
      click:(a.repeatedSnack||[]).length?'admShow(\'snack-repeat\')':''},
-    {icon:'⚠️',val:(a.repeatedMeal||[]).length,lbl:'Repeated Meals',sub:'Tap untuk lihat detail',ac:'ac-red',
+    {icon:'🔄',val:(a.repeatedMeal||[]).length,lbl:'Lauk Berulang',
+     sub:(a.repeatedMeal||[]).length?'Muncul 2+ minggu':'Tidak ada',ac:'ac-red',
      click:(a.repeatedMeal||[]).length?'admShow(\'meal-repeat\')':''},
-    {icon:'✅',val:rotVal,lbl:'Rotation Score',sub:'Variasi per minggu',ac:'ac-blue',click:''}
+    {icon:'📊',val:rotVal,lbl:'Rotation Score',sub:'Variasi per minggu',ac:'ac-blue',
+     click:'admShow(\'rotation\')'}
   ].map(function(s){
     var clickable = s.click ? ' clickable" onclick="'+s.click+'"' : '"';
     return '<div class="stat-card '+s.ac+clickable+'><span class="stat-icon">'+s.icon+'</span>'+
@@ -4656,6 +4640,13 @@ function admShow(type) {
     items = (d.repMeal || []).map(function(r){
       return {name:r.name, totalCount:r.count, weekCount:r.count, weeks:r.weeks};
     });
+  } else if (type === 'rotation') {
+    // Show top snack + top meal combined with frequency
+    title = '📊 Ranking Menu — Top Snack & Meal';
+    color = '#3b6ef5';
+    var topS = (d.topSnack||[]).map(function(r){return {name:'🥐 '+r.name, totalCount:r.count, weekCount:0, weeks:[]};});
+    var topM = (d.topMeal ||[]).map(function(r){return {name:'🍱 '+r.name, totalCount:r.count, weekCount:0, weeks:[]};});
+    items = topS.concat(topM).sort(function(a,b){return b.totalCount-a.totalCount;});
   }
 
   _admCurrent = items;
