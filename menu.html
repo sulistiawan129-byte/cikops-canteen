@@ -1811,7 +1811,7 @@ function rptRenderTV() {
     TV.slides.forEach(function(s, i) {
       stripHtml += '<div class="tv-strip-card">' +
         '<div style="aspect-ratio:16/9;overflow:hidden;position:relative;">' +
-          '<div style="position:absolute;inset:0;transform:scale(.5);transform-origin:top left;width:200%;height:200%;pointer-events:none;">'+s+'</div>' +
+          '<div style="position:absolute;inset:0;transform:scale(.5);transform-origin:top left;width:200%;height:200%;pointer-events:none;font-size:6px;">'+s+'</div>' +
         '</div>' +
         '<div class="tv-strip-label">'+stripLabels[i]+'</div>' +
       '</div>';
@@ -2393,82 +2393,150 @@ function tvFillWeekSel() {
 
 // MENU FINDER
 // ══════════════════════════════════════════════════════════════
-var MF={type:'all',query:'',month:''};
+var MF = { type:'all', query:'', month:'' };
 
 function mfInit(){
-  if(!DATA)return;
-  var sel=document.getElementById('mfMonthSel');if(!sel)return;
-  var cur=sel.value;
-  sel.innerHTML='<option value="">Semua Bulan</option>';
+  if(!DATA) return;
+  var sel=document.getElementById('mfMonthSel');
+  if(!sel) return;
   var months={};
-  (DATA.allEntries||[]).forEach(function(e){if(!e.rawDate)return;var d=new Date(e.rawDate+'T00:00:00');var mk=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');var ml=d.toLocaleDateString('id-ID',{month:'long',year:'numeric'});if(!months[mk])months[mk]=ml;});
-  Object.keys(months).sort().reverse().forEach(function(mk){sel.innerHTML+='<option value="'+mk+'"'+(mk===cur?' selected':'')+'>'+months[mk]+'</option>';});
+  (DATA.allEntries||[]).forEach(function(e){
+    if(!e.rawDate) return;
+    var d=new Date(e.rawDate+'T00:00:00');
+    var mk=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
+    var ml=d.toLocaleDateString('id-ID',{month:'long',year:'numeric'});
+    months[mk]=ml;
+  });
+  sel.innerHTML='<option value="">Semua Bulan</option>';
+  Object.keys(months).sort().reverse().forEach(function(mk){
+    var o=document.createElement('option');
+    o.value=mk; o.textContent=months[mk];
+    if(mk===MF.month) o.selected=true;
+    sel.appendChild(o);
+  });
 }
 
 function mfSetType(t){
   MF.type=t;
-  ['All','Snack','Meal'].forEach(function(x){var b=document.getElementById('mfType'+x);if(b)b.classList.toggle('active',x.toLowerCase()===t||t==='all'&&x==='All');});
+  ['All','Snack','Meal'].forEach(function(x){
+    var b=document.getElementById('mfType'+x);
+    if(b)b.classList.toggle('active',x.toLowerCase()===(t==='all'?'all':t));
+  });
   mfSearch();
 }
 
 function mfSearch(){
-  if(!DATA){document.getElementById('mfResults').innerHTML='<div class="loading"><div class="spin"></div><span class="load-txt">Memuat data…</span></div>';return;}
+  if(!DATA){
+    document.getElementById('mfResults').innerHTML='<div class="mf-empty"><span class="mf-empty-icon">&#x23F3;</span>Memuat data...</div>';
+    return;
+  }
   var q=(document.getElementById('mfQuery').value||'').trim().toLowerCase();
-  var mSel=document.getElementById('mfMonthSel');var mon=mSel?mSel.value:'';
+  MF.query=q;
+  MF.month=(document.getElementById('mfMonthSel').value)||'';
   var sort=(document.getElementById('mfSort').value)||'freq';
-  MF.query=q;MF.month=mon;
 
-  var all=DATA.allEntries||[];
-  // filter
-  var filtered=all.filter(function(e){
-    if(MF.type==='snack'&&e.type.toLowerCase()!=='snack')return false;
-    if(MF.type==='meal'&&e.type.toLowerCase()!=='meal')return false;
-    if(mon){var d=new Date((e.rawDate||'')+'T00:00:00');var mk=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');if(mk!==mon)return false;}
-    if(q){var nm=(e.menuName||e.menu||'').toLowerCase();if(!nm.includes(q))return false;}
-    return true;
+  var entries=DATA.allEntries||[];
+
+  if(MF.type!=='all'){
+    entries=entries.filter(function(e){return e.type.toLowerCase()===MF.type;});
+  }
+  if(MF.month){
+    entries=entries.filter(function(e){
+      if(!e.rawDate) return false;
+      var mk=e.rawDate.substring(0,7);
+      return mk===MF.month;
+    });
+  }
+  if(q){
+    entries=entries.filter(function(e){
+      return e.menuName.toLowerCase().indexOf(q)>=0 ||
+             (e.components||[]).some(function(c){return c.toLowerCase().indexOf(q)>=0;});
+    });
+  }
+
+  if(!q&&!MF.month){
+    document.getElementById('mfCount').textContent='Ketik nama menu untuk mencari...';
+    document.getElementById('mfResults').innerHTML=
+      '<div class="mf-empty"><span class="mf-empty-icon">&#x1F50D;</span>Ketik keyword di atas untuk mencari menu</div>';
+    return;
+  }
+
+  var grouped={};
+  entries.forEach(function(e){
+    var k=e.menuName.trim().toLowerCase();
+    if(!grouped[k]) grouped[k]={name:e.menuName,type:e.type,dates:[],monthCount:{},snackCount:0,mealCount:0,latestDate:''};
+    var rd=e.rawDate||'';
+    grouped[k].dates.push({rawDate:rd,displayDate:e.date,type:e.type});
+    if(rd>grouped[k].latestDate) grouped[k].latestDate=rd;
+    if(e.type.toLowerCase()==='snack') grouped[k].snackCount++;
+    else grouped[k].mealCount++;
+    grouped[k].type = grouped[k].snackCount >= grouped[k].mealCount ? 'snack' : 'meal';
+    var mk=rd.substring(0,7);
+    grouped[k].monthCount[mk]=(grouped[k].monthCount[mk]||0)+1;
   });
 
-  // aggregate by name
-  var agg={};
-  filtered.forEach(function(e){
-    var nm=(e.menuName||e.menu||'').toLowerCase().trim();
-    if(!nm)return;
-    if(!agg[nm])agg[nm]={name:nm,display:cap(nm),type:e.type,count:0,dates:[],weeks:new Set()};
-    agg[nm].count++;
-    if(e.rawDate)agg[nm].dates.push(e.rawDate);
-    if(e.weekKey)agg[nm].weeks.add(e.weekKey);
-  });
+  var items=Object.values(grouped);
+  if(sort==='freq') items.sort(function(a,b){return (b.snackCount+b.mealCount)-(a.snackCount+a.mealCount);});
+  else if(sort==='alpha') items.sort(function(a,b){return a.name.toLowerCase().localeCompare(b.name.toLowerCase());});
+  else if(sort==='latest') items.sort(function(a,b){return b.latestDate.localeCompare(a.latestDate);});
 
-  var arr=Object.values(agg);
-  if(sort==='freq')arr.sort(function(a,b){return b.count-a.count;});
-  else if(sort==='alpha')arr.sort(function(a,b){return a.name.localeCompare(b.name);});
-  else arr.sort(function(a,b){var la=a.dates[a.dates.length-1]||'';var lb=b.dates[b.dates.length-1]||'';return lb.localeCompare(la);});
+  document.getElementById('mfCount').textContent=
+    items.length+' menu ditemukan'+
+    (q?' untuk "'+q+'"':'')+
+    (MF.month?' - '+document.getElementById('mfMonthSel').options[document.getElementById('mfMonthSel').selectedIndex].text:'');
 
-  var cnt=document.getElementById('mfCount');
-  if(cnt)cnt.textContent=arr.length+' menu ditemukan'+(q?' untuk "'+q+'"':'')+(mon?' pada bulan terpilih':'');
+  if(!items.length){
+    document.getElementById('mfResults').innerHTML=
+      '<div class="mf-empty"><span class="mf-empty-icon">&#x1F615;</span>Tidak ada menu yang cocok</div>';
+    return;
+  }
 
-  if(!arr.length){document.getElementById('mfResults').innerHTML='<div class="empty"><span class="empty-icon">🔍</span>'+(q?'Tidak ada menu dengan kata "'+q+'"':'Tidak ada data menu.')+'</div>';return;}
+  var monthKeys=[];
+  items.forEach(function(it){Object.keys(it.monthCount).forEach(function(mk){if(monthKeys.indexOf(mk)<0)monthKeys.push(mk);});});
+  monthKeys.sort();
 
-  var html='<div class="mf-grid">';
-  arr.forEach(function(item){
-    var lastDate=item.dates.sort().reverse()[0]||'—';
-    var typPill=item.type.toLowerCase()==='snack'?'<span class="mf-type-pill snack">🥐 Snack</span>':'<span class="mf-type-pill meal">🍱 Meal</span>';
-    var bar=Math.min(100,Math.round(item.count/Math.max(1,arr[0].count)*100));
-    html+='<div class="mf-card">'+
-      '<div class="mf-card-hdr">'+typPill+'<span class="mf-card-name">'+esc(item.display)+'</span></div>'+
-      '<div class="mf-card-stats">'+
-      '<div class="mf-stat"><span class="mf-stat-val">'+item.count+'×</span><span class="mf-stat-lbl">total kemunculan</span></div>'+
-      '<div class="mf-stat"><span class="mf-stat-val">'+item.weeks.size+'</span><span class="mf-stat-lbl">minggu berbeda</span></div>'+
-      '<div class="mf-stat"><span class="mf-stat-val">'+lastDate+'</span><span class="mf-stat-lbl">terakhir muncul</span></div>'+
+  document.getElementById('mfResults').innerHTML=items.map(function(it){
+    var total=it.snackCount+it.mealCount;
+    var sortedDates=it.dates.slice().sort(function(a,b){return b.rawDate.localeCompare(a.rawDate);});
+    var shown=sortedDates.slice(0,8);
+    var hidden=sortedDates.slice(8);
+    var chips=shown.map(function(d){
+      var dt=new Date((d.rawDate||'')+'T00:00:00');
+      var label=isNaN(dt)?d.displayDate:dt.toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric'});
+      return '<span class="mf-date-chip">'+label+'</span>';
+    }).join('');
+    var moreBtn=hidden.length?'<button class="mf-expand-btn" onclick="mfExpandDates(this,\''+encodeURIComponent(JSON.stringify(hidden))+'\')">+'+hidden.length+' lagi</button>':'';
+
+    var maxMC=Math.max.apply(null,Object.values(it.monthCount).concat([1]));
+    var bars=monthKeys.map(function(mk){
+      var cnt=it.monthCount[mk]||0;
+      var pct=Math.round(cnt/maxMC*100);
+      var dt2=new Date(mk+'-01');
+      var lbl=isNaN(dt2)?mk:dt2.toLocaleDateString('id-ID',{month:'short',year:'2-digit'});
+      return '<div class="mf-month-row">'+
+        '<span class="mf-month-lbl">'+lbl+'</span>'+
+        '<div class="mf-month-bar-bg"><div class="mf-month-bar-fill" style="width:'+pct+'%;background:'+(it.snackCount>it.mealCount?'var(--a-amber)':'var(--meal)')+'"></div></div>'+
+        '<span class="mf-month-count">'+cnt+'</span>'+
+        '</div>';
+    }).join('');
+
+    var typePills='';
+    if(it.snackCount) typePills+='<span class="mf-stat-pill mf-pill-snack">&#x1F950; '+it.snackCount+'x snack</span>';
+    if(it.mealCount)  typePills+='<span class="mf-stat-pill mf-pill-meal">&#x1F371; '+it.mealCount+'x meal</span>';
+
+    return '<div class="mf-menu-card">'+
+      '<div class="mf-menu-top">'+
+        '<span class="mf-menu-name">'+cap(it.name)+'</span>'+
+        '<div class="mf-menu-stats">'+
+          '<span class="mf-stat-pill mf-pill-count">'+total+'x total</span>'+
+          typePills+
+        '</div>'+
       '</div>'+
-      '<div class="mf-bar-wrap"><div class="mf-bar-fill" style="width:'+bar+'%;background:'+(item.type.toLowerCase()==='snack'?'var(--snack)':'var(--meal)')+'"></div></div>'+
+      '<div class="mf-dates-wrap" style="margin-bottom:8px">'+chips+moreBtn+'</div>'+
+      (monthKeys.length>1?'<div class="mf-month-bars">'+bars+'</div>':'')+
       '</div>';
-  });
-  html+='</div>';
-  document.getElementById('mfResults').innerHTML=html;
+  }).join('');
 }
-
-// ══════════════════════════════════════════════════════════════
 
 function mfExpandDates(btn,encoded){
   var hidden=JSON.parse(decodeURIComponent(encoded));
@@ -2476,11 +2544,14 @@ function mfExpandDates(btn,encoded){
   hidden.forEach(function(d){
     var dt=new Date((d.rawDate||'')+'T00:00:00');
     var label=isNaN(dt)?d.displayDate:dt.toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric'});
-    var chip=document.createElement('span');chip.className='mf-date-chip';chip.textContent=label;
+    var chip=document.createElement('span');
+    chip.className='mf-date-chip';
+    chip.textContent=label;
     wrap.insertBefore(chip,btn);
   });
   btn.remove();
 }
+
 
 // ══════════════════════════════════════════════════════════════
 // DISTRIBUTION v2 — Weekly Senin-Minggu, Category-aware, Varied
