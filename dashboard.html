@@ -1218,8 +1218,8 @@ function exportPDF(){
   /* Landscape A4: lebar=297, tinggi=210 */
   var PW=297, PH=210, ML=14, MR=14, CW=PW-ML-MR;
   /* Header tinggi = 38mm, Footer = 12mm, area konten antara */
-  var HDR_H=38, FTR_H=12;
-  var BODY_TOP=HDR_H+4; /* Y mulai konten setelah header */
+  var HDR_H=26, FTR_H=11;
+  var BODY_TOP=HDR_H+5; /* Y mulai konten setelah header */
 
   /* ── data ── */
   var mrows=(D&&D.monthlyRows)?D.monthlyRows:[];
@@ -1281,7 +1281,7 @@ function exportPDF(){
 
   /* ── Y cursor ── */
   var Y=BODY_TOP;
-  var PAGE_BOTTOM=PH-FTR_H-4; /* batas bawah konten */
+  var PAGE_BOTTOM=PH-FTR_H-6; /* batas bawah konten */
 
   function needY(h){
     if(Y+h>PAGE_BOTTOM){
@@ -1297,54 +1297,34 @@ function exportPDF(){
      Logo: PNG/JPG jika di-upload, fallback text "FFI"
   ════════════════════════════════════════════════ */
   function drawPageHeader(){
-    /* band navy penuh */
+    /* ── Single navy band, simple & clean persis fleet ── */
     sf(C.navy); doc.rect(0,0,PW,HDR_H,'F');
-    /* sub-band gelap di bawah */
-    sf(C.navySub); doc.rect(0,24,PW,HDR_H-24,'F');
 
-    /* ── LOGO / teks FFI ── */
-    var logoW=30, logoH=26, logoX=ML, logoY=6;
+    /* logo gambar jika ada, letakkan di kiri sebelum teks */
+    var logoW=0;
     if(_CANTEEN_LOGO_B64){
-      /* logo gambar perusahaan */
       try{
-        doc.addImage(_CANTEEN_LOGO_B64,_CANTEEN_LOGO_FMT,logoX,logoY,logoW,logoH,'','FAST');
-      }catch(e){
-        /* fallback ke teks jika gagal */
-        sf(C.white); doc.roundedRect(logoX,logoY,logoW,logoH,3,3,'F');
-        doc.setFont('helvetica','bold'); doc.setFontSize(11); st(C.navy);
-        doc.text('FFI',logoX+logoW/2,logoY+logoH/2+2,{align:'center'});
-      }
-    } else {
-      /* kotak putih + teks FFI */
-      sf(C.white); doc.roundedRect(logoX,logoY,logoW,logoH,3,3,'F');
-      doc.setFont('helvetica','bold'); doc.setFontSize(11); st(C.navy);
-      doc.text('FFI',logoX+logoW/2,logoY+logoH/2+2,{align:'center'});
+        logoW=18;
+        doc.addImage(_CANTEEN_LOGO_B64,_CANTEEN_LOGO_FMT,ML,4,logoW,18,'','FAST');
+      }catch(e){ logoW=0; }
     }
 
-    /* ── Nama company & subtitle ── */
-    var textX=ML+logoW+6;
-    doc.setFont('helvetica','bold'); doc.setFontSize(18); st(C.txtHd);
-    doc.text('Frisian Flag Indonesia',textX,16);
+    /* ── Kiri: nama company bold + subtitle muted (persis fleet) ── */
+    var tx=ML+logoW+(logoW>0?4:0);
+    doc.setFont('helvetica','bold'); doc.setFontSize(14); st(C.txtHd);
+    doc.text('CANTEEN OPERATIONS — FFI Cikarang',tx,11);
     doc.setFont('helvetica','normal'); doc.setFontSize(8);
     doc.setTextColor(C.txtHdSub[0],C.txtHdSub[1],C.txtHdSub[2]);
-    doc.text('CIK · CIKARANG PLANT  |  CANTEEN OPERATIONS  |  VENDOR: GDSK',textX,23);
+    doc.text('Laporan Komprehensif Operasional Kantin · VENDOR: GDSK',tx,18);
 
-    /* ── Judul laporan — kanan ── */
-    doc.setFont('helvetica','bold'); doc.setFontSize(13); st(C.txtHd);
-    doc.text('CANTEEN OPERATIONS REPORT',PW-MR,14,{align:'right'});
-    doc.setFont('helvetica','normal'); doc.setFontSize(9);
-    doc.setTextColor(C.txtHdSub[0],C.txtHdSub[1],C.txtHdSub[2]);
-    doc.text('Periode '+label,PW-MR,22,{align:'right'});
-
-    /* timestamp */
+    /* ── Kanan: periode + dibuat (persis fleet) ── */
     var now=new Date();
-    var ts='Dibuat '+now.toLocaleDateString('id-ID',{day:'2-digit',month:'2-digit',year:'numeric'})
-      +', '+String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0');
-    doc.setFontSize(7.5);
-    doc.text(ts,PW-MR,34,{align:'right'});
-
-    /* accent stripe bawah header */
-    sf(C.accent); doc.rect(0,HDR_H,PW,2.5,'F');
+    var tgl=now.toLocaleDateString('id-ID',{day:'2-digit',month:'2-digit',year:'numeric'});
+    var jam=String(now.getHours()).padStart(2,'0')+'.'+String(now.getMinutes()).padStart(2,'0');
+    doc.setFont('helvetica','normal'); doc.setFontSize(8.5);
+    doc.setTextColor(C.txtHdSub[0],C.txtHdSub[1],C.txtHdSub[2]);
+    doc.text('Periode '+label,PW-MR,11,{align:'right'});
+    doc.text('Dibuat '+tgl+', '+jam,PW-MR,18,{align:'right'});
 
     Y=BODY_TOP;
   }
@@ -1357,8 +1337,8 @@ function exportPDF(){
     sf(C.navy); doc.rect(0,fy,PW,FTR_H,'F');
     doc.setFont('helvetica','normal'); doc.setFontSize(7.5);
     doc.setTextColor(C.txtHdSub[0],C.txtHdSub[1],C.txtHdSub[2]);
-    doc.text('FFI Cikarang  ·  Canteen Operations Report  ·  Confidential',ML,fy+8);
-    doc.text('Halaman '+doc.internal.getNumberOfPages(),PW-MR,fy+8,{align:'right'});
+    doc.text('FFI Cikarang  ·  Canteen Operations Report  ·  Confidential',ML,fy+7.5);
+    doc.text('Halaman '+doc.internal.getNumberOfPages(),PW-MR,fy+7.5,{align:'right'});
   }
 
   /* ════════════════════════════════════════════════
