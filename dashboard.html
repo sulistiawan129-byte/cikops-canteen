@@ -1304,13 +1304,14 @@ function exportPDF(){
     var logoW=0;
     if(_CANTEEN_LOGO_B64){
       try{
-        logoW=18;
-        doc.addImage(_CANTEEN_LOGO_B64,_CANTEEN_LOGO_FMT,ML,4,logoW,18,'','FAST');
+        logoW=20;
+        /* Logo strictly inside navy band: y=3, height=20 -> bottom=23 < HDR_H=26 */
+        doc.addImage(_CANTEEN_LOGO_B64,_CANTEEN_LOGO_FMT,ML,3,logoW,20,'','FAST');
       }catch(e){ logoW=0; }
     }
 
     /* ── Kiri: nama company bold + subtitle muted (persis fleet) ── */
-    var tx=ML+logoW+(logoW>0?4:0);
+    var tx=ML+(logoW>0?logoW+5:0);
     doc.setFont('helvetica','bold'); doc.setFontSize(14); st(C.txtHd);
     doc.text('CANTEEN OPERATIONS — FFI Cikarang',tx,11);
     doc.setFont('helvetica','normal'); doc.setFontSize(8);
@@ -1326,7 +1327,6 @@ function exportPDF(){
     doc.text('Periode '+label,PW-MR,11,{align:'right'});
     doc.text('Dibuat '+tgl+', '+jam,PW-MR,18,{align:'right'});
 
-    Y=BODY_TOP;
   }
 
   /* ════════════════════════════════════════════════
@@ -1414,6 +1414,7 @@ function exportPDF(){
   ════════════════════════════════════════════════ */
   drawPageHeader();
   drawPageFooter();
+  Y=BODY_TOP;
 
   /* ── PERIOD BAR ── */
   needY(12);
@@ -1568,7 +1569,7 @@ function exportPDF(){
   needY(24);
   doc.autoTable({
     startY:Y,
-    margin:{left:ML,right:MR},
+    margin:{left:ML,right:MR,top:31,bottom:15},
     theme:'grid',
     headStyles:{
       fillColor:C.navy,
@@ -1650,7 +1651,7 @@ function exportPDF(){
     needY(24);
     doc.autoTable({
       startY:Y,
-      margin:{left:ML,right:MR},
+      margin:{left:ML,right:MR,top:31,bottom:15},
       theme:'grid',
       headStyles:{
         fillColor:C.navy,
