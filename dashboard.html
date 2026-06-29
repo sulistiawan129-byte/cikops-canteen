@@ -1160,7 +1160,7 @@ function exportCSV(){
 }
 
 /* ══════════════════════════════════════════════════════════════════
-   EXPORT PDF — FLEET-STYLE LAYOUT
+   EXPORT PDF — FLEET-STYLE LAYOUT (v2 — fixed contrast & header)
 ══════════════════════════════════════════════════════════════════ */
 function exportPDF(){
   var rows=filteredRows.length?filteredRows:(D?D.allRows:[]);
@@ -1172,13 +1172,13 @@ function exportPDF(){
   var doc=new JsPDF({orientation:'portrait',unit:'mm',format:'a4'});
   var PW=210,PH=297,ML=13,MR=13,CW=PW-ML-MR;
 
-  /* ── data shortcuts ── */
+  /* ── data ── */
   var mrows=(D&&D.monthlyRows)?D.monthlyRows:[];
   var sd=(D&&D.shiftData)?D.shiftData:null;
   var thr=(D&&D.config)?+D.config.threshold:15;
   var label=filteredLabel||selMonth||'Period';
 
-  /* ── aggregate KPI ── */
+  /* ── KPI aggregate ── */
   var agg=rows.reduce(function(a,r){
     a.tso+=n(r.snackOrder);a.tsc+=n(r.snackConsumed);a.tsl+=n(r.snackLeftover);
     a.tmo+=n(r.mealOrder); a.tmc+=n(r.mealConsumed); a.tml+=n(r.mealLeftover);
@@ -1197,27 +1197,43 @@ function exportPDF(){
     if(n(r.mealLeftover) >peakM.v){peakM.v=n(r.mealLeftover); peakM.d=r.date||r.rawDate||'—';}
   });
 
-  /* ── colour palette ── */
+  /* ── palette ── */
+  /* NOTE: semua warna pada C.* adalah solid dan kontras penuh.
+     - Stat card background = putih (#fff) agar nilai angka gelap terlihat jelas.
+     - Header color = navy gelap identik dengan fleet PDF.
+     - Table head body rows = dark text on white, bukan white on colored. */
   var C={
-    navy:    [15,26,58],
-    green:   [22,163,74],
-    greenDk: [22,101,52],
-    blue:    [29,78,216],
-    blueDk:  [30,58,138],
-    orange:  [245,132,31],
-    red:     [229,67,75],
-    purple:  [124,94,245],
-    bg:      [247,248,251],
-    border:  [227,231,239],
-    text1:   [13,19,32],
-    text2:   [61,70,99],
-    text3:   [107,117,146],
+    navy:    [10,20,50],        /* #0a1432 — header bg, table head base */
+    navySub: [26,44,102],       /* #1a2c66 — sub-header bg              */
+    green:   [22,163,74],       /* #16a34a — snack accent, bar           */
+    greenDk: [20,83,45],        /* #14532d — snack table header          */
+    blue:    [29,78,216],       /* #1d4ed8 — meal accent, bar            */
+    blueDk:  [23,37,84],        /* #172554 — meal table header           */
+    orange:  [234,88,12],       /* #ea580c — leftover/warn               */
+    red:     [185,28,28],       /* #b91c1c — danger eff                  */
+    purple:  [109,40,217],      /* #6d28d9 — efficiency purple           */
+    accent:  [59,91,219],       /* #3b5bdb — period bar, analysis        */
+    accentLt:[235,240,255],     /* #ebf0ff — period bar bg               */
     white:   [255,255,255],
-    accent:  [59,91,219],
-    accentLt:[235,240,255],
-    warnBg:  [255,251,235],
-    warnDk:  [146,64,14]
+    cardBg:  [255,255,255],     /* card background = pure white          */
+    pageBg:  [245,247,250],     /* page body tint                        */
+    border:  [209,213,230],     /* #d1d5e6                               */
+    borderDk:[150,160,190],     /* darker border for table grid          */
+    /* text — always dark on light bg */
+    txtHd:   [255,255,255],     /* white — on dark header                */
+    txtHdSub:[180,195,230],     /* muted white — subtitles in header     */
+    txt1:    [13,19,40],        /* #0d1328 — primary body text           */
+    txt2:    [45,55,90],        /* #2d375a — secondary body text         */
+    txt3:    [90,105,150],      /* #5a6996 — labels, muted               */
+    /* semantic */
+    effGood: [21,128,61],       /* #158040 — eff>=98                     */
+    effMid:  [146,64,14],       /* #924010 — eff>=95                     */
+    effBad:  [185,28,28],       /* #b91c1c — eff<95                      */
+    warnBg:  [255,247,220],     /* #fff7dc — warn row bg                 */
+    warnTxt: [120,53,15],       /* #78350f                               */
+    altBg:   [248,249,252],     /* #f8f9fc — alt row                     */
   };
+
   function sf(a){doc.setFillColor(a[0],a[1],a[2]);}
   function sd2(a){doc.setDrawColor(a[0],a[1],a[2]);}
   function st(a){doc.setTextColor(a[0],a[1],a[2]);}
@@ -1225,120 +1241,152 @@ function exportPDF(){
 
   /* ── Y cursor ── */
   var Y=0;
-  function needY(h){if(Y+h>PH-14){doc.addPage();Y=14;drawPageFooter();}}
-
-  /* ══════════════════════════════════════════════════
-     HEADER
-  ══════════════════════════════════════════════════ */
-  function drawHeader(){
-    sf(C.navy);doc.rect(0,0,PW,34,'F');
-    /* logo */
-    sf(C.white);doc.roundedRect(ML,5,20,20,2,2,'F');
-    doc.setFont('helvetica','bold');doc.setFontSize(7.5);st(C.navy);
-    doc.text('FFI',ML+10,17,{align:'center'});
-    /* company */
-    doc.setFont('helvetica','bold');doc.setFontSize(13);st(C.white);
-    doc.text('Frisian Flag Indonesia',ML+24,13);
-    doc.setFont('helvetica','normal');doc.setFontSize(7.5);
-    doc.setTextColor(180,190,220);
-    doc.text('CIK · CIKARANG PLANT  |  CANTEEN OPERATIONS  |  VENDOR: GDSK',ML+24,20);
-    /* right block */
-    doc.setFont('helvetica','bold');doc.setFontSize(11);st(C.white);
-    doc.text('Canteen Operations Report',PW-MR,12,{align:'right'});
-    doc.setFont('helvetica','normal');doc.setFontSize(8);
-    doc.setTextColor(180,190,220);
-    doc.text(label,PW-MR,19,{align:'right'});
-    var now=new Date();
-    var genStr='Generated: '+now.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'})
-      +'  '+now.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
-    doc.setFontSize(6.5);doc.setTextColor(140,155,195);
-    doc.text(genStr,PW-MR,30,{align:'right'});
-    /* accent stripe */
-    sf(C.accent);doc.rect(0,34,PW,2.5,'F');
-    Y=41;
+  function needY(h){
+    if(Y+h>PH-16){doc.addPage();drawPageHeader();drawPageFooter();}
   }
 
   /* ══════════════════════════════════════════════════
-     PAGE FOOTER
+     HEADER — identik dengan fleet: navy full-width band
+     - Logo box putih kiri
+     - Nama company & subtitle
+     - Judul laporan & periode kanan
+     - Accent stripe biru bawah header
+  ══════════════════════════════════════════════════ */
+  function drawPageHeader(){
+    /* navy band penuh */
+    sf(C.navy);doc.rect(0,0,PW,40,'F');
+
+    /* subtle lighter sub-band untuk depth */
+    sf(C.navySub);doc.rect(0,26,PW,14,'F');
+
+    /* logo box — putih dengan border radius */
+    sf(C.white);doc.roundedRect(ML,7,26,24,3,3,'F');
+    doc.setFont('helvetica','bold');doc.setFontSize(9);st(C.navy);
+    doc.text('FFI',ML+13,22,{align:'center'});
+
+    /* company name — besar & bold */
+    doc.setFont('helvetica','bold');doc.setFontSize(16);st(C.txtHd);
+    doc.text('Frisian Flag Indonesia',ML+32,16);
+
+    /* subtitle kiri */
+    doc.setFont('helvetica','normal');doc.setFontSize(7.5);
+    doc.setTextColor(C.txtHdSub[0],C.txtHdSub[1],C.txtHdSub[2]);
+    doc.text('CIK · CIKARANG PLANT  |  CANTEEN OPERATIONS  |  VENDOR: GDSK',ML+32,23);
+
+    /* judul laporan kanan — atas */
+    doc.setFont('helvetica','bold');doc.setFontSize(11);st(C.txtHd);
+    doc.text('CANTEEN OPERATIONS REPORT',PW-MR,13,{align:'right'});
+
+    /* periode kanan */
+    doc.setFont('helvetica','normal');doc.setFontSize(8.5);
+    doc.setTextColor(C.txtHdSub[0],C.txtHdSub[1],C.txtHdSub[2]);
+    doc.text('Periode '+label,PW-MR,21,{align:'right'});
+
+    /* generated timestamp kanan bawah */
+    var now=new Date();
+    var genStr='Dibuat '+now.toLocaleDateString('id-ID',{day:'2-digit',month:'2-digit',year:'numeric'})
+      +', '+now.toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'}).replace('.',':');
+    doc.setFontSize(7);doc.setTextColor(C.txtHdSub[0],C.txtHdSub[1],C.txtHdSub[2]);
+    doc.text(genStr,PW-MR,35,{align:'right'});
+
+    /* accent stripe — identik fleet */
+    sf(C.accent);doc.rect(0,40,PW,3,'F');
+
+    Y=48;
+  }
+
+  /* ══════════════════════════════════════════════════
+     FOOTER
   ══════════════════════════════════════════════════ */
   function drawPageFooter(){
-    var fy=PH-11;
-    sf(C.navy);doc.rect(0,fy-1,PW,13,'F');
-    doc.setFont('helvetica','normal');doc.setFontSize(6.5);
-    doc.setTextColor(140,155,195);
-    doc.text('FFI Cikarang · Canteen Operations · Confidential',ML,fy+6);
-    doc.text('Page '+doc.internal.getNumberOfPages(),PW-MR,fy+6,{align:'right'});
+    var fy=PH-13;
+    sf(C.navy);doc.rect(0,fy,PW,13,'F');
+    doc.setFont('helvetica','normal');doc.setFontSize(7);
+    doc.setTextColor(C.txtHdSub[0],C.txtHdSub[1],C.txtHdSub[2]);
+    doc.text('FFI Cikarang  ·  Canteen Operations Report  ·  Confidential',ML,fy+8);
+    doc.text('Halaman '+doc.internal.getNumberOfPages(),PW-MR,fy+8,{align:'right'});
   }
 
   /* ══════════════════════════════════════════════════
-     SECTION LABEL
+     SECTION LABEL — bold, left bar, garis kanan
   ══════════════════════════════════════════════════ */
   function secLbl(txt){
-    needY(10);
-    doc.setFont('helvetica','bold');doc.setFontSize(7);st(C.text3);
-    doc.text(txt.toUpperCase(),ML,Y);
-    sf(C.border);
-    var lw=doc.getTextWidth(txt.toUpperCase())+4;
-    doc.rect(ML+lw,Y-1.5,CW-lw,0.4,'F');
-    Y+=5;
+    needY(12);
+    /* left accent bar */
+    sf(C.accent);doc.rect(ML,Y-1,2.5,8,'F');
+    doc.setFont('helvetica','bold');doc.setFontSize(9);st(C.txt1);
+    doc.text(txt,ML+6,Y+5);
+    /* garis kanan */
+    var lw=ML+6+doc.getTextWidth(txt)+4;
+    sf(C.border);doc.rect(lw,Y+2,PW-MR-lw,0.5,'F');
+    Y+=12;
   }
 
   /* ══════════════════════════════════════════════════
-     STAT CARDS (4-up or 3-up)
+     STAT CARDS
+     - Background: putih solid
+     - Accent bar: warna penuh di atas
+     - Label: gelap & jelas
+     - Nilai: sangat besar, hitam pekat
+     - Border: abu medium
   ══════════════════════════════════════════════════ */
   function drawStatCards(cards,accs){
-    needY(24);
-    var cnt=cards.length,gap=3,cw=(CW-gap*(cnt-1))/cnt,ch=22;
+    needY(28);
+    var cnt=cards.length,gap=4,cw=(CW-gap*(cnt-1))/cnt,ch=26;
     cards.forEach(function(card,i){
       var x=ML+i*(cw+gap),acc=accs[i]||C.accent;
-      sf(C.bg);sd2(C.border);doc.setLineWidth(0.3);doc.roundedRect(x,Y,cw,ch,2,2,'FD');
-      sf(acc);doc.roundedRect(x,Y,cw,2.5,2,2,'F');doc.rect(x,Y+1,cw,1.5,'F');
-      doc.setFont('helvetica','normal');doc.setFontSize(6);st(C.text3);
-      doc.text(card.lbl.toUpperCase(),x+4,Y+8);
-      doc.setFont('helvetica','bold');doc.setFontSize(14);st(C.text1);
-      doc.text(String(card.val),x+4,Y+16);
-      doc.setFont('helvetica','normal');doc.setFontSize(6);st(C.text3);
-      doc.text(card.sub,x+4,Y+21);
+      /* card background putih dengan border */
+      sf(C.cardBg);sd2(C.border);doc.setLineWidth(0.4);
+      doc.roundedRect(x,Y,cw,ch,2,2,'FD');
+      /* accent color bar atas — tebal 3.5mm agar terlihat */
+      sf(acc);doc.roundedRect(x,Y,cw,3.5,2,2,'F');
+      doc.rect(x,Y+1.5,cw,2,'F'); /* ratakan bawah bar */
+      /* label — abu gelap agar terbaca di atas putih */
+      doc.setFont('helvetica','bold');doc.setFontSize(6.5);st(C.txt3);
+      doc.text(card.lbl.toUpperCase(),x+5,Y+10);
+      /* nilai — hitam besar */
+      doc.setFont('helvetica','bold');doc.setFontSize(15);st(C.txt1);
+      doc.text(String(card.val),x+5,Y+20);
+      /* sub — abu muted */
+      doc.setFont('helvetica','normal');doc.setFontSize(6);st(C.txt3);
+      doc.text(card.sub,x+5,Y+25);
     });
-    Y+=ch+4;
+    Y+=ch+5;
   }
 
   /* ══════════════════════════════════════════════════
-     PERIOD BAR
+     MULAI RENDER — panggil header dulu!
   ══════════════════════════════════════════════════ */
-  sf(C.accentLt);sd2(C.accent);doc.setLineWidth(0.4);
-  doc.roundedRect(ML,Y,CW,9,1.5,1.5,'FD');
-  sf(C.accent);doc.rect(ML,Y,2.5,9,'F');
-  doc.setFont('helvetica','bold');doc.setFontSize(7);
-  doc.setTextColor(C.accent[0],C.accent[1],C.accent[2]);
-  doc.text('PERIOD',ML+5,Y+6);
-  doc.setFont('helvetica','normal');st(C.text1);
-  doc.text(label+'  ·  '+days+' working days',ML+24,Y+6);
-  doc.setFont('helvetica','normal');doc.setFontSize(7);st(C.text3);
-  doc.text('Threshold: '+thr+' pcs/day',PW-MR,Y+6,{align:'right'});
-  Y+=14;
+  drawPageHeader();
 
-  /* ══════════════════════════════════════════════════
-     SNACK KPIs
-  ══════════════════════════════════════════════════ */
+  /* ── PERIOD BAR ── */
+  sf(C.accentLt);sd2(C.accent);doc.setLineWidth(0.5);
+  doc.roundedRect(ML,Y,CW,10,1.5,1.5,'FD');
+  sf(C.accent);doc.rect(ML,Y,3,10,'F');
+  doc.setFont('helvetica','bold');doc.setFontSize(7.5);
+  doc.setTextColor(C.accent[0],C.accent[1],C.accent[2]);
+  doc.text('PERIOD',ML+6,Y+7);
+  doc.setFont('helvetica','normal');doc.setFontSize(8);st(C.txt1);
+  doc.text(label+'  ·  '+days+' working days',ML+28,Y+7);
+  doc.setFont('helvetica','normal');doc.setFontSize(7.5);st(C.txt3);
+  doc.text('Threshold: '+thr+' pcs/day',PW-MR,Y+7,{align:'right'});
+  Y+=15;
+
+  /* ── SNACK KPIs ── */
   secLbl('Snack Overview');
   drawStatCards(
     [{lbl:'Ordered',val:f(agg.tso),sub:'Total portions'},{lbl:'Consumed',val:f(agg.tsc),sub:'Total consumed'},{lbl:'Leftover',val:f(agg.tsl),sub:'Total leftover'},{lbl:'Efficiency',val:pct(snackEff),sub:'Period average'}],
     [C.green,C.green,C.orange,C.accent]
   );
 
-  /* ══════════════════════════════════════════════════
-     MEAL KPIs
-  ══════════════════════════════════════════════════ */
+  /* ── MEAL KPIs ── */
   secLbl('Meal Overview');
   drawStatCards(
     [{lbl:'Ordered',val:f(agg.tmo),sub:'Total portions'},{lbl:'Consumed',val:f(agg.tmc),sub:'Total consumed'},{lbl:'Leftover',val:f(agg.tml),sub:'Total leftover'},{lbl:'Efficiency',val:pct(mealEff),sub:'Period average'}],
     [C.blue,C.blue,C.orange,C.purple]
   );
 
-  /* ══════════════════════════════════════════════════
-     OVERALL KPIs (3-up)
-  ══════════════════════════════════════════════════ */
+  /* ── OVERALL KPIs ── */
   secLbl('Overall');
   var effAcc=overallEff>=98?C.green:overallEff>=95?C.accent:overallEff>=90?C.orange:C.red;
   drawStatCards(
@@ -1346,29 +1394,24 @@ function exportPDF(){
     [C.accent,C.green,effAcc]
   );
 
-  /* ══════════════════════════════════════════════════
-     ANALYSIS BAR
-  ══════════════════════════════════════════════════ */
-  needY(18);
+  /* ── ANALYSIS BAR ── */
+  needY(20);
   var effWord=overallEff>=98?'Excellent — minimal waste across all shifts.':overallEff>=95?'Normal — within acceptable target range.':overallEff>=90?'Needs attention — leftover above threshold.':'Poor — immediate review recommended.';
-  var analysisTxt=label+'  ·  Snack '+pct(snackEff)+' (peak leftover '+f(peakS.v)+' on '+peakS.d+')  ·  Meal '+pct(mealEff)+' (peak '+f(peakM.v)+' on '+peakM.d+'). Overall '+pct(overallEff)+' — '+effWord;
-  sf(C.accentLt);sd2(C.accent);doc.setLineWidth(0.3);doc.roundedRect(ML,Y,CW,16,2,2,'FD');
-  sf(C.accent);doc.rect(ML,Y,2.5,16,'F');
-  doc.setFont('helvetica','bold');doc.setFontSize(6.5);
+  var aTxt=label+' · Snack '+pct(snackEff)+' (peak leftover '+f(peakS.v)+' on '+peakS.d+') · Meal '+pct(mealEff)+' (peak '+f(peakM.v)+' on '+peakM.d+'). Overall '+pct(overallEff)+' — '+effWord;
+  sf(C.accentLt);sd2(C.accent);doc.setLineWidth(0.4);doc.roundedRect(ML,Y,CW,18,2,2,'FD');
+  sf(C.accent);doc.rect(ML,Y,3,18,'F');
+  doc.setFont('helvetica','bold');doc.setFontSize(7);
   doc.setTextColor(C.accent[0],C.accent[1],C.accent[2]);
-  doc.text('AUTO ANALYSIS',ML+6,Y+6);
-  doc.setFont('helvetica','normal');doc.setFontSize(7.5);st(C.text1);
-  var aLines=doc.splitTextToSize(analysisTxt,CW-10);
-  doc.text(aLines.slice(0,2),ML+6,Y+12);
-  Y+=20;
+  doc.text('AUTO ANALYSIS',ML+7,Y+7);
+  doc.setFont('helvetica','normal');doc.setFontSize(8);st(C.txt1);
+  var aLines=doc.splitTextToSize(aTxt,CW-12);
+  doc.text(aLines.slice(0,2),ML+7,Y+14);
+  Y+=23;
 
-  /* ══════════════════════════════════════════════════
-     INSIGHT CARDS — 3 columns
-  ══════════════════════════════════════════════════ */
+  /* ── ANALYTICS & INSIGHTS — 3 col ── */
   secLbl('Analytics & Insights');
-  needY(58);
+  needY(62);
 
-  /* build insight data */
   var topLeft=rows.slice()
     .sort(function(a,b){return(n(b.snackLeftover)+n(b.mealLeftover))-(n(a.snackLeftover)+n(a.mealLeftover));})
     .slice(0,5).map(function(r){return{lbl:r.date||r.rawDate||'—',v:n(r.snackLeftover)+n(r.mealLeftover)};});
@@ -1382,104 +1425,144 @@ function exportPDF(){
     .slice(0,5).map(function(r){return{lbl:r.date||r.rawDate||'—',v:Math.round((n(r.snackEff)+n(r.mealEff))/2*10)/10};});
 
   var ig=[
-    {title:'Peak Leftover Days',   entries:topLeft,  barC:C.orange},
-    {title:'Lowest Efficiency Days',entries:worstEff,barC:C.red},
-    {title:'Best Efficiency Days',  entries:bestEff, barC:C.green}
+    {title:'Peak Leftover Days',    entries:topLeft,  barC:C.orange,  titleC:C.orange},
+    {title:'Lowest Efficiency Days',entries:worstEff, barC:C.red,     titleC:C.red},
+    {title:'Best Efficiency Days',  entries:bestEff,  barC:C.green,   titleC:C.green}
   ];
-  var igGap=4,igW=(CW-igGap*2)/3,igH=56,igY=Y;
+  var igGap=5,igW=(CW-igGap*2)/3,igH=62,igY=Y;
 
   ig.forEach(function(card,ci){
     var cx=ML+ci*(igW+igGap);
-    sf(C.bg);sd2(C.border);doc.setLineWidth(0.3);doc.roundedRect(cx,igY,igW,igH,2,2,'FD');
-    doc.setFont('helvetica','bold');doc.setFontSize(7);st(C.text1);
-    doc.text(card.title,cx+4,igY+7);
-    sf(C.border);doc.rect(cx+4,igY+9,igW-8,0.4,'F');
+    /* card: putih + border */
+    sf(C.cardBg);sd2(C.border);doc.setLineWidth(0.4);
+    doc.roundedRect(cx,igY,igW,igH,2,2,'FD');
+    /* accent top bar sesuai warna */
+    sf(card.barC);
+    doc.roundedRect(cx,igY,igW,3,2,2,'F');
+    doc.rect(cx,igY+1,igW,2,'F');
+    /* judul bold, gelap */
+    doc.setFont('helvetica','bold');doc.setFontSize(7.5);st(C.txt1);
+    doc.text(card.title,cx+4,igY+10);
+    /* divider */
+    sf(C.border);doc.rect(cx+4,igY+12,igW-8,0.4,'F');
+    /* entries */
     var maxV=Math.max.apply(null,card.entries.map(function(e){return e.v;}).concat([1]));
-    var barAreaW=igW-8-18;
+    var barAreaW=igW-10-18;
     card.entries.slice(0,4).forEach(function(e,ei){
-      var ry=igY+13+ei*10;
-      doc.setFont('helvetica','normal');doc.setFontSize(6.5);st(C.text2);
-      var lbl=String(e.lbl).length>16?String(e.lbl).slice(0,15)+'…':String(e.lbl);
+      var ry=igY+16+ei*11;
+      /* label */
+      doc.setFont('helvetica','normal');doc.setFontSize(7);st(C.txt2);
+      var lbl=String(e.lbl).length>14?String(e.lbl).slice(0,13)+'…':String(e.lbl);
       doc.text(lbl,cx+4,ry+3.5);
-      sf(C.border);doc.roundedRect(cx+4,ry+4.5,barAreaW,3,1,1,'F');
+      /* bar track abu muda */
+      doc.setFillColor(220,224,240);
+      doc.roundedRect(cx+4,ry+5,barAreaW,3.5,1,1,'F');
+      /* bar fill */
       sf(card.barC);
-      var fw=Math.max(2,(e.v/maxV)*barAreaW);
-      doc.roundedRect(cx+4,ry+4.5,fw,3,1,1,'F');
-      doc.setFont('helvetica','bold');doc.setFontSize(6.5);st(C.text1);
+      var fw=Math.max(3,(e.v/maxV)*barAreaW);
+      doc.roundedRect(cx+4,ry+5,fw,3.5,1,1,'F');
+      /* nilai bold gelap */
+      doc.setFont('helvetica','bold');doc.setFontSize(7.5);st(C.txt1);
       doc.text(String(e.v),cx+igW-4,ry+3.5,{align:'right'});
     });
   });
   Y=igY+igH+6;
 
-  /* ══════════════════════════════════════════════════
-     SHIFT BREAKDOWN
-  ══════════════════════════════════════════════════ */
+  /* ── SHIFT BREAKDOWN ── */
   if(sd){
     secLbl('Shift Breakdown');
-    needY(40);
-    var shH=36,shGap=6,shW=(CW-shGap)/2;
+    needY(44);
+    var shH=40,shGap=6,shW=(CW-shGap)/2;
     var shDefs=[
       {title:'Snack — Shift Breakdown',acc:C.green,vals:[n(sd.snackS1),n(sd.snackS2),n(sd.snackS3)]},
       {title:'Meal — Shift Breakdown', acc:C.blue, vals:[n(sd.mealS1), n(sd.mealS2), n(sd.mealS3)]}
     ];
     shDefs.forEach(function(sh,si){
       var sx=ML+si*(shW+shGap);
-      sf(C.bg);sd2(C.border);doc.setLineWidth(0.3);doc.roundedRect(sx,Y,shW,shH,2,2,'FD');
-      sf(sh.acc);doc.roundedRect(sx,Y,shW,2.5,2,2,'F');doc.rect(sx,Y+1,shW,1.5,'F');
-      doc.setFont('helvetica','bold');doc.setFontSize(7.5);st(C.text1);
-      doc.text(sh.title,sx+4,Y+8);
+      sf(C.cardBg);sd2(C.border);doc.setLineWidth(0.4);
+      doc.roundedRect(sx,Y,shW,shH,2,2,'FD');
+      sf(sh.acc);doc.roundedRect(sx,Y,shW,3.5,2,2,'F');doc.rect(sx,Y+1.5,shW,2,'F');
+      doc.setFont('helvetica','bold');doc.setFontSize(8.5);st(C.txt1);
+      doc.text(sh.title,sx+5,Y+11);
       var tot=sh.vals[0]+sh.vals[1]+sh.vals[2]||1;
-      var barW=shW-8-20;
+      var barW=shW-10-24;
       ['Shift 1','Shift 2','Shift 3'].forEach(function(lbl,li){
-        var ry=Y+12+li*8;
+        var ry=Y+15+li*9;
         var v=sh.vals[li],p=Math.round(v/tot*1000)/10;
-        doc.setFont('helvetica','normal');doc.setFontSize(7);st(C.text2);
-        doc.text(lbl,sx+4,ry+3);
-        doc.setFont('helvetica','bold');doc.setFontSize(7);st(C.text1);
-        doc.text(f(v)+' ('+p+'%)',sx+shW-4,ry+3,{align:'right'});
-        sf(C.border);doc.roundedRect(sx+4,ry+3.5,barW,2.5,1,1,'F');
+        doc.setFont('helvetica','normal');doc.setFontSize(7.5);st(C.txt2);
+        doc.text(lbl,sx+5,ry+4);
+        doc.setFont('helvetica','bold');doc.setFontSize(7.5);st(C.txt1);
+        doc.text(f(v)+' ('+p+'%)',sx+shW-5,ry+4,{align:'right'});
+        doc.setFillColor(220,224,240);
+        doc.roundedRect(sx+5,ry+4.5,barW,3,1,1,'F');
         sf(sh.acc);
-        var fw=Math.max(2,(v/tot)*barW);
-        doc.roundedRect(sx+4,ry+3.5,fw,2.5,1,1,'F');
+        var fw=Math.max(3,(v/tot)*barW);
+        doc.roundedRect(sx+5,ry+4.5,fw,3,1,1,'F');
       });
     });
     Y+=shH+6;
   }
 
-  /* ══════════════════════════════════════════════════
-     DAILY AVG STRIP
-  ══════════════════════════════════════════════════ */
+  /* ── DAILY AVERAGES STRIP ── */
   needY(14);
-  sf(C.bg);sd2(C.border);doc.setLineWidth(0.3);doc.roundedRect(ML,Y,CW,11,2,2,'FD');
-  doc.setFont('helvetica','bold');doc.setFontSize(6.5);st(C.text3);
-  doc.text('DAILY AVERAGES',ML+4,Y+7);
-  doc.setFont('helvetica','normal');doc.setFontSize(7.5);st(C.text1);
-  doc.text('Snack: '+f(avgSO)+' pcs/day  ·  Meal: '+f(avgMO)+' pcs/day  ·  Working Days: '+days,ML+42,Y+7);
-  doc.setFont('helvetica','bold');doc.setFontSize(7.5);st(C.text1);
-  doc.text('Snack Eff: '+pct(snackEff)+'  ·  Meal Eff: '+pct(mealEff)+'  ·  Overall: '+pct(overallEff),PW-MR,Y+7,{align:'right'});
-  Y+=15;
+  sf(C.cardBg);sd2(C.border);doc.setLineWidth(0.4);
+  doc.roundedRect(ML,Y,CW,12,2,2,'FD');
+  sf(C.accent);doc.rect(ML,Y,3,12,'F');
+  doc.setFont('helvetica','bold');doc.setFontSize(7);st(C.txt3);
+  doc.text('DAILY AVERAGES',ML+7,Y+8);
+  doc.setFont('helvetica','normal');doc.setFontSize(8);st(C.txt1);
+  doc.text('Snack: '+f(avgSO)+' pcs/day  ·  Meal: '+f(avgMO)+' pcs/day  ·  Working Days: '+days,ML+48,Y+8);
+  doc.setFont('helvetica','bold');doc.setFontSize(8);st(C.txt1);
+  doc.text('Snack Eff: '+pct(snackEff)+'  ·  Meal Eff: '+pct(mealEff)+'  ·  Overall: '+pct(overallEff),PW-MR,Y+8,{align:'right'});
+  Y+=17;
 
   /* ══════════════════════════════════════════════════
-     DAILY DETAIL TABLE
+     TABEL DAILY DETAIL
+     PERBAIKAN UTAMA:
+     - columnStyles TIDAK mengatur fillColor/textColor (biarkan headStyles yang atur)
+     - headStyles = navy gelap + putih, fontStyle bold, fontSize 8
+     - bodyStyles = teks gelap di atas putih
+     - didParseCell untuk coloring per-cell saja
   ══════════════════════════════════════════════════ */
   secLbl('Daily Report Detail');
+  needY(20);
   doc.autoTable({
     startY:Y,
     margin:{left:ML,right:MR},
     theme:'grid',
-    headStyles:{fillColor:C.navy,textColor:C.white,fontStyle:'bold',fontSize:7,cellPadding:3,halign:'center'},
-    columnStyles:{
-      0:{halign:'left',  cellWidth:24,fillColor:[26,39,68], textColor:C.white,fontStyle:'bold'},
-      1:{halign:'right', cellWidth:18,fillColor:C.greenDk,  textColor:C.white},
-      2:{halign:'right', cellWidth:18,fillColor:C.greenDk,  textColor:C.white},
-      3:{halign:'right', cellWidth:18,fillColor:C.greenDk,  textColor:C.white},
-      4:{halign:'center',cellWidth:16,fillColor:C.greenDk,  textColor:C.white},
-      5:{halign:'right', cellWidth:18,fillColor:C.blueDk,   textColor:C.white},
-      6:{halign:'right', cellWidth:18,fillColor:C.blueDk,   textColor:C.white},
-      7:{halign:'right', cellWidth:18,fillColor:C.blueDk,   textColor:C.white},
-      8:{halign:'center',cellWidth:16,fillColor:C.blueDk,   textColor:C.white}
+    /* ── header: navy base semua kolom, lalu warna per grup via didParseCell ── */
+    headStyles:{
+      fillColor:C.navy,
+      textColor:C.white,
+      fontStyle:'bold',
+      fontSize:7.5,
+      cellPadding:{top:3,bottom:3,left:3,right:3},
+      halign:'center',
+      lineColor:C.border,
+      lineWidth:0.4
     },
-    head:[['Date','Snack Ord','S.Consumed','S.Leftover','S.Eff','Meal Ord','M.Consumed','M.Leftover','M.Eff']],
+    /* ── body: gelap jelas di putih ── */
+    bodyStyles:{
+      fontSize:7.5,
+      cellPadding:{top:2.5,bottom:2.5,left:3,right:3},
+      textColor:C.txt1,
+      fillColor:C.white,
+      lineColor:C.border,
+      lineWidth:0.3
+    },
+    alternateRowStyles:{fillColor:C.altBg},
+    columnStyles:{
+      0:{halign:'left',  cellWidth:26,fontStyle:'bold'},
+      1:{halign:'right', cellWidth:19},
+      2:{halign:'right', cellWidth:19},
+      3:{halign:'right', cellWidth:19},
+      4:{halign:'center',cellWidth:16},
+      5:{halign:'right', cellWidth:19},
+      6:{halign:'right', cellWidth:19},
+      7:{halign:'right', cellWidth:19},
+      8:{halign:'center',cellWidth:16}
+    },
+    head:[['Date','Snack Ord','Consumed','Leftover','Eff%','Meal Ord','Consumed','Leftover','Eff%']],
     body:rows.map(function(r){
       return[
         r.date||r.rawDate||'—',
@@ -1487,26 +1570,44 @@ function exportPDF(){
         f(r.mealOrder), f(r.mealConsumed), f(r.mealLeftover), pct(r.mealEff)
       ];
     }),
-    bodyStyles:{fontSize:7,cellPadding:2.5,textColor:C.text2,fillColor:C.white},
-    alternateRowStyles:{fillColor:C.bg},
     didParseCell:function(data){
+      /* ── HEAD: warnai grup snack vs meal ── */
+      if(data.section==='head'){
+        if(data.column.index>=1&&data.column.index<=4){
+          data.cell.styles.fillColor=C.greenDk;
+          data.cell.styles.textColor=C.white;
+        }
+        if(data.column.index>=5&&data.column.index<=8){
+          data.cell.styles.fillColor=C.blueDk;
+          data.cell.styles.textColor=C.white;
+        }
+        return;
+      }
+      /* ── BODY ── */
       if(data.section!=='body')return;
       var r=rows[data.row.index];if(!r)return;
-      /* warn row */
-      if(n(r.snackLeftover)+n(r.mealLeftover)>thr){data.cell.styles.fillColor=C.warnBg;}
-      /* eff cell colour */
+      var totalLft=n(r.snackLeftover)+n(r.mealLeftover);
+      /* warn row: background kuning muda, teks tetap gelap */
+      if(totalLft>thr){
+        data.cell.styles.fillColor=C.warnBg;
+        data.cell.styles.textColor=C.txt1;
+      }
+      /* eff cell coloring — gunakan bold + warna semantik */
       if(data.column.index===4||data.column.index===8){
-        var v=data.column.index===4?n(r.snackEff):n(r.mealEff);
+        var ev=data.column.index===4?n(r.snackEff):n(r.mealEff);
         data.cell.styles.fontStyle='bold';
-        data.cell.styles.textColor=v>=98?C.green:v>=95?[202,138,4]:C.red;
+        if(ev>=98)     data.cell.styles.textColor=C.effGood;
+        else if(ev>=95)data.cell.styles.textColor=C.effMid;
+        else           data.cell.styles.textColor=C.effBad;
+        if(totalLft>thr)data.cell.styles.fillColor=C.warnBg;
       }
     },
-    willDrawPage:function(){drawPageFooter();}
+    willDrawPage:function(){drawPageHeader();drawPageFooter();}
   });
-  Y=doc.lastAutoTable.finalY+6;
+  Y=doc.lastAutoTable.finalY+7;
 
   /* ══════════════════════════════════════════════════
-     MONTHLY HISTORY TABLE
+     TABEL MONTHLY HISTORY
   ══════════════════════════════════════════════════ */
   if(mrows&&mrows.length){
     secLbl('Monthly History');
@@ -1515,10 +1616,28 @@ function exportPDF(){
       startY:Y,
       margin:{left:ML,right:MR},
       theme:'grid',
-      headStyles:{fillColor:C.navy,textColor:C.white,fontStyle:'bold',fontSize:7,cellPadding:3,halign:'center'},
+      headStyles:{
+        fillColor:C.navy,
+        textColor:C.white,
+        fontStyle:'bold',
+        fontSize:7.5,
+        cellPadding:{top:3,bottom:3,left:3,right:3},
+        halign:'center',
+        lineColor:C.border,
+        lineWidth:0.4
+      },
+      bodyStyles:{
+        fontSize:7.5,
+        cellPadding:{top:2.5,bottom:2.5,left:3,right:3},
+        textColor:C.txt1,
+        fillColor:C.white,
+        lineColor:C.border,
+        lineWidth:0.3
+      },
+      alternateRowStyles:{fillColor:C.altBg},
       columnStyles:{
-        0:{halign:'left', cellWidth:34,fontStyle:'bold'},
-        1:{halign:'center',cellWidth:14},
+        0:{halign:'left',  cellWidth:36,fontStyle:'bold'},
+        1:{halign:'center',cellWidth:12},
         2:{halign:'right', cellWidth:24},
         3:{halign:'center',cellWidth:18},
         4:{halign:'right', cellWidth:24},
@@ -1530,24 +1649,29 @@ function exportPDF(){
       body:mrows.map(function(r){
         return[r.month||'—',r.workingDays||0,f(r.snackOrder),pct(r.snackEff),f(r.mealOrder),pct(r.mealEff),r.peakDate||'—',r.remarks||'—'];
       }),
-      bodyStyles:{fontSize:7,cellPadding:2.5,textColor:C.text2},
-      alternateRowStyles:{fillColor:C.bg},
       didParseCell:function(data){
+        if(data.section==='head'){
+          if(data.column.index===2||data.column.index===3){data.cell.styles.fillColor=C.greenDk;data.cell.styles.textColor=C.white;}
+          if(data.column.index===4||data.column.index===5){data.cell.styles.fillColor=C.blueDk; data.cell.styles.textColor=C.white;}
+          return;
+        }
         if(data.section==='body'&&(data.column.index===3||data.column.index===5)){
-          var v=parseFloat(String(data.cell.raw));
+          var ev=parseFloat(String(data.cell.raw));
           data.cell.styles.fontStyle='bold';
-          data.cell.styles.textColor=v>=98?C.green:v>=95?[202,138,4]:C.red;
+          if(ev>=98)     data.cell.styles.textColor=C.effGood;
+          else if(ev>=95)data.cell.styles.textColor=C.effMid;
+          else           data.cell.styles.textColor=C.effBad;
         }
       },
-      willDrawPage:function(){drawPageFooter();}
+      willDrawPage:function(){drawPageHeader();drawPageFooter();}
     });
-    Y=doc.lastAutoTable.finalY+6;
+    Y=doc.lastAutoTable.finalY+7;
   }
 
-  /* ── footer page terakhir ── */
+  /* footer halaman terakhir */
   drawPageFooter();
 
-  /* ── save ── */
+  /* save */
   var fname='canteen_report_'+String(label).replace(/[^a-zA-Z0-9_\-]/g,'_')+'.pdf';
   doc.save(fname);
 }
