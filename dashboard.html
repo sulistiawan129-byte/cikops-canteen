@@ -7,6 +7,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pptxgenjs/3.12.0/pptxgen.bundle.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -421,6 +422,9 @@ var GAS_URL="https://script.google.com/macros/s/AKfycbywIW79lgCQOvlqUX0XuIsKk8A4
     </button>
     <button class="btn-exp" onclick="exportCSV()">
       <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>CSV
+    </button>
+    <button class="btn-exp" onclick="exportPPT()">
+      <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/><circle cx="8" cy="10" r="2"/><path d="M8 10h4a2 2 0 000-4H8v8"/></svg>PPT
     </button>
     <button class="btn-exp" onclick="pickLogo()" id="logoBtn" title="Upload logo perusahaan untuk header PDF">
       <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg><span id="logoBtnLbl">Logo</span>
@@ -1725,6 +1729,518 @@ function exportPDF(){
   var fname='canteen_report_'+String(label).replace(/[^a-zA-Z0-9_\-]/g,'_')+'.pdf';
   doc.save(fname);
 }
+
+/* ══════════════════════════════════════════════════════════════════
+   EXPORT PPT — FLEET/PDF-STYLE LAYOUT (PptxGenJS)
+   Layout: LAYOUT_WIDE 13.3" × 7.5"  (landscape, mirip PDF)
+   Slide 1 : Cover — Header navy + KPI cards Snack/Meal/Overall + Analysis
+   Slide 2 : Analytics & Insights — 3 insight bars + Shift breakdown
+   Slide 3+: Daily Report Detail — tabel paginasi tiap 20 baris
+   Slide N : Monthly History — tabel ringkasan per bulan
+   ─────────────────────────────────────────────────────────────────
+   Palette identik PDF:
+     Navy    #0A1432   Header bg, table head
+     Green   #16A34A   Snack accent
+     GreenDk #145232   Snack table header
+     Blue    #1D4ED8   Meal accent
+     BlueDk  #172554   Meal table header
+     Orange  #EA580C   Leftover / warn
+     Accent  #3B5BDB   Period bar, section label
+══════════════════════════════════════════════════════════════════ */
+function exportPPT(){
+  var rows=filteredRows.length?filteredRows:(D?D.allRows:[]);
+  if(!rows.length){alert('No data.');return;}
+  if(typeof PptxGenJS==='undefined'){alert('PptxGenJS belum dimuat.');return;}
+
+  /* ── data ── */
+  var mrows=(D&&D.monthlyRows)?D.monthlyRows:[];
+  var sd=(D&&D.shiftData)?D.shiftData:null;
+  var thr=(D&&D.config)?+D.config.threshold:15;
+  var label=filteredLabel||selMonth||'Period';
+
+  /* ── aggregate ── */
+  var agg=rows.reduce(function(a,r){
+    a.tso+=n(r.snackOrder);a.tsc+=n(r.snackConsumed);a.tsl+=n(r.snackLeftover);
+    a.tmo+=n(r.mealOrder); a.tmc+=n(r.mealConsumed); a.tml+=n(r.mealLeftover);
+    return a;
+  },{tso:0,tsc:0,tsl:0,tmo:0,tmc:0,tml:0});
+  var snackEff=agg.tso>0?Math.round(agg.tsc/agg.tso*10000)/100:0;
+  var mealEff =agg.tmo>0?Math.round(agg.tmc/agg.tmo*10000)/100:0;
+  var overallEff=Math.round((snackEff+mealEff)/2*10)/10;
+  var days=rows.length||1;
+  var avgSO=Math.round(agg.tso/days), avgMO=Math.round(agg.tmo/days);
+  var peakS={v:0,d:'—'}, peakM={v:0,d:'—'};
+  rows.forEach(function(r){
+    if(n(r.snackLeftover)>peakS.v){peakS.v=n(r.snackLeftover);peakS.d=r.date||r.rawDate||'—';}
+    if(n(r.mealLeftover) >peakM.v){peakM.v=n(r.mealLeftover); peakM.d=r.date||r.rawDate||'—';}
+  });
+  function pct(v){return(Math.round(n(v)*10)/10).toFixed(1)+'%';}
+
+  /* ── pptx init ── */
+  var pres=new PptxGenJS();
+  pres.layout='LAYOUT_WIDE'; /* 13.3" × 7.5" */
+  pres.author='FFI Cikarang — Canteen Ops';
+  pres.title='Canteen Operations Report — '+label;
+  var SW=13.3, SH=7.5; /* slide dimensions inches */
+
+  /* ── colour constants (no # prefix!) ── */
+  var CLR={
+    navy:'0A1432', navyHdr:'0F1E50',
+    green:'16A34A', greenDk:'145232',
+    blue:'1D4ED8',  blueDk:'172554',
+    orange:'EA580C', red:'B91C1C', purple:'6D28D9',
+    accent:'3B5BDB', accentLt:'EBF0FF',
+    white:'FFFFFF', cardBg:'FFFFFF',
+    border:'D1D5E6',
+    txt1:'0D1328', txt2:'2D375A', txt3:'5A6996',
+    effGood:'158040', effMid:'924010', effBad:'B91C1C',
+    warnBg:'FFF7DC', altBg:'F8F9FC'
+  };
+
+  /* ── helper: header navy band (setiap slide) ── */
+  function addHeader(slide,titleTxt,subTxt){
+    /* navy band */
+    slide.addShape(pres.shapes.RECTANGLE,{
+      x:0,y:0,w:SW,h:0.7,
+      fill:{color:CLR.navy}, line:{color:CLR.navy,pt:0}
+    });
+    /* logo jika ada */
+    var txtX=0.22;
+    if(_CANTEEN_LOGO_B64){
+      try{
+        slide.addImage({data:_CANTEEN_LOGO_B64,x:0.18,y:0.08,w:0.5,h:0.5});
+        txtX=0.76;
+      }catch(e){}
+    }
+    /* judul kiri */
+    slide.addText(titleTxt,{
+      x:txtX,y:0.06,w:7,h:0.32,
+      fontSize:14,bold:true,color:CLR.white,fontFace:'Arial',margin:0
+    });
+    slide.addText(subTxt,{
+      x:txtX,y:0.38,w:7,h:0.24,
+      fontSize:8,color:'B2C1E4',fontFace:'Arial',margin:0
+    });
+    /* kanan: periode + dibuat */
+    var now=new Date();
+    var tgl=now.toLocaleDateString('id-ID',{day:'2-digit',month:'2-digit',year:'numeric'});
+    var jam=String(now.getHours()).padStart(2,'0')+'.'+String(now.getMinutes()).padStart(2,'0');
+    slide.addText('Periode '+label,{
+      x:SW-4.5,y:0.06,w:4.3,h:0.28,
+      fontSize:8.5,color:'B2C1E4',fontFace:'Arial',align:'right',margin:0
+    });
+    slide.addText('Dibuat '+tgl+', '+jam,{
+      x:SW-4.5,y:0.35,w:4.3,h:0.24,
+      fontSize:8,color:'B2C1E4',fontFace:'Arial',align:'right',margin:0
+    });
+  }
+
+  /* ── helper: footer navy band ── */
+  function addFooter(slide,pageNum,totalPages){
+    slide.addShape(pres.shapes.RECTANGLE,{
+      x:0,y:SH-0.28,w:SW,h:0.28,
+      fill:{color:CLR.navy}, line:{color:CLR.navy,pt:0}
+    });
+    slide.addText('FFI Cikarang  ·  Canteen Operations Report  ·  Confidential',{
+      x:0.22,y:SH-0.26,w:8,h:0.22,
+      fontSize:7,color:'8899CC',fontFace:'Arial',margin:0
+    });
+    slide.addText('Halaman '+pageNum+(totalPages?' / '+totalPages:''),{
+      x:SW-2.5,y:SH-0.26,w:2.3,h:0.22,
+      fontSize:7,color:'8899CC',fontFace:'Arial',align:'right',margin:0
+    });
+  }
+
+  /* ── helper: section label ── */
+  function addSection(slide,txt,yPos){
+    slide.addShape(pres.shapes.RECTANGLE,{
+      x:0.22,y:yPos,w:0.06,h:0.28,
+      fill:{color:CLR.accent}, line:{color:CLR.accent,pt:0}
+    });
+    slide.addText(txt,{
+      x:0.34,y:yPos,w:8,h:0.28,
+      fontSize:10,bold:true,color:CLR.txt1,fontFace:'Arial',margin:0
+    });
+    slide.addShape(pres.shapes.RECTANGLE,{
+      x:2.8,y:yPos+0.14,w:SW-3.1,h:0.01,
+      fill:{color:CLR.border}, line:{color:CLR.border,pt:0}
+    });
+  }
+
+  /* ── helper: stat card ── */
+  function addStatCard(slide,x,y,w,h,lbl,val,sub,accentColor){
+    /* card bg */
+    slide.addShape(pres.shapes.ROUNDED_RECTANGLE,{
+      x:x,y:y,w:w,h:h,
+      fill:{color:CLR.cardBg},
+      line:{color:CLR.border,pt:0.75},
+      rectRadius:0.06,
+      shadow:{type:'outer',color:'000000',blur:4,offset:2,angle:45,opacity:0.08}
+    });
+    /* top accent bar */
+    slide.addShape(pres.shapes.ROUNDED_RECTANGLE,{
+      x:x,y:y,w:w,h:0.12,
+      fill:{color:accentColor},
+      line:{color:accentColor,pt:0},
+      rectRadius:0.06
+    });
+    slide.addShape(pres.shapes.RECTANGLE,{
+      x:x,y:y+0.06,w:w,h:0.06,
+      fill:{color:accentColor}, line:{color:accentColor,pt:0}
+    });
+    /* label */
+    slide.addText(lbl.toUpperCase(),{
+      x:x+0.1,y:y+0.16,w:w-0.2,h:0.2,
+      fontSize:6.5,bold:true,color:CLR.txt3,fontFace:'Arial',margin:0
+    });
+    /* value */
+    slide.addText(String(val),{
+      x:x+0.1,y:y+0.35,w:w-0.2,h:0.42,
+      fontSize:22,bold:true,color:CLR.txt1,fontFace:'Arial',margin:0
+    });
+    /* sub */
+    slide.addText(sub,{
+      x:x+0.1,y:y+0.76,w:w-0.2,h:0.16,
+      fontSize:7,color:CLR.txt3,fontFace:'Arial',margin:0
+    });
+  }
+
+  /* ── helper: insight bar card ── */
+  function addInsightCard(slide,x,y,w,h,title,entries,barColor){
+    slide.addShape(pres.shapes.ROUNDED_RECTANGLE,{
+      x:x,y:y,w:w,h:h,
+      fill:{color:CLR.cardBg},
+      line:{color:CLR.border,pt:0.75},
+      rectRadius:0.06,
+      shadow:{type:'outer',color:'000000',blur:3,offset:1,angle:45,opacity:0.07}
+    });
+    /* top accent */
+    slide.addShape(pres.shapes.ROUNDED_RECTANGLE,{
+      x:x,y:y,w:w,h:0.1, fill:{color:barColor}, line:{color:barColor,pt:0}, rectRadius:0.06
+    });
+    slide.addShape(pres.shapes.RECTANGLE,{
+      x:x,y:y+0.05,w:w,h:0.05, fill:{color:barColor}, line:{color:barColor,pt:0}
+    });
+    slide.addText(title,{
+      x:x+0.12,y:y+0.14,w:w-0.24,h:0.22,
+      fontSize:8.5,bold:true,color:CLR.txt1,fontFace:'Arial',margin:0
+    });
+    var maxV=Math.max.apply(null,entries.map(function(e){return e.v;}).concat([1]));
+    var barMaxW=w-0.6;
+    var rowH=(h-0.42)/Math.min(entries.length,5);
+    entries.slice(0,5).forEach(function(e,i){
+      var ry=y+0.42+i*rowH;
+      var lbl=String(e.lbl).length>16?String(e.lbl).slice(0,15)+'…':String(e.lbl);
+      slide.addText(lbl,{
+        x:x+0.12,y:ry,w:w-0.24,h:0.18,
+        fontSize:7.5,color:CLR.txt2,fontFace:'Arial',margin:0
+      });
+      /* bar track */
+      slide.addShape(pres.shapes.ROUNDED_RECTANGLE,{
+        x:x+0.12,y:ry+0.19,w:barMaxW,h:0.1,
+        fill:{color:'D7DCF0'}, line:{color:'D7DCF0',pt:0}, rectRadius:0.04
+      });
+      /* bar fill */
+      var fw=Math.max(0.04,(e.v/maxV)*barMaxW);
+      slide.addShape(pres.shapes.ROUNDED_RECTANGLE,{
+        x:x+0.12,y:ry+0.19,w:fw,h:0.1,
+        fill:{color:barColor}, line:{color:barColor,pt:0}, rectRadius:0.04
+      });
+      /* value */
+      slide.addText(String(e.v),{
+        x:x+w-0.38,y:ry,w:0.26,h:0.18,
+        fontSize:7.5,bold:true,color:CLR.txt1,fontFace:'Arial',align:'right',margin:0
+      });
+    });
+  }
+
+  /* ══════════════════════════════════════════════
+     SLIDE 1 — OVERVIEW (KPI + Analysis)
+  ══════════════════════════════════════════════ */
+  var s1=pres.addSlide();
+  addHeader(s1,'CANTEEN OPERATIONS — FFI Cikarang','Laporan Komprehensif Operasional Kantin · VENDOR: GDSK');
+  addFooter(s1,1);
+
+  /* period bar */
+  s1.addShape(pres.shapes.ROUNDED_RECTANGLE,{
+    x:0.22,y:0.78,w:SW-0.44,h:0.32,
+    fill:{color:CLR.accentLt}, line:{color:CLR.accent,pt:0.75}, rectRadius:0.06
+  });
+  s1.addText('PERIOD',{
+    x:0.38,y:0.82,w:0.7,h:0.22,
+    fontSize:8,bold:true,color:CLR.accent,fontFace:'Arial',margin:0
+  });
+  s1.addText(label+'  ·  '+days+' working days',{
+    x:1.1,y:0.82,w:7,h:0.22,
+    fontSize:9,color:CLR.txt1,fontFace:'Arial',margin:0
+  });
+  s1.addText('Threshold: '+thr+' pcs/day',{
+    x:SW-2.6,y:0.82,w:2.38,h:0.22,
+    fontSize:8,color:CLR.txt3,fontFace:'Arial',align:'right',margin:0
+  });
+
+  /* ── SNACK KPI cards ── */
+  s1.addText('SNACK OVERVIEW',{x:0.22,y:1.2,w:3,h:0.2,fontSize:7.5,bold:true,color:CLR.txt3,fontFace:'Arial',margin:0});
+  var scards=[
+    {lbl:'Ordered',  val:f(agg.tso), sub:'Total portions', acc:CLR.green},
+    {lbl:'Consumed', val:f(agg.tsc), sub:'Total consumed', acc:CLR.green},
+    {lbl:'Leftover', val:f(agg.tsl), sub:'Total leftover', acc:CLR.orange},
+    {lbl:'Efficiency',val:pct(snackEff),sub:'Period average',acc:CLR.accent}
+  ];
+  var cw=(SW-0.44-0.18*3)/4, cg=0.06;
+  scards.forEach(function(c,i){
+    addStatCard(s1, 0.22+i*(cw+cg), 1.44, cw, 0.96, c.lbl, c.val, c.sub, c.acc);
+  });
+
+  /* ── MEAL KPI cards ── */
+  s1.addText('MEAL OVERVIEW',{x:0.22,y:2.5,w:3,h:0.2,fontSize:7.5,bold:true,color:CLR.txt3,fontFace:'Arial',margin:0});
+  var mcards=[
+    {lbl:'Ordered',  val:f(agg.tmo), sub:'Total portions', acc:CLR.blue},
+    {lbl:'Consumed', val:f(agg.tmc), sub:'Total consumed', acc:CLR.blue},
+    {lbl:'Leftover', val:f(agg.tml), sub:'Total leftover', acc:CLR.orange},
+    {lbl:'Efficiency',val:pct(mealEff),sub:'Period average',acc:CLR.purple}
+  ];
+  mcards.forEach(function(c,i){
+    addStatCard(s1, 0.22+i*(cw+cg), 2.74, cw, 0.96, c.lbl, c.val, c.sub, c.acc);
+  });
+
+  /* ── OVERALL KPI cards ── */
+  s1.addText('OVERALL',{x:0.22,y:3.8,w:2,h:0.2,fontSize:7.5,bold:true,color:CLR.txt3,fontFace:'Arial',margin:0});
+  var effAcc=overallEff>=98?CLR.green:overallEff>=95?CLR.accent:overallEff>=90?CLR.orange:CLR.red;
+  var ow=(SW-0.44-0.18*2)/3;
+  [
+    {lbl:'Total Ordered',  val:f(agg.tso+agg.tmo), sub:'Snack + Meal',   acc:CLR.accent},
+    {lbl:'Total Consumed', val:f(agg.tsc+agg.tmc), sub:'Snack + Meal',   acc:CLR.green},
+    {lbl:'Overall Efficiency',val:pct(overallEff), sub:days+' days',     acc:effAcc}
+  ].forEach(function(c,i){
+    addStatCard(s1, 0.22+i*(ow+cg), 4.04, ow, 0.96, c.lbl, c.val, c.sub, c.acc);
+  });
+
+  /* ── Auto Analysis bar ── */
+  var effWord=overallEff>=98?'Excellent — minimal waste across all shifts.':
+    overallEff>=95?'Normal — within acceptable target range.':
+    overallEff>=90?'Needs attention — leftover above threshold.':'Poor — immediate review recommended.';
+  var aTxt=label+' · Snack '+pct(snackEff)+' (peak leftover '+f(peakS.v)+' on '+peakS.d
+    +') · Meal '+pct(mealEff)+' (peak '+f(peakM.v)+' on '+peakM.d
+    +'). Overall '+pct(overallEff)+' — '+effWord;
+  s1.addShape(pres.shapes.ROUNDED_RECTANGLE,{
+    x:0.22,y:5.12,w:SW-0.44,h:0.52,
+    fill:{color:CLR.accentLt}, line:{color:CLR.accent,pt:0.75}, rectRadius:0.06
+  });
+  s1.addText('AUTO ANALYSIS',{
+    x:0.38,y:5.16,w:1.3,h:0.18, fontSize:7,bold:true,color:CLR.accent,fontFace:'Arial',margin:0
+  });
+  s1.addText(aTxt,{
+    x:0.38,y:5.36,w:SW-0.7,h:0.22,
+    fontSize:8.5,color:CLR.txt1,fontFace:'Arial',margin:0
+  });
+
+  /* daily avg strip */
+  s1.addShape(pres.shapes.ROUNDED_RECTANGLE,{
+    x:0.22,y:5.74,w:SW-0.44,h:0.42,
+    fill:{color:'F5F7FB'}, line:{color:CLR.border,pt:0.75}, rectRadius:0.06
+  });
+  s1.addText('DAILY AVERAGES',{
+    x:0.36,y:5.78,w:1.6,h:0.18, fontSize:7.5,bold:true,color:CLR.txt3,fontFace:'Arial',margin:0
+  });
+  s1.addText('Snack: '+f(avgSO)+' pcs/day     Meal: '+f(avgMO)+' pcs/day     Working Days: '+days,{
+    x:2.1,y:5.78,w:6,h:0.18, fontSize:9,color:CLR.txt1,fontFace:'Arial',margin:0
+  });
+  s1.addText('Snack Eff: '+pct(snackEff)+'     Meal Eff: '+pct(mealEff)+'     Overall: '+pct(overallEff),{
+    x:2.1,y:5.96,w:SW-2.5,h:0.18, fontSize:9,bold:true,color:CLR.txt1,fontFace:'Arial',margin:0
+  });
+
+  /* ══════════════════════════════════════════════
+     SLIDE 2 — ANALYTICS & INSIGHTS
+  ══════════════════════════════════════════════ */
+  var s2=pres.addSlide();
+  addHeader(s2,'CANTEEN OPERATIONS — FFI Cikarang','Analytics & Insights · '+label);
+  addFooter(s2,2);
+
+  /* build insight data */
+  var topLeft=rows.slice()
+    .sort(function(a,b){return(n(b.snackLeftover)+n(b.mealLeftover))-(n(a.snackLeftover)+n(a.mealLeftover));})
+    .slice(0,5).map(function(r){return{lbl:r.date||r.rawDate||'—',v:n(r.snackLeftover)+n(r.mealLeftover)};});
+  var worstEff=rows.slice()
+    .filter(function(r){return n(r.snackEff)>0||n(r.mealEff)>0;})
+    .sort(function(a,b){return(n(a.snackEff)+n(a.mealEff))-(n(b.snackEff)+n(b.mealEff));})
+    .slice(0,5).map(function(r){return{lbl:r.date||r.rawDate||'—',v:Math.round((n(r.snackEff)+n(r.mealEff))/2*10)/10};});
+  var bestEff=rows.slice()
+    .filter(function(r){return n(r.snackEff)>0||n(r.mealEff)>0;})
+    .sort(function(a,b){return(n(b.snackEff)+n(b.mealEff))-(n(a.snackEff)+n(a.mealEff));})
+    .slice(0,5).map(function(r){return{lbl:r.date||r.rawDate||'—',v:Math.round((n(r.snackEff)+n(r.mealEff))/2*10)/10};});
+
+  /* 3 insight cards */
+  s2.addText('ANALYTICS & INSIGHTS',{x:0.22,y:0.82,w:4,h:0.22,fontSize:9,bold:true,color:CLR.txt1,fontFace:'Arial',margin:0});
+  var igW=(SW-0.44-0.24)/3, igH=2.6, igY=1.1;
+  addInsightCard(s2, 0.22,           igY, igW, igH, 'Peak Leftover Days',     topLeft,  CLR.orange);
+  addInsightCard(s2, 0.22+igW+0.12,  igY, igW, igH, 'Lowest Efficiency Days', worstEff, CLR.red);
+  addInsightCard(s2, 0.22+2*(igW+0.12), igY, igW, igH, 'Best Efficiency Days',   bestEff,  CLR.green);
+
+  /* Shift breakdown */
+  if(sd){
+    s2.addText('SHIFT BREAKDOWN',{x:0.22,y:3.85,w:4,h:0.22,fontSize:9,bold:true,color:CLR.txt1,fontFace:'Arial',margin:0});
+    var shW=(SW-0.44-0.24)/2, shH=2.4;
+    var shDefs=[
+      {title:'Snack — Shift Breakdown',acc:CLR.green,vals:[n(sd.snackS1),n(sd.snackS2),n(sd.snackS3)]},
+      {title:'Meal — Shift Breakdown', acc:CLR.blue, vals:[n(sd.mealS1), n(sd.mealS2), n(sd.mealS3)]}
+    ];
+    shDefs.forEach(function(sh,si){
+      var sx=0.22+si*(shW+0.24), sy=4.12;
+      s2.addShape(pres.shapes.ROUNDED_RECTANGLE,{
+        x:sx,y:sy,w:shW,h:shH,
+        fill:{color:CLR.cardBg}, line:{color:CLR.border,pt:0.75}, rectRadius:0.06,
+        shadow:{type:'outer',color:'000000',blur:3,offset:1,angle:45,opacity:0.07}
+      });
+      s2.addShape(pres.shapes.ROUNDED_RECTANGLE,{
+        x:sx,y:sy,w:shW,h:0.12, fill:{color:sh.acc}, line:{color:sh.acc,pt:0}, rectRadius:0.06
+      });
+      s2.addShape(pres.shapes.RECTANGLE,{
+        x:sx,y:sy+0.06,w:shW,h:0.06, fill:{color:sh.acc}, line:{color:sh.acc,pt:0}
+      });
+      s2.addText(sh.title,{
+        x:sx+0.12,y:sy+0.18,w:shW-0.24,h:0.24,
+        fontSize:9,bold:true,color:CLR.txt1,fontFace:'Arial',margin:0
+      });
+      var tot=sh.vals[0]+sh.vals[1]+sh.vals[2]||1;
+      var barAreaW=shW-0.72;
+      ['Shift 1','Shift 2','Shift 3'].forEach(function(lbl,li){
+        var ry=sy+0.54+li*0.58;
+        var v=sh.vals[li], p=(Math.round(v/tot*1000)/10).toFixed(1);
+        s2.addText(lbl,{x:sx+0.12,y:ry,w:0.6,h:0.2,fontSize:8.5,color:CLR.txt2,fontFace:'Arial',margin:0});
+        s2.addText(f(v)+' ('+p+'%)',{
+          x:sx+shW-1.1,y:ry,w:0.98,h:0.2,
+          fontSize:8.5,bold:true,color:CLR.txt1,fontFace:'Arial',align:'right',margin:0
+        });
+        s2.addShape(pres.shapes.ROUNDED_RECTANGLE,{
+          x:sx+0.12,y:ry+0.22,w:barAreaW,h:0.12,
+          fill:{color:'D7DCF0'}, line:{color:'D7DCF0',pt:0}, rectRadius:0.04
+        });
+        var fw=Math.max(0.04,(v/tot)*barAreaW);
+        s2.addShape(pres.shapes.ROUNDED_RECTANGLE,{
+          x:sx+0.12,y:ry+0.22,w:fw,h:0.12,
+          fill:{color:sh.acc}, line:{color:sh.acc,pt:0}, rectRadius:0.04
+        });
+      });
+    });
+  }
+
+  /* ══════════════════════════════════════════════
+     SLIDE 3+ — DAILY DETAIL TABLE (20 rows/slide)
+  ══════════════════════════════════════════════ */
+  var ROWS_PER = 20;
+  var totalDetailSlides = Math.ceil(rows.length/ROWS_PER);
+  for(var pg=0;pg<totalDetailSlides;pg++){
+    var sl=pres.addSlide();
+    var pageLabel='Daily Report Detail'+(totalDetailSlides>1?' (Hal '+(pg+1)+'/'+totalDetailSlides+')':'');
+    addHeader(sl,'CANTEEN OPERATIONS — FFI Cikarang',pageLabel);
+    addFooter(sl, 3+pg, 3+totalDetailSlides+(mrows.length?1:0)-1);
+
+    var chunk=rows.slice(pg*ROWS_PER,(pg+1)*ROWS_PER);
+
+    /* build table data */
+    var colW=[1.1,1.05,1.05,1.05,0.82,1.05,1.05,1.05,0.82]; /* total ~9.04" < 13.3-0.44 */
+    var headRow=[
+      {text:'Date',    options:{bold:true,color:CLR.white,fill:{color:CLR.navy},    align:'left'}},
+      {text:'Snack Ordered', options:{bold:true,color:CLR.white,fill:{color:CLR.greenDk},align:'center'}},
+      {text:'Consumed',options:{bold:true,color:CLR.white,fill:{color:CLR.greenDk},align:'center'}},
+      {text:'Leftover',options:{bold:true,color:CLR.white,fill:{color:CLR.greenDk},align:'center'}},
+      {text:'Eff %',  options:{bold:true,color:CLR.white,fill:{color:CLR.greenDk},align:'center'}},
+      {text:'Meal Ordered', options:{bold:true,color:CLR.white,fill:{color:CLR.blueDk}, align:'center'}},
+      {text:'Consumed',options:{bold:true,color:CLR.white,fill:{color:CLR.blueDk}, align:'center'}},
+      {text:'Leftover',options:{bold:true,color:CLR.white,fill:{color:CLR.blueDk}, align:'center'}},
+      {text:'Eff %',  options:{bold:true,color:CLR.white,fill:{color:CLR.blueDk}, align:'center'}}
+    ];
+
+    var tableRows=[headRow];
+    chunk.forEach(function(r,ri){
+      var isWarn=(n(r.snackLeftover)+n(r.mealLeftover))>thr;
+      var rowBg=isWarn?CLR.warnBg:(ri%2===0?CLR.white:CLR.altBg);
+      var se=n(r.snackEff), me=n(r.mealEff);
+      var sEffC=se>=98?CLR.effGood:se>=95?CLR.effMid:CLR.effBad;
+      var mEffC=me>=98?CLR.effGood:me>=95?CLR.effMid:CLR.effBad;
+      tableRows.push([
+        {text:r.date||r.rawDate||'—', options:{bold:true,color:CLR.txt1,fill:{color:rowBg},align:'left'}},
+        {text:f(r.snackOrder),         options:{color:CLR.txt1,fill:{color:rowBg},align:'right'}},
+        {text:f(r.snackConsumed),      options:{color:CLR.txt1,fill:{color:rowBg},align:'right'}},
+        {text:f(r.snackLeftover),      options:{color:CLR.txt1,fill:{color:rowBg},align:'right'}},
+        {text:pct(se),                 options:{bold:true,color:sEffC,fill:{color:rowBg},align:'center'}},
+        {text:f(r.mealOrder),          options:{color:CLR.txt1,fill:{color:rowBg},align:'right'}},
+        {text:f(r.mealConsumed),       options:{color:CLR.txt1,fill:{color:rowBg},align:'right'}},
+        {text:f(r.mealLeftover),       options:{color:CLR.txt1,fill:{color:rowBg},align:'right'}},
+        {text:pct(me),                 options:{bold:true,color:mEffC,fill:{color:rowBg},align:'center'}}
+      ]);
+    });
+
+    sl.addTable(tableRows,{
+      x:0.22, y:0.85, w:SW-0.44,
+      colW:colW,
+      rowH:0.24,
+      border:{pt:0.5,color:CLR.border},
+      fontFace:'Arial', fontSize:8
+    });
+  }
+
+  /* ══════════════════════════════════════════════
+     SLIDE N — MONTHLY HISTORY TABLE
+  ══════════════════════════════════════════════ */
+  if(mrows&&mrows.length){
+    var sm=pres.addSlide();
+    addHeader(sm,'CANTEEN OPERATIONS — FFI Cikarang','Monthly History · All Recorded Months');
+    addFooter(sm, 3+totalDetailSlides, 3+totalDetailSlides);
+
+    var mColW=[2.0,0.55,1.3,0.9,1.3,0.9,1.1,2.25];
+    var mHead=[
+      {text:'Month',        options:{bold:true,color:CLR.white,fill:{color:CLR.navy},align:'left'}},
+      {text:'Days',         options:{bold:true,color:CLR.white,fill:{color:CLR.navy},align:'center'}},
+      {text:'Snack Ordered',options:{bold:true,color:CLR.white,fill:{color:CLR.greenDk},align:'center'}},
+      {text:'Snack Eff',    options:{bold:true,color:CLR.white,fill:{color:CLR.greenDk},align:'center'}},
+      {text:'Meal Ordered', options:{bold:true,color:CLR.white,fill:{color:CLR.blueDk},align:'center'}},
+      {text:'Meal Eff',     options:{bold:true,color:CLR.white,fill:{color:CLR.blueDk},align:'center'}},
+      {text:'Peak Date',    options:{bold:true,color:CLR.white,fill:{color:CLR.navy},align:'left'}},
+      {text:'Remarks',      options:{bold:true,color:CLR.white,fill:{color:CLR.navy},align:'left'}}
+    ];
+
+    var mTableRows=[mHead];
+    mrows.forEach(function(r,ri){
+      var rowBg=ri%2===0?CLR.white:CLR.altBg;
+      var se=n(r.snackEff), me=n(r.mealEff);
+      var sC=se>=98?CLR.effGood:se>=95?CLR.effMid:CLR.effBad;
+      var mC=me>=98?CLR.effGood:me>=95?CLR.effMid:CLR.effBad;
+      mTableRows.push([
+        {text:r.month||'—',          options:{bold:true,color:CLR.txt1,fill:{color:rowBg},align:'left'}},
+        {text:String(r.workingDays||0),options:{color:CLR.txt1,fill:{color:rowBg},align:'center'}},
+        {text:f(r.snackOrder),       options:{color:CLR.txt1,fill:{color:rowBg},align:'right'}},
+        {text:pct(se),               options:{bold:true,color:sC,fill:{color:rowBg},align:'center'}},
+        {text:f(r.mealOrder),        options:{color:CLR.txt1,fill:{color:rowBg},align:'right'}},
+        {text:pct(me),               options:{bold:true,color:mC,fill:{color:rowBg},align:'center'}},
+        {text:r.peakDate||'—',       options:{color:CLR.txt1,fill:{color:rowBg},align:'left'}},
+        {text:r.remarks||'—',        options:{color:CLR.txt3,fill:{color:rowBg},align:'left'}}
+      ]);
+    });
+
+    sm.addTable(mTableRows,{
+      x:0.22, y:0.85, w:SW-0.44,
+      colW:mColW, rowH:0.26,
+      border:{pt:0.5,color:CLR.border},
+      fontFace:'Arial', fontSize:8
+    });
+  }
+
+  /* ── save: browser download via Blob ── */
+  var fname='canteen_report_'+String(label).replace(/[^a-zA-Z0-9_\-]/g,'_')+'.pptx';
+  pres.write({outputType:'blob'}).then(function(blob){
+    var url=URL.createObjectURL(blob);
+    var a=document.createElement('a');
+    a.href=url; a.download=fname;
+    document.body.appendChild(a); a.click();
+    setTimeout(function(){document.body.removeChild(a);URL.revokeObjectURL(url);},200);
+  }).catch(function(e){
+    alert('Gagal export PPT: '+e.message);
+  });
+}
+/* END exportPPT */
+
 /* END exportPDF */
 </script>
 </body>
