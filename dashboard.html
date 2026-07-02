@@ -664,6 +664,18 @@ var filteredRows=[], filteredLabel='';
 var tSnack=null, tMeal=null, dSnack=null, dMeal=null, mChart=null;
 var snackChartType='bar', mealChartType='bar';
 var monthCache={}; /* 'YYYY-MM' -> cleaned rows cache, avoids re-fetching months we already have */
+var loadEpoch=0; /* incremented on every loadMonth() call; guards against a slow/stale fetch overwriting a newer selection */
+
+/* Always derive the displayed period label from the month WE requested,
+   never from a value the backend echoes back — if the backend's
+   "selectedMonth" field is ever stale or doesn't track the `month`
+   query param, the UI must not show the wrong period. */
+function monthLabelFromValue(m){
+  var mt=String(m||'').match(/^(\d{4})-(\d{1,2})$/);
+  if(!mt)return m||'—';
+  var d=new Date(Number(mt[1]),Number(mt[2])-1,1);
+  return d.toLocaleDateString('en-GB',{month:'long',year:'numeric'});
+}
 
 /* ══════════════════════════════════════════════════════════════════
    INIT
@@ -781,10 +793,12 @@ function fetchMonthRows(m){
    itself has no entry yet. */
 function getRowsForRange(fromYMD,toYMD,label,dayFallback){
   var months=monthsBetween(fromYMD,toYMD);
+  var myEpoch=++loadEpoch;
   document.getElementById('loader').innerHTML='<div class="spin"></div><span class="load-txt">Fetching canteen data…</span>';
   document.getElementById('loader').style.display='flex';
   document.getElementById('dash').style.display='none';
   Promise.all(months.map(fetchMonthRows)).then(function(chunks){
+    if(myEpoch!==loadEpoch)return; /* a newer request/selection has superseded this one */
     var merged={};
     chunks.forEach(function(arr){arr.forEach(function(r){if(r.rawDate)merged[r.rawDate]=r;});});
     var all=Object.keys(merged).sort().map(function(k){return merged[k];});
@@ -799,6 +813,7 @@ function getRowsForRange(fromYMD,toYMD,label,dayFallback){
     filteredRows=rows;filteredLabel=label;
     renderAll(rows,label);
   }).catch(function(e){
+    if(myEpoch!==loadEpoch)return;
     document.getElementById('loader').style.display='none';
     document.getElementById('dash').style.display='';
     alert('Failed to load range: '+e.message);
@@ -833,18 +848,23 @@ function onMonthSelChange(val){if(val!==selMonth){selMonth=val;loadMonth(val);}}
 ══════════════════════════════════════════════════════════════════ */
 function loadMonth(m,cb){
   selMonth=m;
+  var myEpoch=++loadEpoch; /* mark this as the latest request; any older in-flight fetch that resolves later will be ignored */
   document.getElementById('loader').innerHTML='<div class="spin"></div><span class="load-txt">Fetching canteen data…</span>';
   document.getElementById('loader').style.display='flex';
   document.getElementById('dash').style.display='none';
+  var monthSelEl=document.getElementById('monthSel');
+  if(monthSelEl)monthSelEl.disabled=true;
   fetch(GAS_URL+'?action=dashboard&month='+m,{redirect:'follow'})
     .then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.json();})
     .then(function(data){
+      if(myEpoch!==loadEpoch)return; /* a newer request has since been made — discard this stale response */
       if(!data.success)throw new Error(data.message||'API error');
       D=data;
       D.allRows=cleanRows(data.chartData||[]);
       monthCache[m]=D.allRows; /* seed the range-filter cache so Day/Week/Custom don't re-fetch this month */
       D.monthlyRows=dedupeMonthlyRows(cleanMonthlyRows(data.monthlyRows||[]));
       fillMonthSel(data.availableMonths);
+      if(monthSelEl){monthSelEl.value=m;monthSelEl.disabled=false;} /* force dropdown to reflect the month actually loaded, regardless of backend list quirks */
       document.getElementById('loader').style.display='none';
       document.getElementById('dash').style.display='';
       rangeMode='month';
@@ -852,11 +872,13 @@ function loadMonth(m,cb){
       var bm=document.getElementById('btnMonth');if(bm)bm.classList.add('active');
       document.getElementById('wrapMonth').style.display='';
       document.getElementById('wrapCustom').style.display='none';
-      filteredRows=D.allRows;filteredLabel=data.selectedMonth||m;
+      filteredRows=D.allRows;filteredLabel=monthLabelFromValue(m); /* label always reflects the month we asked for, never a possibly-stale backend field */
       renderAll(D.allRows,filteredLabel);
       if(typeof cb==='function')cb();
     })
     .catch(function(e){
+      if(myEpoch!==loadEpoch)return;
+      if(monthSelEl)monthSelEl.disabled=false;
       document.getElementById('loader').innerHTML=
         '<div style="color:var(--acc-red);font-size:11px;text-align:center;padding:40px;line-height:2;font-family:var(--mono)">⚠ Cannot reach API<br><small style="color:var(--text-3)">'+e.message+'</small></div>';
     });
@@ -865,11 +887,30 @@ function loadMonth(m,cb){
 /* ══════════════════════════════════════════════════════════════════
    RENDER ALL
 ══════════════════════════════════════════════════════════════════ */
+function renderNoDataBanner(rows,label){
+  var ov=document.getElementById('overview');
+  var existing=document.getElementById('noDataBanner');
+  if(existing)existing.remove();
+  if(!ov||(rows&&rows.length))return;
+  var b=document.createElement('div');
+  b.id='noDataBanner';
+  b.className='analysis-bar mb';
+  b.style.borderColor='rgba(229,67,75,.35)';
+  b.style.borderLeftColor='var(--acc-red)';
+  b.style.background='rgba(229,67,75,.06)';
+  b.innerHTML='<span class="analysis-bar-icon">⚠️</span><div><div class="analysis-bar-lbl" style="color:var(--acc-red)">NO DATA</div>'+
+    '<div class="analysis-bar-txt">No canteen entries were found for <strong>'+(label||'this period')+'</strong>. '+
+    'The request succeeded, but the source sheet has no rows for this period — this reflects the underlying data, not a display bug. '+
+    'KPI cards, shift breakdown and heatmaps below will show zero/empty accordingly.</div></div>';
+  ov.insertBefore(b,ov.firstChild);
+}
+
 function renderAll(rows,label){
   document.getElementById('periodBadge').textContent=label||'—';
   document.getElementById('dateBarVal').textContent=label||'—';
   document.getElementById('sumPeriodS').textContent=label||'—';
   document.getElementById('sumPeriodM').textContent=label||'—';
+  renderNoDataBanner(rows,label);
   var thr=(D&&D.config)?+D.config.threshold:15;
   var k=buildKPI(rows);
   renderKPI(k);
